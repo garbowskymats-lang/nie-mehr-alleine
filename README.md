@@ -31,7 +31,11 @@ App installieren (PWA)
 - app-installieren.html: Anleitung getrennt nach Android, iPhone/iPad, PC – inkl. Hinweis, dass Firefox am PC nicht installieren kann.
 
 Mitarbeiterbereich
-- mitarbeiter-login.html → team.html: Statistik (Nachrichten, Antwortzeiten, Auslastung nach Uhrzeit)
+- Login für Mitarbeiter: über die normale Anmeldeseite (login.html) mit Team-Kennung hinter dem Benutzernamen,
+  z. B. „marco#2580“ (Kennung ändert der Chef unter Mitarbeiter). mitarbeiter-login.html leitet nur noch auf login.html weiter.
+  SERVER: Kennung nur serverseitig prüfen (nicht im Browser-Code ausliefern), echte Sicherheit = Passwort + möglichst
+  2-Faktor, Login-Versuche begrenzen, team.html nur mit gültiger Mitarbeiter-Sitzung ausliefern.
+- team.html: Statistik (Nachrichten, Antwortzeiten, Auslastung nach Uhrzeit)
   und Mitarbeiterverwaltung (anlegen, bearbeiten, sperren, Rollen Admin/Moderator).
 - Posteingang: wartende Kundennachrichten (älteste zuerst, Wartezeit farbig), Antwort als Profil,
   Kunden-Infos + gemeinsame Notizen, Profil-Infos. Moderator sieht nur seine eigene Warteschlange, der Chef alle.

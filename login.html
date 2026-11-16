@@ -18,7 +18,7 @@
   <div class="auth-photo"><p>Schön, dass du wieder da bist.</p></div>
   <div class="auth-side">
     <a class="brand" href="index.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span></a>
-    <form class="card auth-card" data-next="uebersicht.html" novalidate>
+    <form class="card auth-card" id="loginForm" novalidate>
       <h1>Anmelden</h1>
       <p>Melde dich mit deinem Nickname oder deiner E-Mail-Adresse an.</p>
       <div class="field"><label for="nick">Nickname oder E-Mail</label><input class="input" id="nick" autocomplete="username" required></div>
@@ -27,11 +27,26 @@
       <button class="btn primary wide" type="submit">Anmelden</button>
       <p class="auth-alt"><a href="passwort.html">Passwort vergessen?</a></p>
       <p class="auth-alt">Noch kein Mitglied? <a href="register.html">Kostenlos registrieren</a></p>
-      <p class="auth-alt small"><a href="mitarbeiter-login.html" style="color:var(--muted);font-weight:400">Mitarbeiter-Login</a></p>
       <p class="demo">Demo: Beliebige Eingaben funktionieren, es wird nichts gespeichert.</p>
     </form>
   </div>
 </main>
 <script src="app.js"></script>
+<script>{
+  /* Ein Login für alle: Mitarbeiter hängen ihre Team-Kennung an den Benutzernamen, z. B. „marco#2580“.
+     „#“ ist in Kunden-Nicknames nicht erlaubt – Verwechslungen sind ausgeschlossen.
+     SERVER: Die Kennung prüft nur der Server (nicht im Browser-Code!). Echte Sicherheit = Passwort (+ 2-Faktor). */
+  const f=document.getElementById("loginForm"),nick=document.getElementById("nick"),pw=document.getElementById("pw");
+  f.addEventListener("submit",e=>{e.preventDefault();
+    if(!nick.value.trim()||!pw.value){NMA.toast("Bitte Nickname und Passwort eingeben.");return}
+    const v=nick.value.trim(),suf=String(NMA.store.get("staffSuffix","#2580"));
+    if(v.toLowerCase().endsWith(suf.toLowerCase())){
+      const user=v.slice(0,-suf.length).trim().toLowerCase();
+      const staff=NMA.store.get("staff",null)||[{user:"sandra",active:true},{user:"marco",active:true},{user:"julia",active:true},{user:"tim",active:true},{user:"nicole",active:true}];
+      const s=staff.find(x=>x.user===user&&x.active!==false);
+      if(!s){NMA.toast("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");return}
+      NMA.store.set("teamUser",user);location.href="team.html";return}
+    const u=NMA.user();u.lastLogin=Date.now();NMA.store.set("user",u);location.href="uebersicht.html"});
+}</script>
 </body>
 </html>

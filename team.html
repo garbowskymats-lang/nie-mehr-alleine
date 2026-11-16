@@ -151,7 +151,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <body data-page="team">
 <header class="topbar">
   <a class="brand" href="team.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span><span class="tb-tag">Team</span></a>
-  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><a class="btn sm ghost" href="index.html" title="Zur Kundenseite">Zur Startseite</a><a class="btn sm ghost" href="mitarbeiter-login.html">Abmelden</a></div>
+  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><a class="btn sm ghost" href="index.html" title="Zur Kundenseite">Zur Startseite</a><a class="btn sm ghost" href="login.html" id="teamLogout">Abmelden</a></div>
 </header>
 
 <main class="page">
@@ -262,6 +262,9 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
         <tbody id="rows"></tbody>
       </table>
     </div>
+    <div class="card pad" style="margin-top:16px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:240px"><b>Team-Kennung für den Login</b><p class="hint" style="margin:4px 0 0">Mitarbeiter melden sich auf der normalen Anmeldeseite an und hängen die Kennung an ihren Benutzernamen, z. B. <b id="sufEx"></b>. Einen eigenen Mitarbeiter-Link gibt es nicht. Beginnt mit „#“, das in Kunden-Nicknames nicht erlaubt ist.</p></div>
+      <label class="small">Kennung <input class="input" id="staffSuf" maxlength="12" style="width:140px;min-height:40px;margin-left:6px"></label><button class="btn sm" id="staffSufSave">Speichern</button></div>
     <p class="hint" style="margin-top:12px"><b>Admin</b> darf Mitarbeiter verwalten, alle Statistiken und – mit Zusatzcode – die Verläufe sehen. <b>Moderator</b> sieht nur seinen eigenen Posteingang und seine Zahlen.</p>
   </section>
   <!-- ================= KUNDEN (nur Admin, kunden.js) ================= -->
@@ -379,7 +382,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     const q=$("q").value.trim().toLowerCase(),r=$("fRole").value;
     const list=staff.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.user.includes(q))&&(!r||s.role===r));
     $("rows").innerHTML=list.length?list.map(s=>`<tr class="${s.active?"":"off"}">
-      <td data-l="Name"><span class="who"><span class="avatar" style="--g:${s.g};width:38px;height:38px;font-size:14px">${NMA.esc(s.name[0])}</span><span><b>${NMA.esc(s.name)}</b><br><span class="muted small">@${NMA.esc(s.user)}${s.active?"":" · deaktiviert"}</span></span></span></td>
+      <td data-l="Name"><span class="who"><span class="avatar" style="--g:${s.g};width:38px;height:38px;font-size:14px">${NMA.esc(s.name[0])}</span><span><b>${NMA.esc(s.name)}</b><br><span class="muted small">Login: ${NMA.esc(s.user+NMA.store.get("staffSuffix","#2580"))}${s.active?"":" · deaktiviert"}</span></span></span></td>
       <td data-l="Rolle"><span class="role ${s.role==="Admin"?"admin":""}">${s.role}</span>${s.role!=="Admin"&&s.mass&&s.mass!=="aus"?`<br><span class="mv-tag ${s.mass}" title="Massenversand">📣 ${s.mass==="frei"?"selbstständig":"mit Kontrolle"}</span>`:""}</td>
       <td data-l="Status"><span class="st ${s.status}">${s.active?stLabel[s.status]:"Gesperrt"}</span></td>
       <td data-l="Letzter Login">${s.last}</td>
@@ -424,6 +427,10 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
         onOk:()=>{s.active=!s.active;if(!s.active)s.status="offline";persist();renderStaff();renderStats();window.MV&&MV.render()}})}
   });
   $("add").addEventListener("click",()=>form());
+  const sufShow=()=>{const s=NMA.store.get("staffSuffix","#2580");$("staffSuf").value=s;$("sufEx").textContent="marco"+s};sufShow();
+  $("staffSufSave").addEventListener("click",()=>{const v=$("staffSuf").value.trim();
+    if(!/^#[A-Za-z0-9]{3,11}$/.test(v)){NMA.toast("Die Kennung muss mit # beginnen, danach 3–11 Buchstaben oder Ziffern, z. B. #2580.");return}
+    NMA.modal({title:"Kennung ändern?",text:`Ab sofort melden sich alle Mitarbeiter mit „Benutzername${NMA.esc(v)}“ an. Sag deinem Team Bescheid.`,cancel:"Abbrechen",ok:"Ändern",onOk:()=>{NMA.store.set("staffSuffix",v);sufShow();renderStaff();NMA.toast("Team-Kennung geändert.")}})});
   $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
@@ -733,6 +740,13 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     profiles,customers,cust,get notes(){return notes},get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff};
 
   renderStats();renderStaff();applyRole();
+
+  /* Angemeldeter Mitarbeiter (Login über login.html mit Team-Kennung, z. B. „marco#2580“) */
+  {const tu=NMA.store.get("teamUser",null),s=tu&&staff.find(x=>x.user===tu&&x.active);
+    if(s){const v=s.role==="Admin"?"admin":s.user;
+      if(![...$("viewAs").options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=`${s.name} (${s.role})`;$("viewAs").appendChild(o)}
+      $("viewAs").value=v;me=v;applyRole()}}
+  $("teamLogout").addEventListener("click",()=>NMA.store.set("teamUser",null));
 }</script>
 <script src="massenversand.js"></script>
 <script src="support.js"></script>
