@@ -6,14 +6,14 @@ const NMA = window.NMA = {};
 
 /* ---------------- DATEN (Demo) ---------------- */
 NMA.profiles = [
-  {id:"lena",   name:"Gitarren Lena",    age:52, city:"Hamburg",     km:8,  online:true,  sex:"w", photo:"assets/hero-romance.png", about:"Ich liebe Musik, spontane Ausflüge und Gespräche, bei denen man die Zeit vergisst. Mein perfekter Sonntag beginnt mit Kaffee und endet irgendwo am Wasser.", tags:["Gitarre","Konzerte","Natur"], looking:"Beziehung", job:"Musiklehrerin", height:"168 cm", status:"Verwitwet"},
-  {id:"sabine", name:"Sabine Herz",  age:58, city:"Lüneburg",    km:14, online:true,  sex:"w", g:"linear-gradient(145deg,#c0796a,#4a2b2e)", about:"Lebensfroh, neugierig und gern unterwegs. Ich koche gern für zwei und suche jemanden, der mitisst und mitlacht.", tags:["Kochen","Reisen","Garten"], looking:"Beziehung", job:"Köchin", height:"165 cm", status:"Geschieden"},
-  {id:"petra",  name:"Tanzmaus Petra",   age:49, city:"Buxtehude",   km:22, online:false, last:"vor 2 Std.", sex:"w", g:"linear-gradient(145deg,#8a6aa8,#2c2240)", about:"Tanzen, Radfahren und ein gutes Buch auf dem Balkon. Ehrlichkeit ist mir wichtig.", tags:["Tanzen","Radfahren","Lesen"], looking:"Abenteuer", job:"Bürokauffrau", height:"171 cm", status:"Single"},
-  {id:"monika", name:"Monika am Meer",  age:61, city:"Stade",       km:31, online:true,  sex:"w", g:"linear-gradient(145deg,#c79a54,#4b3517)", about:"Ich bin gern draußen mit meinem Hund und freue mich über jemanden für Spaziergänge und gemütliche Abende.", tags:["Hund","Wandern","Kaffee"], looking:"Beziehung", job:"Rentnerin", height:"162 cm", status:"Verwitwet"},
-  {id:"andrea", name:"Andrea Lächeln",  age:45, city:"Norderstedt", km:18, online:false, last:"gestern", sex:"w", g:"linear-gradient(145deg,#4f8f87,#173a37)", about:"Humor mit Tiefgang, Meer und Fotografie. Wer mich zum Lachen bringt, hat schon gewonnen.", tags:["Meer","Fotografie","Kino"], looking:"Abenteuer", job:"Fotografin", height:"174 cm", status:"Single"},
-  {id:"karin",  name:"Theater Karin",   age:55, city:"Pinneberg",   km:26, online:true,  sex:"w", g:"linear-gradient(145deg,#b0566f,#3b1825)", about:"Ich gehe gern ins Theater, mag Städtereisen und suche einen Mann mit Herz und Zeit.", tags:["Theater","Städtereisen","Wein"], looking:"Beziehung", job:"Buchhändlerin", height:"166 cm", status:"Geschieden"},
+  {id:"lena",   name:"GitarrenLena",    age:52, city:"Hamburg",     km:8,  online:true,  sex:"w", photo:"assets/hero-romance.png", about:"Ich liebe Musik, spontane Ausflüge und Gespräche, bei denen man die Zeit vergisst. Mein perfekter Sonntag beginnt mit Kaffee und endet irgendwo am Wasser.", tags:["Gitarre","Konzerte","Natur"], looking:"Beziehung", job:"Musiklehrerin", height:"168 cm", status:"Verwitwet"},
+  {id:"sabine", name:"SabineHerz",  age:58, city:"Lüneburg",    km:14, online:true,  sex:"w", g:"linear-gradient(145deg,#c0796a,#4a2b2e)", about:"Lebensfroh, neugierig und gern unterwegs. Ich koche gern für zwei und suche jemanden, der mitisst und mitlacht.", tags:["Kochen","Reisen","Garten"], looking:"Beziehung", job:"Köchin", height:"165 cm", status:"Geschieden"},
+  {id:"petra",  name:"TanzmausPetra",   age:49, city:"Buxtehude",   km:22, online:false, last:"vor 2 Std.", sex:"w", g:"linear-gradient(145deg,#8a6aa8,#2c2240)", about:"Tanzen, Radfahren und ein gutes Buch auf dem Balkon. Ehrlichkeit ist mir wichtig.", tags:["Tanzen","Radfahren","Lesen"], looking:"Abenteuer", job:"Bürokauffrau", height:"171 cm", status:"Single"},
+  {id:"monika", name:"MonikaHerz",  age:61, city:"Stade",       km:31, online:true,  sex:"w", g:"linear-gradient(145deg,#c79a54,#4b3517)", about:"Ich bin gern draußen mit meinem Hund und freue mich über jemanden für Spaziergänge und gemütliche Abende.", tags:["Hund","Wandern","Kaffee"], looking:"Beziehung", job:"Rentnerin", height:"162 cm", status:"Verwitwet"},
+  {id:"andrea", name:"AndreaLächeln",  age:45, city:"Norderstedt", km:18, online:false, last:"gestern", sex:"w", g:"linear-gradient(145deg,#4f8f87,#173a37)", about:"Humor mit Tiefgang, Meer und Fotografie. Wer mich zum Lachen bringt, hat schon gewonnen.", tags:["Meer","Fotografie","Kino"], looking:"Abenteuer", job:"Fotografin", height:"174 cm", status:"Single"},
+  {id:"karin",  name:"TheaterKarin",   age:55, city:"Pinneberg",   km:26, online:true,  sex:"w", g:"linear-gradient(145deg,#b0566f,#3b1825)", about:"Ich gehe gern ins Theater, mag Städtereisen und suche einen Mann mit Herz und Zeit.", tags:["Theater","Städtereisen","Wein"], looking:"Beziehung", job:"Buchhändlerin", height:"166 cm", status:"Geschieden"},
   {id:"thomas", name:"Bikerthomas",  age:57, city:"Hamburg",     km:5,  online:true,  sex:"m", g:"linear-gradient(145deg,#5b7aa0,#1c2a3c)", about:"Handwerker im Ruhestand, gern am Grill und auf dem Motorrad.", tags:["Motorrad","Grillen","Fußball"], looking:"Abenteuer", job:"Tischler", height:"182 cm", status:"Geschieden"},
-  {id:"rainer", name:"Gärtner Rainer",  age:63, city:"Elmshorn",    km:35, online:false, last:"vor 5 Std.", sex:"m", g:"linear-gradient(145deg,#7b8a5a,#283019)", about:"Ruhig, verlässlich und gern im Garten. Ich suche eine Frau für gemeinsame Ausflüge.", tags:["Garten","Ausflüge","Angeln"], looking:"Beziehung", job:"Gärtner", height:"178 cm", status:"Verwitwet"}
+  {id:"rainer", name:"GärtnerRainer",  age:63, city:"Elmshorn",    km:35, online:false, last:"vor 5 Std.", sex:"m", g:"linear-gradient(145deg,#7b8a5a,#283019)", about:"Ruhig, verlässlich und gern im Garten. Ich suche eine Frau für gemeinsame Ausflüge.", tags:["Garten","Ausflüge","Angeln"], looking:"Beziehung", job:"Gärtner", height:"178 cm", status:"Verwitwet"}
 ];
 NMA.get = id => NMA.profiles.find(p => p.id === id) || NMA.profiles[0];
 
@@ -78,9 +78,11 @@ NMA.sendHeart = id => {
 };
 NMA.coins = () => store.get("coins",5);
 NMA.setCoins = n => {store.set("coins",n);document.querySelectorAll("[data-coins]").forEach(e=>e.textContent=n+" Coins")};
-NMA.user = () => store.get("user",{nick:"Michael Nordlicht",vorname:"Michael",age:56,plz:"20095",city:"Hamburg",radius:"50",job:"Elektriker",about:"Ich freue mich auf nette Gespräche und vielleicht mehr.",looking:"Beziehung"});
+NMA.user = () => store.get("user",{nick:"MichaelNordlicht",vorname:"Michael",age:56,plz:"20095",city:"Hamburg",radius:"50",job:"Elektriker",about:"Ich freue mich auf nette Gespräche und vielleicht mehr.",looking:"Beziehung"});
 /* Vergebene Nicknames (Demo). Jeder Nickname darf nur einmal existieren – der Server prüft das endgültig. */
-NMA.takenNicks = () => NMA.profiles.map(p=>p.name).concat(["Blonde Carola","Claudia Herz"]);
+NMA.takenNicks = () => NMA.profiles.map(p=>p.name).concat(["BlondeCarola","ClaudiaHerz"]);
+/* Nickname-Regel: 3–30 Zeichen, Buchstaben, Ziffern, _ - . – KEINE Leerzeichen (Server prüft zusätzlich) */
+NMA.nickOk = n => /^[\p{L}\p{N}._-]{3,30}$/u.test(String(n));
 NMA.nickFree = n => !NMA.takenNicks().some(t=>t.toLowerCase()===n.trim().toLowerCase());
 NMA.notice = "Unterhaltungs-Chat mit moderierten Profilen: Die Profile werden von Moderatoren geführt.";
 

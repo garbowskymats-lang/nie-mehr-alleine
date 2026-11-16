@@ -52,21 +52,21 @@
   {
     const extra = {
       "Heidi_HH":            { nr: 10544, st: "T", age: 59, ort: "22041 Hamburg",     job: "Friseurin",   coins: 5,  since: "10.11.2026", look: "Beziehung", sex: "w" },
-      "Rosi aus Celle":      { nr: 10322, st: "K", age: 64, ort: "29221 Celle",       job: "Rentnerin",   coins: 31, since: "04.10.2026", look: "Beziehung", sex: "w" },
+      "Rosi_Celle":      { nr: 10322, st: "K", age: 64, ort: "29221 Celle",       job: "Rentnerin",   coins: 31, since: "04.10.2026", look: "Beziehung", sex: "w" },
       "Gisela60":            { nr: 10561, st: "T", age: 60, ort: "23552 Lübeck",      job: "Verkäuferin", coins: 5,  since: "14.11.2026", look: "Beziehung", sex: "w" },
-      "Seebär Uwe":          { nr: 10498, st: "T", age: 62, ort: "21680 Stade",       job: "Kapitän a. D.", coins: 5, since: "11.11.2026", look: "Abenteuer", sex: "m" },
+      "SeebärUwe":          { nr: 10498, st: "T", age: 62, ort: "21680 Stade",       job: "Kapitän a. D.", coins: 5, since: "11.11.2026", look: "Abenteuer", sex: "m" },
       "Jens_N":              { nr: 10276, st: "K", age: 54, ort: "22846 Norderstedt", job: "Mechaniker",  coins: 64, since: "29.09.2026", look: "Abenteuer", sex: "m" },
       "Hafenkapitän":        { nr: 10533, st: "T", age: 66, ort: "20457 Hamburg",     job: "Rentner",     coins: 5,  since: "13.11.2026", look: "Beziehung", sex: "m" },
-      "Klaus L.":            { nr: 10467, st: "T", age: 58, ort: "21335 Lüneburg",    job: "Koch",        coins: 9,  since: "07.11.2026", look: "Beziehung", sex: "m" },
-      "Peter aus Pinneberg": { nr: 10301, st: "K", age: 61, ort: "25421 Pinneberg",   job: "Maler",       coins: 17, since: "01.10.2026", look: "Abenteuer", sex: "m" },
+      "KlausL":            { nr: 10467, st: "T", age: 58, ort: "21335 Lüneburg",    job: "Koch",        coins: 9,  since: "07.11.2026", look: "Beziehung", sex: "m" },
+      "Peter_Pinneberg": { nr: 10301, st: "K", age: 61, ort: "25421 Pinneberg",   job: "Maler",       coins: 17, since: "01.10.2026", look: "Abenteuer", sex: "m" },
       "Norbert65":           { nr: 10552, st: "T", age: 65, ort: "25335 Elmshorn",    job: "",            coins: 5,  since: "15.11.2026", look: "Abenteuer", sex: "m" },
-      "Dieter K.":           { nr: 10489, st: "T", age: 57, ort: "24103 Kiel",        job: "Hausmeister", coins: 5,  since: "09.11.2026", look: "Beziehung", sex: "m" }
+      "DieterK":           { nr: 10489, st: "T", age: 57, ort: "24103 Kiel",        job: "Hausmeister", coins: 5,  since: "09.11.2026", look: "Beziehung", sex: "m" }
     };
     let ch = false;
     Object.entries(extra).forEach(([n, c]) => { if (!T.customers[n]) { T.customers[n] = c; ch = true; } });
-    const vn = { "Michael Nordlicht": "Michael", "Sonnenschein63": "Werner", "Rolf aus Kassel": "Rolf", "Wanderfreund": "Günter", "Berti_K": "Bertram", "Kalle 58": "Karl",
-      "Heidi_HH": "Heidi", "Rosi aus Celle": "Rosemarie", "Gisela60": "Gisela", "Seebär Uwe": "Uwe", "Jens_N": "Jens", "Hafenkapitän": "Horst", "Klaus L.": "Klaus",
-      "Peter aus Pinneberg": "Peter", "Norbert65": "Norbert", "Dieter K.": "Dieter" };
+    const vn = { "MichaelNordlicht": "Michael", "Sonnenschein63": "Werner", "Rolf_Kassel": "Rolf", "Wanderfreund": "Günter", "Berti_K": "Bertram", "Kalle58": "Karl",
+      "Heidi_HH": "Heidi", "Rosi_Celle": "Rosemarie", "Gisela60": "Gisela", "SeebärUwe": "Uwe", "Jens_N": "Jens", "Hafenkapitän": "Horst", "KlausL": "Klaus",
+      "Peter_Pinneberg": "Peter", "Norbert65": "Norbert", "DieterK": "Dieter" };
     Object.entries(T.customers).forEach(([n, c]) => { if (!c.sex) { c.sex = "m"; ch = true; } if (!c.vorname && vn[n]) { c.vorname = vn[n]; ch = true; } });
     /* angemeldeter Demo-Kunde (Kundenseite) */
     const u = NMA.user();

@@ -13,7 +13,7 @@
 
   /* Demo-Anfragen, damit der Bereich nicht leer ist */
   if (!S.get("support", null)) S.set("support", [
-    { id: "t1", nick: "Rolf aus Kassel", vorname: "Rolf", topic: "name", wish: "Vorname: Rudolf", msg: "Ich habe mich beim Vornamen vertippt, ich heiße Rudolf.", t: Date.now() - 36e5 * 5, status: "offen", replies: [] },
+    { id: "t1", nick: "Rolf_Kassel", vorname: "Rolf", topic: "name", wish: "Vorname: Rudolf", msg: "Ich habe mich beim Vornamen vertippt, ich heiße Rudolf.", t: Date.now() - 36e5 * 5, status: "offen", replies: [] },
     { id: "t2", nick: "Wanderfreund", vorname: "Günter", topic: "coins", wish: "", msg: "Ich habe Coins gekauft, aber sie sind noch nicht da.", t: Date.now() - 36e5 * 26, status: "offen", replies: [] }
   ]);
 
@@ -59,7 +59,7 @@
       <small class="muted">von <b>${esc(t.nick)}</b>${c.nr ? " · Kunden-Nr. #" + c.nr : ""} · ${fmt(t.t)}</small>
       <div class="sup-msg">${esc(t.msg)}${t.wish ? `<br><br><b>Gewünscht:</b> ${esc(t.wish)}` : ""}</div>
       ${(t.replies || []).map(r => `<div class="sup-ans"><small style="color:#bfe0dc">${esc(r.by)} · ${fmt(r.t)}</small><br>${esc(r.text)}</div>`).join("")}
-      <div class="sup-box"><b>Name des Kunden ändern</b><p class="hint" style="margin:4px 0 10px">Nur der Admin kann Nickname und Vorname ändern. Jeder Nickname existiert nur einmal.</p>
+      <div class="sup-box"><b>Name des Kunden ändern</b><p class="hint" style="margin:4px 0 10px">Nur der Admin kann Nickname und Vorname ändern. Jeder Nickname existiert nur einmal, ohne Leerzeichen.</p>
         <div class="form-grid"><div class="field"><label for="supNick">Nickname</label><input class="input" id="supNick" maxlength="30" value="${esc(t.nick)}"></div>
         <div class="field"><label for="supVn">Vorname</label><input class="input" id="supVn" maxlength="30" value="${esc(c.vorname || t.vorname || "")}"></div></div>
         <button class="btn sm" id="supName">Namen speichern</button></div>
@@ -77,8 +77,8 @@
     });
     $("supDone").addEventListener("click", () => upd(x => { x.status = x.status === "offen" ? "erledigt" : "offen"; }));
     $("supName").addEventListener("click", () => {
-      const nn = $("supNick").value.replace(/\s+/g, " ").trim(), vn = $("supVn").value.replace(/\s+/g, " ").trim();
-      if (nn.length < 3) { NMA.toast("Der Nickname braucht mindestens 3 Zeichen."); return; }
+      const nn = $("supNick").value.trim(), vn = $("supVn").value.replace(/\s+/g, " ").trim();
+      if (!NMA.nickOk(nn)) { NMA.toast("Nickname: 3–30 Zeichen, keine Leerzeichen (nur Buchstaben, Ziffern, _ - .)."); return; }
       if (!/^[\p{L}][\p{L}' -]*[\p{L}]$/u.test(vn)) { NMA.toast("Der Vorname braucht mindestens 2 Buchstaben."); return; }
       const old = t.nick, changed = nn.toLowerCase() !== old.toLowerCase();
       if (changed && (!NMA.nickFree(nn) || Object.keys(T.customers).some(k => k.toLowerCase() === nn.toLowerCase()) || T.profiles.some(p => p.name.toLowerCase() === nn.toLowerCase()))) { NMA.toast(`„${nn}“ ist schon vergeben.`); return; }

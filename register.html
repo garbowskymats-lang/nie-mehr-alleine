@@ -23,7 +23,7 @@
       <p>Kostenlos und in zwei Minuten erledigt.</p>
       <p class="notice">Unterhaltungs-Chat mit moderierten Profilen: Die Profile auf dieser Seite werden von Moderatoren geführt.</p>
 
-      <div class="field"><label for="nick">Nickname</label><input class="input" id="nick" autocomplete="nickname" required minlength="3" maxlength="30" placeholder="z. B. Nordlicht Michael"><span class="hint" id="nickHint">Jeder Nickname existiert nur einmal. Leerzeichen sind erlaubt.</span></div>
+      <div class="field"><label for="nick">Nickname</label><input class="input" id="nick" autocomplete="nickname" required minlength="3" maxlength="30" placeholder="z. B. NordlichtMichael" autocapitalize="off" spellcheck="false"><span class="hint" id="nickHint">Ohne Leerzeichen. Jeder Nickname existiert nur einmal.</span></div>
       <div class="field"><label for="vorname">Vorname</label><input class="input" id="vorname" autocomplete="given-name" required maxlength="30" placeholder="z. B. Michael"><span class="hint" id="vnHint">Mindestens 2 Buchstaben. Kann später nur der Support ändern.</span></div>
       <div class="field"><label for="mail">E-Mail-Adresse</label><input class="input" id="mail" type="email" autocomplete="email" required></div>
       <div class="field"><label for="pw">Passwort</label><input class="input" id="pw" type="password" autocomplete="new-password" required minlength="8"><span class="hint">Mindestens 8 Zeichen.</span></div>
@@ -42,7 +42,7 @@
       <label class="check" style="margin-bottom:18px"><input type="checkbox" id="ok" required disabled> <span>Ich bin mindestens 18 Jahre alt, habe verstanden, dass die Profile von Moderatoren geführt werden, und akzeptiere die <a class="link" href="rechtliches.html#agb">AGB</a> und <a class="link" href="rechtliches.html#datenschutz">Datenschutzhinweise</a>.</span></label>
       <button class="btn primary wide" type="submit">Kostenlos starten</button>
       <p class="auth-alt">Schon Mitglied? <a href="login.html">Anmelden</a></p>
-      <p class="demo">Demo: Es wird kein echtes Konto angelegt. Zum Testen der Nickname-Prüfung: „Blonde Carola“ ist schon vergeben.</p>
+      <p class="demo">Demo: Es wird kein echtes Konto angelegt. Zum Testen der Nickname-Prüfung: „BlondeCarola“ ist schon vergeben.</p>
     </form>
   </div>
 </main>
@@ -57,10 +57,12 @@
     if(a<18){hint.className="hint bad";hint.textContent=`Du bist ${Math.max(a,0)} Jahre alt. Diese Seite ist nur für Erwachsene ab 18.`;ok.disabled=true;ok.checked=false;birth.setCustomValidity("unter 18");return}
     if(a>110){hint.className="hint bad";hint.textContent="Bitte prüfe das Geburtsdatum.";ok.disabled=true;birth.setCustomValidity("unplausibel");return}
     hint.className="hint good";hint.textContent=`Du bist ${a} Jahre alt.`;ok.disabled=false;birth.setCustomValidity("")};
-  const checkNick=()=>{const v=nick.value.replace(/\s+/g," ").trim();
-    if(v.length<3){nh.className="hint";nh.textContent="Jeder Nickname existiert nur einmal. Leerzeichen sind erlaubt.";nick.setCustomValidity("kurz");return}
-    if(!NMA.nickFree(v)){nh.className="hint bad";nh.textContent=`„${v}“ ist leider schon vergeben. Wie wäre es mit „${v} ${Math.floor(Math.random()*90+10)}“?`;nick.setCustomValidity("vergeben");return}
-    nh.className="hint good";nh.textContent=`„${v}“ ist noch frei.`;nick.setCustomValidity("")};
+  let hadSpace=false;
+  const checkNick=()=>{if(/\s/.test(nick.value)){nick.value=nick.value.replace(/\s+/g,"");hadSpace=true}const v=nick.value;
+    if(v.length<3){nh.className=hadSpace?"hint bad":"hint";nh.textContent=hadSpace?"Leerzeichen sind im Nickname nicht erlaubt.":"Ohne Leerzeichen. Jeder Nickname existiert nur einmal.";nick.setCustomValidity("kurz");return}
+    if(!NMA.nickOk(v)){nh.className="hint bad";nh.textContent="Nur Buchstaben, Ziffern sowie _ - . erlaubt – keine Leerzeichen.";nick.setCustomValidity("zeichen");return}
+    if(!NMA.nickFree(v)){nh.className="hint bad";nh.textContent=`„${v}“ ist leider schon vergeben. Wie wäre es mit „${v}${Math.floor(Math.random()*90+10)}“?`;nick.setCustomValidity("vergeben");return}
+    nh.className="hint good";nh.textContent=`„${v}“ ist noch frei.`+(hadSpace?" (Leerzeichen wurden entfernt)":"");hadSpace=false;nick.setCustomValidity("")};
   const vn=$("vorname"),vh=$("vnHint");
   const checkVn=()=>{const v=vn.value.replace(/\s+/g," ").trim();
     const okV=/^[\p{L}][\p{L}' -]*[\p{L}]$/u.test(v)&&(v.match(/\p{L}/gu)||[]).length>=2;
@@ -73,7 +75,7 @@
   f.addEventListener("submit",e=>{e.preventDefault();checkAge();checkNick();checkVn();
     if(!f.checkValidity()){const bad=f.querySelector(":invalid");bad&&bad.focus();
       NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="vorname"?"Bitte gib deinen Vornamen ein (mindestens 2 Buchstaben).":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?"Bitte gib deine Postleitzahl ein (4 oder 5 Ziffern).":"Bitte fülle alle Pflichtfelder aus.");return}
-    NMA.store.set("user",{nick:nick.value.replace(/\s+/g," ").trim(),vorname:vn.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,sex:$("sex").value,job:$("job").value.trim(),plz:$("plz").value,radius:$("radius").value,city:"",about:""});
+    NMA.store.set("user",{nick:nick.value.trim(),vorname:vn.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,sex:$("sex").value,job:$("job").value.trim(),plz:$("plz").value,radius:$("radius").value,city:"",about:""});
     NMA.setCoins(5); location.href="uebersicht.html?neu=1";
   });
 }</script>

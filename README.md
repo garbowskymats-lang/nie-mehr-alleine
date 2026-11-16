@@ -94,7 +94,7 @@ UMGESETZT (Demo, 16.11.2026) – Wohnort der Profile pro Kunde („Kontakt-Ort�
 - AGB/Hinweis muss ausdrücklich sagen, dass Angaben der Profile (auch der Wohnort) erfunden sind und Treffen nicht möglich sind.
 
 Stand 16.11.2026 – Registrierung, Vorname, Support
-- Pflichtangaben bei der Registrierung: Nickname (einmalig), Vorname (nur Buchstaben, mind. 2), E-Mail, Passwort,
+- Pflichtangaben bei der Registrierung: Nickname (einmalig, KEINE Leerzeichen; 3–30 Zeichen: Buchstaben, Ziffern, _ - . – gilt auch für Profilnamen; Regel NMA.nickOk), Vorname (nur Buchstaben, mind. 2), E-Mail, Passwort,
   wer sucht wen, Beziehung/Abenteuer, Geburtsdatum (ab 18), PLZ + Umkreis.
 - Nickname und Vorname kann der Kunde NICHT selbst ändern (Mein Profil zeigt sie gesperrt) – nur der Admin im
   Mitarbeiterbereich unter „🛟 Support“. Server: Änderungen protokollieren, Nickname-Eindeutigkeit serverseitig prüfen.

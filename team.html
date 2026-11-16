@@ -382,10 +382,10 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
   /* ---------- Verläufe (nur Admin, mit Zusatzcode) ---------- */
   const logs=[
-    {id:"l1",cust:"Michael Nordlicht",profile:"Gitarren Lena",msgs:[["c","Hallo! Dein Profil klingt sympathisch.","Heute 18:30"],["m","Hallo! Spielst du auch ein Instrument?","Heute 18:34","Marco B."],["c","Ein bisschen Gitarre, am liebsten draußen.","Heute 18:36"],["m","Das klingt schön 😊 Erzähl mir mehr von dir!","Heute 18:39","Marco B."]]},
-    {id:"l2",cust:"Sonnenschein63",profile:"Sabine Herz",msgs:[["c","Guten Abend, wie war dein Tag?","Heute 18:20"],["m","Ganz entspannt, ich war im Garten. Und deiner?","Heute 18:25","Julia W."],["c","Lang, aber jetzt wird er besser 🙂","Heute 18:29"],["m","Das freut mich! Hast du am Wochenende schon was vor?","Heute 18:31","Sandra K."]]},
-    {id:"l3",cust:"Rolf aus Kassel",profile:"Monika am Meer",msgs:[["c","Hallo Monika, wie heißt denn dein Hund?","Gestern 20:10"],["m","Er heißt Bruno und ist ein echter Schatz.","Gestern 20:22","Tim R."],["c","Schöner Name! Was für eine Rasse?","Gestern 20:24"],["m","Ein Labrador-Mischling, 6 Jahre alt.","Gestern 20:31","Tim R."]]},
-    {id:"l4",cust:"Wanderfreund",profile:"Andrea Lächeln",msgs:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?","Montag 09:05"],["m","Das war an der Ostsee, im letzten Sommer.","Montag 09:12","Nicole H."]]}
+    {id:"l1",cust:"MichaelNordlicht",profile:"GitarrenLena",msgs:[["c","Hallo! Dein Profil klingt sympathisch.","Heute 18:30"],["m","Hallo! Spielst du auch ein Instrument?","Heute 18:34","Marco B."],["c","Ein bisschen Gitarre, am liebsten draußen.","Heute 18:36"],["m","Das klingt schön 😊 Erzähl mir mehr von dir!","Heute 18:39","Marco B."]]},
+    {id:"l2",cust:"Sonnenschein63",profile:"SabineHerz",msgs:[["c","Guten Abend, wie war dein Tag?","Heute 18:20"],["m","Ganz entspannt, ich war im Garten. Und deiner?","Heute 18:25","Julia W."],["c","Lang, aber jetzt wird er besser 🙂","Heute 18:29"],["m","Das freut mich! Hast du am Wochenende schon was vor?","Heute 18:31","Sandra K."]]},
+    {id:"l3",cust:"Rolf_Kassel",profile:"MonikaHerz",msgs:[["c","Hallo Monika, wie heißt denn dein Hund?","Gestern 20:10"],["m","Er heißt Bruno und ist ein echter Schatz.","Gestern 20:22","Tim R."],["c","Schöner Name! Was für eine Rasse?","Gestern 20:24"],["m","Ein Labrador-Mischling, 6 Jahre alt.","Gestern 20:31","Tim R."]]},
+    {id:"l4",cust:"Wanderfreund",profile:"AndreaLächeln",msgs:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?","Montag 09:05"],["m","Das war an der Ostsee, im letzten Sommer.","Montag 09:12","Nicole H."]]}
   ];
   const audit=[];
   let unlocked=false,curLog=null;
@@ -434,24 +434,24 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 
   /* Kunden (Demo). st: T = Tester (noch nichts bezahlt), K = Kunde (hat bezahlt) */
   const customers=NMA.store.get("tCustomers",null)||{
-    "Michael Nordlicht":{nr:10482,st:"T",age:56,ort:"20095 Hamburg",job:"Elektriker",coins:5,since:"12.11.2026",look:"Beziehung"},
+    "MichaelNordlicht":{nr:10482,st:"T",age:56,ort:"20095 Hamburg",job:"Elektriker",coins:5,since:"12.11.2026",look:"Beziehung"},
     "Sonnenschein63":{nr:10217,st:"K",age:63,ort:"34508 Willingen",job:"Rentner",coins:42,since:"02.10.2026",look:"Beziehung"},
-    "Rolf aus Kassel":{nr:9876,st:"K",age:59,ort:"34117 Kassel",job:"Busfahrer",coins:118,since:"14.08.2026",look:"Abenteuer"},
+    "Rolf_Kassel":{nr:9876,st:"K",age:59,ort:"34117 Kassel",job:"Busfahrer",coins:118,since:"14.08.2026",look:"Abenteuer"},
     "Wanderfreund":{nr:10391,st:"T",age:61,ort:"28195 Bremen",job:"Lehrer",coins:12,since:"30.10.2026",look:"Beziehung"},
     "Berti_K":{nr:10511,st:"T",age:67,ort:"60311 Frankfurt",job:"",coins:7,since:"15.11.2026",look:"Abenteuer"},
-    "Kalle 58":{nr:10133,st:"K",age:58,ort:"34537 Bad Wildungen",job:"Landwirt",coins:22,since:"21.09.2026",look:"Abenteuer"}
+    "Kalle58":{nr:10133,st:"K",age:58,ort:"34537 Bad Wildungen",job:"Landwirt",coins:22,since:"21.09.2026",look:"Abenteuer"}
   };
   const cust=n=>customers[n]||(customers[n]={nr:10500+Math.floor(Math.random()*400),st:"T",age:"",ort:"",job:"",coins:NMA.coins(),since:new Date().toLocaleDateString("de-DE"),look:""});
-  let notes=NMA.store.get("teamNotes",{"Rolf aus Kassel":"Hat einen Garten, mag Labradore. Geburtstag im März.","Sonnenschein63":"Witwer seit 2022, sehr höflich."});
+  let notes=NMA.store.get("teamNotes",{"Rolf_Kassel":"Hat einen Garten, mag Labradore. Geburtstag im März.","Sonnenschein63":"Witwer seit 2022, sehr höflich."});
 
   const mins=m=>Date.now()-m*60000;
   let items=NMA.store.get("tItems",null)||[
     {id:"q1",kind:"msg",cust:"Sonnenschein63",pid:"sabine",t:mins(9),read:false,hist:[["c","Guten Abend, wie war dein Tag?"],["m","Ganz entspannt, ich war im Garten. Und deiner?","marco"],["c","Lang, aber jetzt wird er besser 🙂 Was machst du am Wochenende?"]]},
-    {id:"q2",kind:"msg",cust:"Rolf aus Kassel",pid:"monika",t:mins(4),read:false,hist:[["c","Hallo Monika, wie heißt denn dein Hund?"],["m","Er heißt Bruno und ist ein echter Schatz.","marco"],["c","Schöner Name! Gehst du morgen früh mit ihm raus?"]]},
+    {id:"q2",kind:"msg",cust:"Rolf_Kassel",pid:"monika",t:mins(4),read:false,hist:[["c","Hallo Monika, wie heißt denn dein Hund?"],["m","Er heißt Bruno und ist ein echter Schatz.","marco"],["c","Schöner Name! Gehst du morgen früh mit ihm raus?"]]},
     {id:"q3",kind:"msg",cust:"Berti_K",pid:"petra",t:mins(2),read:false,hist:[["c","Hallo Petra, tanzt du auch Discofox?"]]},
-    {id:"q4",kind:"msg",cust:"Michael Nordlicht",pid:"lena",t:mins(6),read:true,hist:[["c","Hallo! Dein Profil klingt sympathisch."],["m","Hallo! Spielst du auch ein Instrument?","marco"],["c","Ein bisschen Gitarre. Und welche Musik hörst du am liebsten?"]]},
+    {id:"q4",kind:"msg",cust:"MichaelNordlicht",pid:"lena",t:mins(6),read:true,hist:[["c","Hallo! Dein Profil klingt sympathisch."],["m","Hallo! Spielst du auch ein Instrument?","marco"],["c","Ein bisschen Gitarre. Und welche Musik hörst du am liebsten?"]]},
     {id:"q5",kind:"msg",cust:"Wanderfreund",pid:"andrea",t:mins(1),read:false,hist:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?"]]},
-    {id:"h1",kind:"heart",cust:"Kalle 58",pid:"monika",t:mins(12),read:false,hist:[]},
+    {id:"h1",kind:"heart",cust:"Kalle58",pid:"monika",t:mins(12),read:false,hist:[]},
     {id:"h2",kind:"heart",cust:"Wanderfreund",pid:"thomas",t:mins(30),read:false,hist:[]}
   ];
   let sent=NMA.store.get("tSent",[]);
@@ -460,7 +460,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     {nr:2,owner:"marco",name:"Danke fürs Herz",text:"Danke für dein Herz! Ich habe mich gefreut und wollte dir gleich mal Hallo sagen 😊"},
     {nr:3,owner:"julia",name:"Guten Morgen",text:"Guten Morgen! Ich hoffe, du hast gut geschlafen. Was steht heute bei dir an?"}
   ];
-  let tplSent=NMA.store.get("tTplSent",{"Kalle 58":[{nr:2,t:mins(60*24*3),pid:"lena"}]});
+  let tplSent=NMA.store.get("tTplSent",{"Kalle58":[{nr:2,t:mins(60*24*3),pid:"lena"}]});
   const saveAll=()=>{NMA.store.set("tItems",items);NMA.store.set("tSent",sent);NMA.store.set("tTpls",tpls);NMA.store.set("tTplSent",tplSent);NMA.store.set("teamNotes",notes);NMA.store.set("tCustomers",customers)};
   const tplNo=n=>"V-"+String(n).padStart(3,"0");
   const norm=s=>s.toLowerCase().replace(/\s+/g," ").replace(/[^\p{L}\p{N} ]/gu,"").trim();
@@ -589,7 +589,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     const m=document.createElement("div");m.className="modal form-modal";
     m.innerHTML=`<form class="card" novalidate style="max-height:92svh;overflow:auto"><h2>${isNew?"Profil anlegen":"Profil bearbeiten"}</h2>
       <div class="form-grid" style="margin-top:14px">
-        <div class="field full"><label for="pn">Nickname</label><input class="input" id="pn" required maxlength="30" value="${NMA.esc(p.name||"")}"><span class="hint" id="pnh">Jeder Name nur einmal, z. B. „Blonde Carola“.</span></div>
+        <div class="field full"><label for="pn">Nickname</label><input class="input" id="pn" required maxlength="30" value="${NMA.esc(p.name||"")}"><span class="hint" id="pnh">Ohne Leerzeichen, jeder Name nur einmal, z. B. „BlondeCarola“.</span></div>
         <div class="field"><span class="label">Geschlecht</span><div class="seg"><label><input type="radio" name="psx" value="w" ${p.sex!=="m"?"checked":""}> Frau</label><label><input type="radio" name="psx" value="m" ${p.sex==="m"?"checked":""}> Mann</label></div></div>
         <div class="field"><span class="label">Sucht</span><div class="seg"><label><input type="radio" name="plk" value="Beziehung" ${p.looking!=="Abenteuer"?"checked":""}> Beziehung</label><label><input type="radio" name="plk" value="Abenteuer" ${p.looking==="Abenteuer"?"checked":""}> Abenteuer</label></div></div>
         <div class="field"><label for="pa">Alter</label><input class="input" id="pa" type="number" min="18" max="99" required value="${p.age||""}"></div>
@@ -607,8 +607,8 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     const del=m.querySelector("[data-del]");if(del)del.addEventListener("click",()=>{if(items.some(i=>i.pid===p.id)){NMA.toast("Profil hat noch offene Nachrichten – erst beantworten oder verschieben.");return}
       const i=profiles.indexOf(p);profiles.splice(i,1);saveProfiles();m.remove();renderProfiles();NMA.toast("Profil gelöscht.")});
     m.querySelector("form").addEventListener("submit",e=>{e.preventDefault();
-      const name=m.querySelector("#pn").value.replace(/\s+/g," ").trim(),age=+m.querySelector("#pa").value,city=m.querySelector("#pc").value.trim();
-      if(name.length<3){NMA.toast("Bitte einen Nickname eingeben.");return}
+      const name=m.querySelector("#pn").value.trim(),age=+m.querySelector("#pa").value,city=m.querySelector("#pc").value.trim();
+      if(!NMA.nickOk(name)){m.querySelector("#pnh").className="hint bad";m.querySelector("#pnh").textContent="3–30 Zeichen, keine Leerzeichen (nur Buchstaben, Ziffern, _ - .).";return}
       const taken=profiles.some(x=>x!==p&&x.name.toLowerCase()===name.toLowerCase())||Object.keys(customers).some(c=>c.toLowerCase()===name.toLowerCase())||(isNew||name.toLowerCase()!==(p.name||"").toLowerCase())&&!NMA.nickFree(name);
       if(taken){m.querySelector("#pnh").className="hint bad";m.querySelector("#pnh").textContent=`„${name}“ ist schon vergeben.`;return}
       if(!(age>=18&&age<=99)){NMA.toast("Alter muss zwischen 18 und 99 liegen.");return}
