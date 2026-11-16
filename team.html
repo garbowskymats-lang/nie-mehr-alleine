@@ -102,7 +102,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   .staff td:first-child{grid-column:1/-1}.staff td:first-child::before{display:none}
   .staff td:last-child{grid-column:1/-1;flex-direction:row;gap:8px}.staff td:last-child::before{display:none}
   .bar{grid-template-columns:minmax(0,96px) minmax(0,1fr) 46px}
-  .tb-tag,#me .lbl{display:none}
+  .tb-tag,#me .lbl,a[title="Zur Kundenseite"]{display:none}
   #me select{max-width:150px}
   .staff .role{align-self:flex-start}
 }
@@ -111,7 +111,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <body data-page="team">
 <header class="topbar">
   <a class="brand" href="team.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span><span class="tb-tag">Team</span></a>
-  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><a class="btn sm ghost" href="mitarbeiter-login.html">Abmelden</a></div>
+  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><a class="btn sm ghost" href="index.html" title="Zur Kundenseite">Zur Startseite</a><a class="btn sm ghost" href="mitarbeiter-login.html">Abmelden</a></div>
 </header>
 
 <main class="page">
