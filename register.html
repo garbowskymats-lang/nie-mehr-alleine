@@ -65,7 +65,7 @@
   f.addEventListener("submit",e=>{e.preventDefault();checkAge();checkNick();
     if(!f.checkValidity()){const bad=f.querySelector(":invalid");bad&&bad.focus();
       NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?"Bitte gib deine Postleitzahl ein (4 oder 5 Ziffern).":"Bitte fülle alle Pflichtfelder aus.");return}
-    NMA.store.set("user",{nick:nick.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,job:$("job").value.trim(),plz:$("plz").value,radius:$("radius").value,city:"",about:""});
+    NMA.store.set("user",{nick:nick.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,sex:$("sex").value,job:$("job").value.trim(),plz:$("plz").value,radius:$("radius").value,city:"",about:""});
     NMA.setCoins(5); location.href="uebersicht.html?neu=1";
   });
 }</script>

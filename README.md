@@ -73,3 +73,19 @@ Stand 16.11.2026 – Massenversand (massenversand.js, Reiter „📣 Massenversa
 - SERVER: Empfänger serverseitig berechnen (echte PLZ-Geodaten), Rechte und Pause serverseitig prüfen,
   Versand als Hintergrund-Job, Nachrichten in Postfach/Chat der Kunden zustellen. Profile müssen für Kunden
   als moderierte Profile gekennzeichnet bleiben (AGB/Hinweis).
+
+GEPLANT (Konzept 16.11.2026) – Wohnort der Profile pro Kunde („Kontakt-Ort“)
+- Ziel: Ein Profil wohnt für JEDEN Kunden fest in dessen Nähe – Susi für den Berliner Kunden in Spandau,
+  für den Münchner Kunden in Dachau – und bleibt dort für diesen Kunden für immer.
+- Pflichtangaben bei der Registrierung (schon vorhanden): PLZ, Umkreis, wer sucht wen, Beziehung/Abenteuer.
+- Neue Tabelle kontakt_ort (profil_id, kunde_id, ort, plz, entfernung_km, festgelegt_am).
+  Beim ERSTEN Mal, wenn ein Kunde ein Profil sieht oder von ihm angeschrieben wird (Suche, Profilseite, Herz,
+  Massenversand, Chat), würfelt der Server einen echten Ort im Umkreis des Kunden (mind. 5 km, höchstens sein
+  gewählter Umkreis) und speichert ihn. Danach wird für dieses Paar immer genau dieser Ort angezeigt.
+- Moderator sieht im Chat rechts „Wohnt für diesen Kunden in: Spandau (12 km)“, damit er nicht danebenliegt.
+- Umzug des Kunden: festgelegte Orte bleiben (Hinweis für den Moderator), nur neue Kontakte bekommen den neuen Raum.
+- Profiltexte ortsneutral schreiben oder Platzhalter {ort} verwenden; keine festen Städte im „Über mich“.
+- Massenversand: Umkreis-Suche nach Profil-PLZ entfällt. Es schreiben passende Profile, die den Kunden noch nie
+  angeschrieben haben (gleichmäßig verteilt); der Ort wird dabei wie oben im Umkreis des Kunden festgelegt.
+- Ortsdaten: OpenPLZ / OpenGeoDB (PLZ, Ortsname, Koordinaten).
+- AGB/Hinweis muss ausdrücklich sagen, dass Angaben der Profile (auch der Wohnort) erfunden sind und Treffen nicht möglich sind.
