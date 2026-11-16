@@ -109,6 +109,17 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 .tpl-nr{font:700 12px/1 var(--sans);padding:5px 8px;border-radius:8px;background:#10292a;color:var(--accent)}
 .tpl p{margin:8px 0;color:#cfe3e1}
 .tpl-acts{display:flex;gap:6px}
+.gen-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 14px}
+@media(max-width:700px){.gen-opts{grid-template-columns:1fr 1fr}}
+.gen-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+@media(max-width:760px){.gen-list{grid-template-columns:1fr}}
+.gcard{padding:14px 16px;display:grid;gap:6px}
+.gcard.off{opacity:.45}
+.gcard small{color:var(--muted);font-size:13px}
+.gcard p{margin:0;font-size:14px;color:#cfe3e1}
+.gacts{display:flex;gap:6px;margin-top:4px}
+.gen #gRow{position:sticky;bottom:-26px;margin:16px -26px -26px;padding:14px 26px;background:var(--card);border-top:1px solid var(--line);align-items:center}
+.gk .input{min-height:38px;font-size:15px}
 .lockbox{max-width:520px;margin:20px auto;text-align:center}
 .lockbox h2{font-size:26px;margin-bottom:8px}
 .pin-row{display:flex;gap:10px;margin:18px 0 8px}
@@ -196,7 +207,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     <div class="toolbar">
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="pq" placeholder="Profil suchen" aria-label="Profil suchen"></label>
         <select class="input" id="pOwner" style="width:auto" aria-label="Mitarbeiter" data-admin><option value="">Alle Mitarbeiter</option></select></div>
-      <button class="btn primary" id="pAdd">+ Profil anlegen</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="pGen">🎲 Profile vorschlagen</button><button class="btn primary" id="pAdd">+ Profil anlegen</button></div>
     </div>
     <p class="hint" id="pRule" style="margin:-4px 0 16px"></p>
     <div class="pgroups" id="pGroups"></div>
@@ -616,6 +627,112 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("pq").addEventListener("input",renderProfiles);$("pOwner").addEventListener("change",e=>{pOwnerSel=e.target.value;renderProfiles()});
   $("pGroups").addEventListener("click",e=>{const b=e.target.closest("[data-pedit]");if(b)profileForm(prof(b.dataset.pedit))});
   $("pGroups").addEventListener("change",e=>{const s=e.target.closest("[data-pmove]");if(s){const p=prof(s.dataset.pmove);if(s.value!==p.owner)moveProfile(p,s.value)}});
+
+  /* ---------- Profil-Generator: Zufalls-Entwürfe, die man prüft und dann anlegt ---------- */
+  const G={
+    w:{first:["Carola","Sabine","Petra","Monika","Andrea","Karin","Birgit","Heike","Claudia","Martina","Susanne","Gabi","Anja","Ute","Doris","Elke","Silke","Renate","Bettina","Manuela","Ines","Nicole","Simone","Angelika","Marion","Sonja","Kerstin","Tanja","Jutta","Iris"],
+       pre:["Blonde","Sonnige","Fröhliche","Süße","Wilde","Zarte","Lustige","Romantische","Kesse","Sanfte","Verträumte","Lebensfrohe"],
+       post:["Herz","Sonne","Engel","Rose","Lächeln","Maus","Stern","Blüte","am Meer","vom Land","aus dem Norden"],
+       jobs:["Krankenschwester","Bürokauffrau","Friseurin","Lehrerin","Erzieherin","Verkäuferin","Buchhalterin","Altenpflegerin","Arzthelferin","Floristin","Köchin","Rentnerin","Sekretärin","Bankkauffrau","Physiotherapeutin"]},
+    m:{first:["Thomas","Michael","Andreas","Frank","Peter","Jürgen","Klaus","Uwe","Ralf","Bernd","Stefan","Dirk","Holger","Wolfgang","Rainer","Jörg","Markus","Volker","Harald","Detlef"],
+       pre:["Starker","Ruhiger","Netter","Treuer","Wilder","Lustiger","Sportlicher","Bodenständiger"],
+       post:["Bär","Kumpel","vom Land","Biker","Gärtner","aus dem Süden","Nordlicht","Kapitän"],
+       jobs:["Handwerker","Elektriker","Tischler","Lkw-Fahrer","Landwirt","Polizist","Mechaniker","Ingenieur","Koch","Rentner","Hausmeister","Kaufmann","Busfahrer","Maler"]},
+    regions:{
+      "Nordhessen":["Kassel","Baunatal","Bad Wildungen","Korbach","Willingen","Fritzlar","Homberg (Efze)","Melsungen","Wabern","Hofgeismar"],
+      "Hamburg & Umland":["Hamburg","Norderstedt","Pinneberg","Elmshorn","Buxtehude","Stade","Lüneburg","Ahrensburg"],
+      "Ruhrgebiet":["Dortmund","Essen","Bochum","Gelsenkirchen","Duisburg","Herne","Hagen","Recklinghausen"],
+      "Rhein-Main":["Frankfurt","Offenbach","Hanau","Darmstadt","Wiesbaden","Mainz","Bad Homburg","Gießen"],
+      "Köln & Bonn":["Köln","Bonn","Leverkusen","Bergisch Gladbach","Brühl","Troisdorf","Siegburg"],
+      "München & Bayern":["München","Augsburg","Rosenheim","Ingolstadt","Landshut","Freising","Dachau"],
+      "Berlin & Brandenburg":["Berlin","Potsdam","Oranienburg","Bernau","Königs Wusterhausen","Falkensee"],
+      "Ganz Deutschland":[]
+    },
+    tags:["Wandern","Kochen","Reisen","Tanzen","Garten","Musik","Kino","Lesen","Radfahren","Schwimmen","Hund","Katze","Kaffee","Wein","Meer","Berge","Camping","Fotografie","Theater","Konzerte","Grillen","Motorrad","Angeln","Natur","Fußball","Backen","Spieleabende","Flohmärkte"],
+    open:["Ich bin {adj} und lache gern.","Mich beschreiben Freunde als {adj}.","Ich bin eher {adj} und mag es gemütlich.","Man sagt mir nach, ich sei {adj}.","Ich bin {adj} und mitten im Leben."],
+    adj:["herzlich und ehrlich","ruhig und verlässlich","lebensfroh und neugierig","humorvoll und spontan","bodenständig und treu","offen und unkompliziert","zärtlich und verschmust","aktiv und abenteuerlustig"],
+    free:["In meiner Freizeit bin ich gern {t1} oder genieße {t2}.","Am Wochenende findet man mich beim {t1} oder bei {t2}.","Ich liebe {t1} und sage nie Nein zu {t2}."],
+    bez:["Ich suche jemanden für eine ehrliche, feste Beziehung.","Mein Wunsch: jemand zum Reden, Lachen und Ankommen.","Ich wünsche mir einen Menschen, mit dem ich den Alltag teilen kann."],
+    abe:["Ich suche jemanden für aufregende Treffen ohne Verpflichtungen.","Ich bin offen für ein Abenteuer und lasse mich gern überraschen.","Erst mal schauen, was passiert – Spaß steht im Vordergrund."],
+    tagPhrase:{"Wandern":"Wandern","Kochen":"Kochen","Reisen":"Reisen","Tanzen":"Tanzen","Garten":"Arbeiten im Garten","Musik":"guter Musik","Kino":"einem Kinoabend","Lesen":"einem guten Buch","Radfahren":"Radfahren","Schwimmen":"Schwimmen","Hund":"Spaziergängen mit dem Hund","Katze":"Kuscheln mit der Katze","Kaffee":"einem Kaffee in der Sonne","Wein":"einem Glas Wein","Meer":"Ausflügen ans Meer","Berge":"Touren in die Berge","Camping":"Camping","Fotografie":"Fotografieren","Theater":"einem Theaterbesuch","Konzerte":"Konzerten","Grillen":"Grillen mit Freunden","Motorrad":"Motorradfahren","Angeln":"Angeln","Natur":"Zeit in der Natur","Fußball":"Fußball","Backen":"Backen","Spieleabende":"Spieleabenden","Flohmärkte":"Flohmärkten"}
+  };
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+  const allCities=()=>Object.values(G.regions).flat();
+  const nameTaken=n=>profiles.some(p=>p.name.toLowerCase()===n.toLowerCase())||Object.keys(customers).some(c=>c.toLowerCase()===n.toLowerCase())||!NMA.nickFree(n);
+  const makeName=(sx,used)=>{const L=G[sx];
+    for(let i=0;i<60;i++){const f=pick(L.first),r=Math.random();
+      const n=r<.4?`${pick(L.pre)} ${f}`:r<.8?`${f} ${pick(L.post)}`:`${f}${Math.floor(Math.random()*40)+50}`;
+      if(!nameTaken(n)&&!used.has(n.toLowerCase()))return n}
+    return `${pick(L.first)} ${Date.now()%1000}`;
+  };
+  const makeDraft=(o,used)=>{
+    const sx=o.sex==="mix"?(Math.random()<.75?"w":"m"):o.sex;
+    const lk=o.look==="mix"?(Math.random()<.5?"Beziehung":"Abenteuer"):o.look;
+    const age=o.min+Math.floor(Math.random()*(o.max-o.min+1));
+    const cities=G.regions[o.region].length?G.regions[o.region]:allCities();
+    const tags=shuffle(G.tags).slice(0,3);
+    const about=[pick(G.open).replace("{adj}",pick(G.adj)),pick(G.free).replace("{t1}",G.tagPhrase[tags[0]]).replace("{t2}",G.tagPhrase[tags[1]]),pick(lk==="Beziehung"?G.bez:G.abe)].join(" ");
+    const name=makeName(sx,used);used.add(name.toLowerCase());
+    return {name,sex:sx,looking:lk,age,city:pick(cities),job:age>=64?(sx==="w"?"Rentnerin":"Rentner"):pick(G[sx].jobs),status:pick(age>58?["Verwitwet","Geschieden","Single"]:["Single","Geschieden","Getrennt lebend"]),about,tags,keep:true};
+  };
+  const generator=()=>{
+    const m=document.createElement("div");m.className="modal form-modal gen";
+    let opts={n:10,sex:"w",look:"mix",min:45,max:65,region:"Nordhessen",owner:meKey()},drafts=[];
+    const used=new Set();
+    m.innerHTML=`<div class="card" role="dialog" aria-modal="true" style="width:min(980px,100%);max-height:94svh;overflow:auto">
+      <h2>🎲 Profile vorschlagen</h2>
+      <p class="hint" style="margin:0 0 14px">Erzeugt zufällige Entwürfe mit einmaligem Namen, Alter, Ort, Beruf, Text und Interessen. Nichts wird angelegt, bevor du es bestätigst. Fotos bitte nur eigene oder lizenzierte Bilder – niemals Fotos echter Personen ohne deren Zustimmung.</p>
+      <div class="gen-opts">
+        <div class="field"><label for="gN">Anzahl</label><select class="input" id="gN">${[5,10,20].map(x=>`<option ${x===10?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div class="field"><label for="gS">Geschlecht</label><select class="input" id="gS"><option value="w">Frauen</option><option value="m">Männer</option><option value="mix">Gemischt</option></select></div>
+        <div class="field"><label for="gL">Rubrik</label><select class="input" id="gL"><option value="mix">Gemischt</option><option>Beziehung</option><option>Abenteuer</option></select></div>
+        <div class="field"><label>Alter</label><div class="range"><input class="input" id="gMin" type="number" min="18" max="99" value="45" aria-label="Alter von"><span>–</span><input class="input" id="gMax" type="number" min="18" max="99" value="65" aria-label="Alter bis"></div></div>
+        <div class="field"><label for="gR">Region</label><select class="input" id="gR">${Object.keys(G.regions).map(r=>`<option>${r}</option>`).join("")}</select></div>
+        ${isAdmin()?`<div class="field"><label for="gO">Gehört</label><select class="input" id="gO">${owners().map(x=>`<option value="${x.user}">${NMA.esc(x.name)}</option>`).join("")}</select></div>`:""}
+      </div>
+      <button class="btn primary" id="gGo">Vorschläge erzeugen</button>
+      <div class="gen-list" id="gList"></div>
+      <div class="row" id="gRow" hidden><span class="hint" id="gCount" style="margin-right:auto"></span><button class="btn ghost" data-x>Abbrechen</button><button class="btn" id="gAgain">Alle neu würfeln</button><button class="btn primary" id="gSave">Ausgewählte anlegen</button></div>
+    </div>`;
+    document.body.appendChild(m);
+    const q=s=>m.querySelector(s);
+    const read=()=>{let mn=+q("#gMin").value||18,mx=+q("#gMax").value||99;mn=Math.max(18,Math.min(99,mn));mx=Math.max(mn,Math.min(99,mx));q("#gMin").value=mn;q("#gMax").value=mx;
+      opts={n:+q("#gN").value,sex:q("#gS").value,look:q("#gL").value,min:mn,max:mx,region:q("#gR").value,owner:isAdmin()?q("#gO").value:meKey()}};
+    const draw=()=>{
+      q("#gList").innerHTML=drafts.map((d,i)=>`<article class="card gcard ${d.keep?"":"off"}">
+        <label class="check gk"><input type="checkbox" data-k="${i}" ${d.keep?"checked":""}> <b>${NMA.esc(d.name)}, ${d.age}</b></label>
+        <small>${d.sex==="w"?"Frau":"Mann"} · ${d.looking} · ${NMA.esc(d.city)} · ${NMA.esc(d.job)} · ${d.status}</small>
+        <p>${NMA.esc(d.about)}</p><div class="tags">${d.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        <div class="gacts"><button type="button" class="btn sm" data-re="${i}">🎲 Neu</button><button type="button" class="btn sm ghost" data-ed="${i}">Name ändern</button></div></article>`).join("");
+      const k=drafts.filter(d=>d.keep).length;q("#gCount").textContent=`${k} von ${drafts.length} ausgewählt`;q("#gRow").hidden=!drafts.length;q("#gSave").disabled=!k;
+    };
+    const gen=()=>{read();used.clear();drafts=Array.from({length:opts.n},()=>makeDraft(opts,used));draw()};
+    q("#gGo").addEventListener("click",gen);q("#gAgain").addEventListener("click",gen);
+    m.addEventListener("click",e=>{
+      if(e.target===m||e.target.hasAttribute("data-x"))return m.remove();
+      const re=e.target.closest("[data-re]"),ed=e.target.closest("[data-ed]");
+      if(re){read();const i=+re.dataset.re;used.delete(drafts[i].name.toLowerCase());drafts[i]=makeDraft(opts,used);draw()}
+      if(ed){const i=+ed.dataset.ed,card=ed.closest(".gcard"),lbl=card.querySelector(".gk");
+        lbl.outerHTML=`<div class="range gk"><input class="input" value="${NMA.esc(drafts[i].name)}" data-nm="${i}" maxlength="30" aria-label="Name"><button type="button" class="btn sm primary" data-nok="${i}">OK</button></div>`;card.querySelector("[data-nm]").focus()}
+      const ok=e.target.closest("[data-nok]");
+      if(ok){const i=+ok.dataset.nok,v=m.querySelector(`[data-nm="${i}"]`).value.replace(/\s+/g," ").trim();
+        if(v.length<3){NMA.toast("Name zu kurz.");return}
+        if(v.toLowerCase()!==drafts[i].name.toLowerCase()&&(nameTaken(v)||used.has(v.toLowerCase()))){NMA.toast(`„${v}“ ist schon vergeben.`);return}
+        used.delete(drafts[i].name.toLowerCase());drafts[i].name=v;used.add(v.toLowerCase());draw()}
+    });
+    m.addEventListener("change",e=>{const k=e.target.closest("[data-k]");if(k){drafts[+k.dataset.k].keep=k.checked;draw()}});
+    q("#gSave").addEventListener("click",()=>{
+      const sel=drafts.filter(d=>d.keep);let n=0;
+      const grads=["#c0796a,#4a2b2e","#8a6aa8,#2c2240","#c79a54,#4b3517","#4f8f87,#173a37","#b0566f,#3b1825","#5b7aa0,#1c2a3c","#7b8a5a,#283019"];
+      sel.forEach((d,i)=>{if(nameTaken(d.name))return;const {keep,...data}=d;
+        profiles.push(Object.assign({id:"p"+Date.now()+"_"+i,owner:opts.owner,km:5+Math.floor(Math.random()*40),online:Math.random()<.6,last:"vor 1 Std.",height:"",g:`linear-gradient(145deg,${grads[(profiles.length+i)%grads.length]})`},data));n++});
+      saveProfiles();m.remove();renderProfiles();
+      NMA.toast(`${n} Profil${n===1?"":"e"} angelegt – ${opts.owner===meKey()?"sie gehören dir":"zugeteilt an "+ownerName(opts.owner)}.`);
+    });
+    gen();
+  };
+  $("pGen").addEventListener("click",generator);
 
   /* ---------- Vorlagen ---------- */
   let editTpl=null;
