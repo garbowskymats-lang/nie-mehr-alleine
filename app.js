@@ -140,7 +140,7 @@ if (document.body.classList.contains("member")) {
 }
 /* Fußzeile überall */
 const foot=document.createElement("footer");foot.className="foot";
-foot.innerHTML=`<span>© 2026 Nie mehr alleine · Unterhaltungs-Chat mit moderierten Profilen · ab 18</span><nav><a href="rechtliches.html#impressum">Impressum</a><a href="rechtliches.html#datenschutz">Datenschutz</a><a href="rechtliches.html#agb">AGB</a><a href="hilfe.html">Hilfe</a></nav>`;
+foot.innerHTML=`<span>© ${new Date().getFullYear()} Nie mehr alleine · Unterhaltungs-Chat mit moderierten Profilen · ab 18</span><nav><a href="rechtliches.html#impressum">Impressum</a><a href="rechtliches.html#datenschutz">Datenschutz</a><a href="rechtliches.html#agb">AGB</a><a href="hilfe.html">Hilfe</a></nav>`;
 if(!document.body.classList.contains("full")) document.body.appendChild(foot);
 
 /* Demo-Formulare: kein Absenden an einen Server */

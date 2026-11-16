@@ -301,7 +301,8 @@ body.full .foot{display:none}
 .pack .price{font-size:22px;font-weight:700;white-space:nowrap}
 .pack small{color:var(--muted)}
 .pack .flag{position:absolute;top:-11px;right:14px;padding:3px 10px;border-radius:20px;background:var(--accent);color:#03201d;font-size:12px;font-weight:700}
-.pay{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.pay{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(170px,100%),1fr));gap:10px}
+.pay label{overflow-wrap:anywhere}
 .pay label{display:flex;align-items:center;gap:10px;min-height:52px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg-2);cursor:pointer}
 .pay input{accent-color:var(--accent);width:18px;height:18px;flex:none}
 .pay label:has(input:checked){border-color:var(--accent);background:#0f2a2b}

@@ -40,7 +40,7 @@
 <script>{
   const $=id=>document.getElementById(id);
   const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
-  const methods=["Kreditkarte","Sofortüberweisung","Vorkasse"];
+  const methods=["Kreditkarte","Online-Überweisung","Vorkasse"];
   let pick=2,method=0;
   $("have").textContent=NMA.coins();
   $("packs").innerHTML=NMA.packs.map((p,i)=>`<button class="pack" role="radio" data-i="${i}">${p.flag?`<span class="flag">${p.flag}</span>`:""}<strong>${p.coins} Coins</strong><span class="price">${eur(p.price)}</span><small>${eur(p.price/p.coins)} pro Coin</small></button>`).join("");
