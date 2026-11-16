@@ -36,7 +36,6 @@
   </div>
 </main>
 <script src="app.js"></script>
-<script src="edit.js" defer></script>
 <script>{
   const f=document.getElementById("f");
   f.addEventListener("submit",e=>{e.preventDefault();if(!f.checkValidity()){NMA.toast("Bitte schreib kurz dein Anliegen.");return}f.reset();NMA.toast("Danke! Der Support meldet sich per E-Mail (Demo).")});

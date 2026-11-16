@@ -46,7 +46,6 @@
   </div>
 </main>
 <script src="app.js"></script>
-<script src="edit.js" defer></script>
 <script>{
   document.getElementById("pw").addEventListener("click",()=>NMA.toast("Link zum Ändern des Passworts gesendet (Demo)."));
   document.getElementById("del").addEventListener("click",()=>NMA.modal({title:"Konto wirklich löschen?",text:"Das kann nicht rückgängig gemacht werden. Profil, Fotos, Nachrichten und restliche Coins gehen verloren.",cancel:"Behalten",ok:"Endgültig löschen",onOk:()=>NMA.toast("In der echten Version wäre das Konto jetzt gelöscht.")}));

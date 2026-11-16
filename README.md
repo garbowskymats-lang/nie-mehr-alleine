@@ -21,11 +21,6 @@ Für den Server-Entwickler
 - Handy-Benachrichtigungen (Einstellungen) brauchen Web-Push bzw. eine App-Hülle (PWA).
 - Rechtliches: Platzhaltertexte, vom Betreiber zu ersetzen.
 
-Bearbeitungsmodus (edit.js)
-- Knopf "✎ Bearbeiten" unten links: Texte ändern, Elemente verschieben, Größe ziehen, ausblenden.
-- Änderungen werden nur im jeweiligen Browser gespeichert. "Änderungen kopieren" liefert sie als Liste
-  (Seite, Element, neuer Text/Position/Größe) zum Übernehmen in den Code.
-- Für die Live-Seite edit.js entfernen oder nur für Admins laden.
 
 App installieren (PWA)
 - manifest.webmanifest, sw.js und die Icons in assets/ machen die Seite installierbar (Startbildschirm).
