@@ -27,7 +27,7 @@
       <a class="card stat" href="chat.html"><strong id="sChat">2</strong><span>Ungelesene Chats</span></a>
       <a class="card stat" href="postfach.html"><strong id="sMail">1</strong><span>Neue Mails</span></a>
       <a class="card stat" href="mein-profil.html"><strong>7</strong><span>Profilbesucher heute</span></a>
-      <a class="card stat" href="suche.html"><strong id="sLiked">0</strong><span>Gemerkte Profile</span></a>
+      <a class="card stat" href="suche.html"><strong id="sLiked">5</strong><span>Herzen heute übrig</span></a>
     </div>
   </section>
 
@@ -43,7 +43,7 @@
   const u=NMA.user();
   if(NMA.param("neu")){document.getElementById("greetSmall").textContent="Willkommen";document.getElementById("greet").textContent=`Hallo ${u.nick}, dein Profil ist bereit!`;document.getElementById("greetText").innerHTML='Du hast 5 Coins zum Start geschenkt bekommen. Ergänze jetzt ein Foto – Profile mit Foto bekommen viel mehr Nachrichten.'}
   else document.getElementById("greet").textContent=`Schön, dass du da bist, ${u.nick}!`;
-  document.getElementById("sLiked").textContent=NMA.store.get("liked",[]).length;
+  document.getElementById("sLiked").textContent=NMA.heartsLeft();
   document.getElementById("sChat").textContent=Object.values(NMA.unread).reduce((a,b)=>a+b,0);
   document.getElementById("sMail").textContent=NMA.mails.filter(m=>m.unread).length;
   document.getElementById("recent").innerHTML=Object.keys(NMA.chats).map(id=>{const p=NMA.get(id),msgs=NMA.chats[id].filter(m=>m.x),last=msgs[msgs.length-1];const n=NMA.unread[id]||0;

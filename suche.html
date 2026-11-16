@@ -16,7 +16,7 @@
 <body class="member" data-page="suche">
 <main class="page">
   <div class="page-head">
-    <div><h1>Menschen entdecken</h1><p><b id="count">0</b> Profile passen zu deiner Suche.</p></div>
+    <div><h1>Menschen entdecken</h1><p><b id="count">0</b> Profile passen zu deiner Suche · <span id="hl">♥ 5</span> Herzen heute übrig</p></div>
     <button class="btn filter-btn" id="filterBtn" aria-expanded="false" aria-controls="filters">Filter anzeigen</button>
   </div>
 
@@ -37,20 +37,18 @@
 <script src="edit.js" defer></script>
 <script>{
   const $=id=>document.getElementById(id);
-  const liked=new Set(NMA.store.get("liked",[]));
   const render=()=>{
     const sex=$("fSex").value,min=+$("fMin").value||18,max=+$("fMax").value||99,km=+$("fKm").value,on=$("fOnline").checked,sort=$("fSort").value,look=$("fLook").value;
     let list=NMA.profiles.filter(p=>(!sex||p.sex===sex)&&p.age>=min&&p.age<=max&&p.km<=km&&(!on||p.online)&&(!look||p.looking===look));
     list.sort(sort==="km"?(a,b)=>a.km-b.km:sort==="age"?(a,b)=>a.age-b.age:(a,b)=>(b.online-a.online)||a.km-b.km);
-    $("count").textContent=list.length;
-    $("grid").innerHTML=list.length?list.map(p=>`<article class="card person"><a href="profil.html?id=${p.id}" aria-label="Profil von ${p.name}">${NMA.photo(p)}</a><div class="body"><div class="title"><h3>${p.name}, ${p.age}</h3><span class="small muted">${p.km} km</span></div><p>${NMA.esc(p.about.split(".")[0])}.</p><div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div><div class="acts"><button class="btn sm like ${liked.has(p.id)?"on":""}" data-like="${p.id}" aria-pressed="${liked.has(p.id)}">${liked.has(p.id)?"♥ Gemerkt":"♡ Merken"}</button><a class="btn sm primary" href="chat.html?mit=${p.id}">Chatten</a></div></div></article>`).join(""):'<div class="card empty" style="grid-column:1/-1">Keine Profile gefunden. Erweitere Alter oder Entfernung.</div>';
+    $("count").textContent=list.length;$("hl").textContent="♥ "+NMA.heartsLeft();
+    $("grid").innerHTML=list.length?list.map(p=>`<article class="card person"><a href="profil.html?id=${p.id}" aria-label="Profil von ${p.name}">${NMA.photo(p)}</a><div class="body"><div class="title"><h3>${p.name}, ${p.age}</h3><span class="small muted">${p.km} km</span></div><p>${NMA.esc(p.about.split(".")[0])}.</p><div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div><div class="acts"><button class="btn sm like ${NMA.hasHeart(p.id)?"on":""}" data-like="${p.id}" aria-pressed="${NMA.hasHeart(p.id)}">${NMA.hasHeart(p.id)?"♥ Herz gesendet":"♡ Herz schicken"}</button><a class="btn sm primary" href="chat.html?mit=${p.id}">Chatten</a></div></div></article>`).join(""):'<div class="card empty" style="grid-column:1/-1">Keine Profile gefunden. Erweitere Alter oder Entfernung.</div>';
   };
   $("filters").addEventListener("submit",e=>{e.preventDefault();render();if(innerWidth<600){$("filters").classList.remove("open");$("filterBtn").textContent="Filter anzeigen"}});
   ["fSex","fKm","fSort","fOnline","fLook"].forEach(id=>$(id).addEventListener("change",render));
   $("filterBtn").addEventListener("click",()=>{const o=$("filters").classList.toggle("open");$("filterBtn").setAttribute("aria-expanded",o);$("filterBtn").textContent=o?"Filter schließen":"Filter anzeigen"});
   $("grid").addEventListener("click",e=>{const b=e.target.closest("[data-like]");if(!b)return;const id=b.dataset.like;
-    if(liked.has(id)){liked.delete(id)}else{liked.add(id);NMA.toast(`${NMA.get(id).name} wurde gemerkt.`)}
-    NMA.store.set("liked",[...liked]);render()});
+    if(NMA.sendHeart(id))render()});
   render();
 }</script>
 </body>

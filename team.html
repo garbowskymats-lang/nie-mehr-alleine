@@ -73,6 +73,42 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 .assignee{font-size:12px;color:var(--gold)}
 @media(max-width:1100px){.ibx{grid-template-columns:minmax(0,260px) minmax(0,1fr)}.ibx-info{grid-column:1/-1;max-height:none}.ibx{height:auto}.ibx-chat{min-height:520px}}
 @media(max-width:700px){.ibx{grid-template-columns:1fr}.ibx-list{max-height:260px}}
+.ibx-filter{padding:12px 12px 10px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.ibx-filter .chips{padding:0}
+.ibx-filter .chip b{margin-left:4px;font-size:12px;opacity:.85}
+.seg-sm label{min-height:36px;font-size:13px;border-radius:10px;padding:0 4px}
+.seg-sm input{position:absolute;opacity:0;pointer-events:none}
+.q-item .top b{display:flex;align-items:center;gap:6px;min-width:0}
+.seg.seg-sm{grid-template-columns:repeat(3,1fr);gap:6px}
+.q-item.unread b:first-child{color:var(--ink)}
+.q-item.unread{box-shadow:inset 3px 0 0 var(--accent)}
+.q-item.heart{box-shadow:inset 3px 0 0 #ff6b8b}
+.q-item.sent{cursor:default}
+.kst{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font:700 12px/1 var(--sans);vertical-align:1px}
+.kst.k{background:#e3b26a;color:#2a1c06}.kst.t{background:#2b3f3e;color:#cfe3e1}
+.ibx-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.ibx-badges .nr{font-size:13px;color:var(--muted)}
+.coin-b{white-space:nowrap;font-size:13px;font-weight:700;padding:3px 9px;border-radius:20px;background:#2a2112;color:#f6d79f}
+.heart-note{margin:auto;text-align:center;padding:24px;border-radius:14px;background:#2a1018;border:1px solid #6b2a3b;color:#ffd6df;max-width:420px;line-height:1.6}
+.owner-lock{margin:12px 14px;padding:12px 14px;border-radius:10px;background:#1a1110;border:1px solid #5a2a26;color:#e9cfcb;font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tpl-row{margin-bottom:8px}.tpl-row select{min-height:40px;font-size:14px}
+#ibxConv{display:flex;flex-direction:column;min-height:0;flex:1}
+#ibxConv[hidden]{display:none}
+.pgroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media(max-width:900px){.pgroups{grid-template-columns:1fr}}
+.pgroup h3{font:700 18px/1.2 var(--sans);margin-bottom:10px}
+.pcards{display:grid;gap:10px}
+.pcard{display:flex;align-items:center;gap:12px;padding:12px 14px;flex-wrap:wrap}
+.pcard .grow{flex:1;min-width:150px;display:grid;gap:2px}
+.pcard small{color:var(--muted);font-size:13px}
+.pacts{display:flex;gap:6px;flex-wrap:wrap}
+.sm-sel{min-height:38px;padding:4px 10px;font-size:14px;width:auto;border-radius:10px}
+.tpl{padding:14px 0;border-bottom:1px solid var(--line)}
+.tpl:last-child{border-bottom:0}
+.tpl-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tpl-nr{font:700 12px/1 var(--sans);padding:5px 8px;border-radius:8px;background:#10292a;color:var(--accent)}
+.tpl p{margin:8px 0;color:#cfe3e1}
+.tpl-acts{display:flex;gap:6px}
 .lockbox{max-width:520px;margin:20px auto;text-align:center}
 .lockbox h2{font-size:26px;margin-bottom:8px}
 .pin-row{display:flex;gap:10px;margin:18px 0 8px}
@@ -117,24 +153,69 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <main class="page">
   <div class="page-head">
     <div><h1 id="pTitle">Mitarbeiterbereich</h1><p id="pSub">Statistik und Verwaltung des Moderatoren-Teams.</p></div>
-    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Posteingang <span class="badge" id="qBadge">0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
+    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
   </div>
 
   <!-- ================= STATISTIK ================= -->
-  <!-- ================= POSTEINGANG ================= -->
+  <!-- ================= NACHRICHTEN ================= -->
   <section id="inbox">
     <div class="ibx">
-      <aside class="card ibx-list"><div class="ibx-head"><b id="qTitle">Wartende Nachrichten</b><small class="muted">älteste zuerst</small></div><div id="queue"></div></aside>
+      <aside class="card ibx-list">
+        <div class="ibx-filter">
+          <div class="chips" id="boxChips" role="tablist" aria-label="Ordner">
+            <button class="chip on" data-box="unread">Ungelesen <b id="nUnread">0</b></button>
+            <button class="chip" data-box="read">Gelesen <b id="nRead">0</b></button>
+            <button class="chip" data-box="sent">Gesendet</button>
+            <button class="chip" data-box="hearts">♥ Herzchen <b id="nHearts">0</b></button>
+          </div>
+          <div class="seg seg-sm" role="radiogroup" aria-label="Rubrik">
+            <label><input type="radio" name="rub" value="" checked> Alle</label><label><input type="radio" name="rub" value="Beziehung"> Beziehung</label><label><input type="radio" name="rub" value="Abenteuer"> Abenteuer</label>
+          </div>
+        </div>
+        <div id="queue"></div>
+      </aside>
       <div class="card ibx-chat">
-        <div id="ibxEmpty" class="empty" style="margin:auto">Wähle links eine wartende Nachricht.</div>
-        <div id="ibxConv" hidden style="display:contents">
-          <div class="log-head ibx-top"><div><h3 id="cTitle"></h3><small class="muted" id="cSub"></small></div><span class="wait" id="cWait"></span></div>
+        <div id="ibxEmpty" class="empty" style="margin:auto">Wähle links eine Nachricht.</div>
+        <div id="ibxConv" hidden>
+          <div class="log-head ibx-top"><div><h3 id="cTitle"></h3><small class="muted" id="cSub"></small></div><div class="ibx-badges" id="cBadges"></div></div>
           <div class="log-msgs" id="cMsgs"></div>
-          <form class="ibx-reply" id="replyForm"><textarea class="input" id="reply" rows="3" placeholder="Antwort schreiben … (Strg+Enter sendet)" aria-label="Antwort"></textarea>
-            <div class="ibx-actions"><span class="hint" id="charHint">0 Zeichen</span><button type="button" class="btn ghost sm" id="skip">Zurückstellen</button><button class="btn primary">Antworten</button></div></form>
+          <div class="owner-lock" id="ownerLock" hidden></div>
+          <form class="ibx-reply" id="replyForm">
+            <div class="tpl-row"><select class="input" id="tplPick" aria-label="Vorlage einfügen"><option value="">Vorlage einfügen …</option></select></div>
+            <textarea class="input" id="reply" rows="3" placeholder="Antwort schreiben … (Strg+Enter sendet)" aria-label="Antwort"></textarea>
+            <div class="ibx-actions"><span class="hint" id="charHint">0 Zeichen</span><button type="button" class="btn ghost sm" id="skip">Zurückstellen</button><button class="btn primary" id="sendBtn">Senden</button></div>
+          </form>
         </div>
       </div>
       <aside class="card ibx-info" id="infoPane"><p class="empty">Infos zu Kunde und Profil erscheinen hier.</p></aside>
+    </div>
+  </section>
+
+  <!-- ================= MEINE PROFILE ================= -->
+  <section id="profiles" hidden>
+    <div class="toolbar">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="pq" placeholder="Profil suchen" aria-label="Profil suchen"></label>
+        <select class="input" id="pOwner" style="width:auto" aria-label="Mitarbeiter" data-admin><option value="">Alle Mitarbeiter</option></select></div>
+      <button class="btn primary" id="pAdd">+ Profil anlegen</button>
+    </div>
+    <p class="hint" id="pRule" style="margin:-4px 0 16px"></p>
+    <div class="pgroups" id="pGroups"></div>
+  </section>
+
+  <!-- ================= VORLAGEN ================= -->
+  <section id="templates" hidden>
+    <div class="two">
+      <form class="card pad" id="tplForm">
+        <h2 style="font-size:22px;margin-bottom:6px" id="tplFormTitle">Neue Vorlage</h2>
+        <p class="hint" style="margin:0 0 12px">Jede Vorlage bekommt automatisch eine Nummer. Das System merkt sich, welcher Kunde welche Vorlage bekommen hat – <b>derselbe Text geht nie zweimal an denselben Kunden</b>, auch nicht von verschiedenen Profilen.</p>
+        <div class="field"><label for="tplName">Kurzname</label><input class="input" id="tplName" maxlength="40" placeholder="z. B. Wochenende"></div>
+        <div class="field"><label for="tplText">Text</label><textarea class="input" id="tplText" required placeholder="Das Wochenende war toll – was hast du so gemacht?"></textarea></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="tplSave">Vorlage speichern</button><button type="button" class="btn ghost" id="tplCancel" hidden>Abbrechen</button></div>
+      </form>
+      <div class="card pad">
+        <h2 style="font-size:22px;margin-bottom:12px" id="tplListTitle">Meine Vorlagen</h2>
+        <div id="tplList"></div>
+      </div>
     </div>
   </section>
 
@@ -289,7 +370,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
-    ["inbox","stats","staff","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
+    ["inbox","profiles","templates","stats","staff","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
   $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
     $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
   /* ---------- Verläufe (nur Admin, mit Zusatzcode) ---------- */
@@ -327,69 +408,241 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   const isAdmin=()=>me==="admin";
   const meStaff=()=>staff.find(x=>x.user===me);
 
-  /* ---------- Posteingang ---------- */
-  const customers={
-    "Michael Nordlicht":{age:56,ort:"20095 Hamburg",job:"Elektriker",coins:5,since:"12.11.2026",look:"Beziehung"},
-    "Sonnenschein63":{age:63,ort:"34508 Willingen",job:"Rentner",coins:42,since:"02.10.2026",look:"Beziehung"},
-    "Rolf aus Kassel":{age:59,ort:"34117 Kassel",job:"Busfahrer",coins:118,since:"14.08.2026",look:"Abenteuer"},
-    "Wanderfreund":{age:61,ort:"– (keine Angabe)",job:"Lehrer",coins:12,since:"30.10.2026",look:"Beziehung"},
-    "Berti_K":{age:67,ort:"60311 Frankfurt",job:"",coins:7,since:"15.11.2026",look:"Abenteuer"}
+  /* ======================================================
+     NACHRICHTEN · MEINE PROFILE · VORLAGEN
+     Regeln:
+     - Jedes Profil gehört genau einem Mitarbeiter. Nur er schreibt damit.
+     - Nur der Chef kann Profile verschieben (zu einem anderen Mitarbeiter oder zu sich).
+     - Kunden sehen nur diese Profile, nie andere Kunden. Kunden können nie miteinander schreiben.
+     - Vorlagen haben eine Nummer; dieselbe Vorlage geht nie zweimal an denselben Kunden.
+     ====================================================== */
+  const meKey=()=>isAdmin()?"chef":me;
+  const ownerName=u=>u==="chef"?"Chef":(staff.find(x=>x.user===u)||{name:u}).name;
+  const owners=()=>[{user:"chef",name:"Chef"}].concat(staff.filter(s=>s.active&&s.role==="Moderator").map(s=>({user:s.user,name:s.name})));
+  const profiles=NMA.profiles;
+  const saveProfiles=()=>NMA.store.set("tProfiles",profiles);
+  const prof=id=>profiles.find(p=>p.id===id);
+  const mine=p=>p&&p.owner===meKey();
+  const visibleProfile=p=>isAdmin()||mine(p);
+
+  /* Kunden (Demo). st: T = Tester (noch nichts bezahlt), K = Kunde (hat bezahlt) */
+  const customers=NMA.store.get("tCustomers",null)||{
+    "Michael Nordlicht":{nr:10482,st:"T",age:56,ort:"20095 Hamburg",job:"Elektriker",coins:5,since:"12.11.2026",look:"Beziehung"},
+    "Sonnenschein63":{nr:10217,st:"K",age:63,ort:"34508 Willingen",job:"Rentner",coins:42,since:"02.10.2026",look:"Beziehung"},
+    "Rolf aus Kassel":{nr:9876,st:"K",age:59,ort:"34117 Kassel",job:"Busfahrer",coins:118,since:"14.08.2026",look:"Abenteuer"},
+    "Wanderfreund":{nr:10391,st:"T",age:61,ort:"28195 Bremen",job:"Lehrer",coins:12,since:"30.10.2026",look:"Beziehung"},
+    "Berti_K":{nr:10511,st:"T",age:67,ort:"60311 Frankfurt",job:"",coins:7,since:"15.11.2026",look:"Abenteuer"},
+    "Kalle 58":{nr:10133,st:"K",age:58,ort:"34537 Bad Wildungen",job:"Landwirt",coins:22,since:"21.09.2026",look:"Abenteuer"}
   };
+  const cust=n=>customers[n]||(customers[n]={nr:10500+Math.floor(Math.random()*400),st:"T",age:"",ort:"",job:"",coins:NMA.coins(),since:new Date().toLocaleDateString("de-DE"),look:""});
   let notes=NMA.store.get("teamNotes",{"Rolf aus Kassel":"Hat einen Garten, mag Labradore. Geburtstag im März.","Sonnenschein63":"Witwer seit 2022, sehr höflich."});
+
   const mins=m=>Date.now()-m*60000;
-  let queue=NMA.store.get("teamQueue",null)||[
-    {id:"q1",cust:"Sonnenschein63",profile:"Sabine Herz",mod:"marco",t:mins(9),hist:[["c","Guten Abend, wie war dein Tag?"],["m","Ganz entspannt, ich war im Garten. Und deiner?","Julia W."],["c","Lang, aber jetzt wird er besser 🙂 Was machst du am Wochenende?"]]},
-    {id:"q2",cust:"Rolf aus Kassel",profile:"Monika am Meer",mod:"marco",t:mins(4),hist:[["c","Hallo Monika, wie heißt denn dein Hund?"],["m","Er heißt Bruno und ist ein echter Schatz.","Tim R."],["c","Schöner Name! Gehst du morgen früh mit ihm raus?"]]},
-    {id:"q3",cust:"Berti_K",profile:"Tanzmaus Petra",mod:"marco",t:mins(2),hist:[["c","Hallo Petra, tanzt du auch Discofox?"]]},
-    {id:"q4",cust:"Michael Nordlicht",profile:"Gitarren Lena",mod:"julia",t:mins(6),hist:[["c","Hallo! Dein Profil klingt sympathisch."],["m","Hallo! Spielst du auch ein Instrument?","Marco B."],["c","Ein bisschen Gitarre. Und welche Musik hörst du am liebsten?"]]},
-    {id:"q5",cust:"Wanderfreund",profile:"Andrea Lächeln",mod:"julia",t:mins(1),hist:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?"]]}
+  let items=NMA.store.get("tItems",null)||[
+    {id:"q1",kind:"msg",cust:"Sonnenschein63",pid:"sabine",t:mins(9),read:false,hist:[["c","Guten Abend, wie war dein Tag?"],["m","Ganz entspannt, ich war im Garten. Und deiner?","marco"],["c","Lang, aber jetzt wird er besser 🙂 Was machst du am Wochenende?"]]},
+    {id:"q2",kind:"msg",cust:"Rolf aus Kassel",pid:"monika",t:mins(4),read:false,hist:[["c","Hallo Monika, wie heißt denn dein Hund?"],["m","Er heißt Bruno und ist ein echter Schatz.","marco"],["c","Schöner Name! Gehst du morgen früh mit ihm raus?"]]},
+    {id:"q3",kind:"msg",cust:"Berti_K",pid:"petra",t:mins(2),read:false,hist:[["c","Hallo Petra, tanzt du auch Discofox?"]]},
+    {id:"q4",kind:"msg",cust:"Michael Nordlicht",pid:"lena",t:mins(6),read:true,hist:[["c","Hallo! Dein Profil klingt sympathisch."],["m","Hallo! Spielst du auch ein Instrument?","marco"],["c","Ein bisschen Gitarre. Und welche Musik hörst du am liebsten?"]]},
+    {id:"q5",kind:"msg",cust:"Wanderfreund",pid:"andrea",t:mins(1),read:false,hist:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?"]]},
+    {id:"h1",kind:"heart",cust:"Kalle 58",pid:"monika",t:mins(12),read:false,hist:[]},
+    {id:"h2",kind:"heart",cust:"Wanderfreund",pid:"thomas",t:mins(30),read:false,hist:[]}
   ];
-  const saveQ=()=>{NMA.store.set("teamQueue",queue);NMA.store.set("teamNotes",notes)};
-  let cur=null;
-  const myQueue=()=>(isAdmin()?queue:queue.filter(q=>q.mod===me)).slice().sort((a,b)=>(a.later||a.t)-(b.later||b.t));
-  const waitTxt=t=>{const m=Math.max(0,Math.round((Date.now()-t)/60000));return m<1?"gerade eben":m+" Min."};
+  let sent=NMA.store.get("tSent",[]);
+  let tpls=NMA.store.get("tTpls",null)||[
+    {nr:1,owner:"marco",name:"Wochenende",text:"Das Wochenende war toll – ich war viel draußen. Was hast du so gemacht?"},
+    {nr:2,owner:"marco",name:"Danke fürs Herz",text:"Danke für dein Herz! Ich habe mich gefreut und wollte dir gleich mal Hallo sagen 😊"},
+    {nr:3,owner:"julia",name:"Guten Morgen",text:"Guten Morgen! Ich hoffe, du hast gut geschlafen. Was steht heute bei dir an?"}
+  ];
+  let tplSent=NMA.store.get("tTplSent",{"Kalle 58":[{nr:2,t:mins(60*24*3),pid:"lena"}]});
+  const saveAll=()=>{NMA.store.set("tItems",items);NMA.store.set("tSent",sent);NMA.store.set("tTpls",tpls);NMA.store.set("tTplSent",tplSent);NMA.store.set("teamNotes",notes);NMA.store.set("tCustomers",customers)};
+  const tplNo=n=>"V-"+String(n).padStart(3,"0");
+  const norm=s=>s.toLowerCase().replace(/\s+/g," ").replace(/[^\p{L}\p{N} ]/gu,"").trim();
+
+  /* Herzen von der Kundenseite übernehmen */
+  const pullHearts=()=>{
+    const hs=NMA.store.get("hearts",[]);let n=0;
+    hs.forEach(h=>{if(!items.some(i=>i.id===h.id)&&prof(h.pid)){items.push({id:h.id,kind:"heart",cust:h.cust,pid:h.pid,t:h.t,read:false,hist:[]});cust(h.cust);n++}});
+    if(n){saveAll();renderQueue()}
+  };
+
+  let box="unread",rub="",cur=null,insertedTpl=null;
+  const inScope=i=>{const p=prof(i.pid);return p&&visibleProfile(p)&&(!rub||p.looking===rub)};
+  const listFor=b=>{
+    if(b==="sent")return sent.filter(s=>{const p=prof(s.pid);return p&&visibleProfile(p)&&(!rub||p.looking===rub)}).sort((a,c)=>c.t-a.t);
+    return items.filter(i=>inScope(i)&&(b==="hearts"?i.kind==="heart":i.kind==="msg"&&(b==="unread"?!i.read:i.read))).sort((a,c)=>(a.later||a.t)-(c.later||c.t));
+  };
+  const waitTxt=t=>{const m=Math.max(0,Math.round((Date.now()-t)/60000));return m<1?"gerade eben":m<60?m+" Min.":m<1440?Math.round(m/60)+" Std.":Math.round(m/1440)+" Tg."};
   const waitCls=t=>{const m=(Date.now()-t)/60000;return m>=8?"late":m>=5?"warn":""};
-  const modName=u=>(staff.find(x=>x.user===u)||{name:u}).name;
+  const stBadge=c=>`<span class="kst ${c.st==="K"?"k":"t"}" title="${c.st==="K"?"Kunde – hat bezahlt":"Tester – hat noch nichts bezahlt"}">${c.st}</span>`;
+  const myQueue=()=>items.filter(i=>{const p=prof(i.pid);return i.kind==="msg"&&p&&visibleProfile(p)}).sort((a,b)=>a.t-b.t);
+
   const renderQueue=()=>{
-    const q=myQueue();$("qBadge").textContent=q.length;$("qBadge").hidden=!q.length;
-    $("qTitle").textContent=isAdmin()?"Alle wartenden Nachrichten":"Deine wartenden Nachrichten";
-    $("queue").innerHTML=q.length?q.map(x=>{const last=x.hist[x.hist.length-1];
-      return `<button class="q-item ${x.id===cur?"on":""}" data-q="${x.id}"><span class="top"><b>${NMA.esc(x.cust)}</b><span class="wait ${waitCls(x.t)}">${waitTxt(x.t)}</span></span><small>an „${NMA.esc(x.profile)}“</small><small>${NMA.esc(last[1])}</small>${isAdmin()?`<span class="assignee">→ ${NMA.esc(modName(x.mod))}</span>`:""}</button>`}).join(""):'<p class="empty">Keine wartenden Nachrichten 🎉</p>';
+    const all=items.filter(i=>{const p=prof(i.pid);return p&&visibleProfile(p)});
+    const nU=all.filter(i=>i.kind==="msg"&&!i.read).length,nR=all.filter(i=>i.kind==="msg"&&i.read).length,nH=all.filter(i=>i.kind==="heart").length;
+    $("nUnread").textContent=nU;$("nRead").textContent=nR;$("nHearts").textContent=nH;
+    $("qBadge").textContent=nU+nH;$("qBadge").hidden=!(nU+nH);
+    const list=listFor(box);
+    $("queue").innerHTML=list.length?list.map(x=>{
+      const p=prof(x.pid)||{name:"?"},c=cust(x.cust);
+      if(box==="sent")return `<div class="q-item sent"><span class="top"><b>${NMA.esc(x.cust)} ${stBadge(c)}</b><small>${waitTxt(x.t)}</small></span><small>von „${NMA.esc(p.name)}“${x.tpl?" · "+tplNo(x.tpl):""}${isAdmin()?" · ✎ "+NMA.esc(ownerName(x.by)):""}</small><small>${NMA.esc(x.text)}</small></div>`;
+      const last=x.kind==="heart"?"♥ hat dir ein Herzchen geschickt":x.hist[x.hist.length-1][1];
+      return `<button class="q-item ${x.id===cur?"on":""} ${x.kind==="heart"?"heart":""} ${!x.read?"unread":""}" data-q="${x.id}"><span class="top"><b>${NMA.esc(x.cust)} ${stBadge(c)}</b><span class="wait ${x.kind==="msg"&&!x.read?waitCls(x.t):""}">${waitTxt(x.t)}</span></span><small>an „${NMA.esc(p.name)}“ · ${p.looking} · ${c.coins} Coins</small><small>${NMA.esc(last)}</small>${isAdmin()?`<span class="assignee">Profil gehört: ${NMA.esc(ownerName(p.owner))}</span>`:""}</button>`}).join("")
+      :`<p class="empty">${box==="hearts"?"Keine neuen Herzchen.":box==="sent"?"Noch nichts gesendet.":box==="read"?"Keine gelesenen, offenen Nachrichten.":"Keine ungelesenen Nachrichten 🎉"}</p>`;
+  };
+
+  const renderTplPick=()=>{
+    const own=tpls.filter(t=>t.owner===meKey()||isAdmin());
+    $("tplPick").innerHTML='<option value="">Vorlage einfügen …</option>'+own.map(t=>`<option value="${t.nr}">${tplNo(t.nr)} · ${NMA.esc(t.name||t.text.slice(0,30))}</option>`).join("");
   };
   const renderInfo=x=>{
-    const c=customers[x.cust]||{},p=NMA.profiles.find(pp=>pp.name===x.profile)||{};
-    $("infoPane").innerHTML=`<h4>KUNDE</h4><div class="kv"><span>Nickname</span><b>${NMA.esc(x.cust)}</b><span>Alter</span>${c.age||"–"}<span>Wohnort</span>${NMA.esc(c.ort||"–")}<span>Beruf</span>${NMA.esc(c.job||"–")}<span>Sucht</span>${c.look||"–"}<span>Coins</span>${c.coins??"–"}<span>Dabei seit</span>${c.since||"–"}</div>
+    const c=cust(x.cust),p=prof(x.pid)||{};
+    const got=(tplSent[x.cust]||[]).map(s=>tplNo(s.nr)).join(", ")||"keine";
+    $("infoPane").innerHTML=`<h4>KUNDE</h4><div class="kv"><span>Nickname</span><b>${NMA.esc(x.cust)}</b><span>Kunden-Nr.</span>#${c.nr}<span>Status</span><span style="color:var(--ink)">${stBadge(c)} ${c.st==="K"?"Kunde (hat bezahlt)":"Tester"}</span><span>Coins</span><b style="color:var(--gold)">${c.coins}</b><span>Alter</span>${c.age||"–"}<span>Wohnort</span>${NMA.esc(c.ort||"–")}<span>Beruf</span>${NMA.esc(c.job||"–")}<span>Sucht</span>${c.look||"–"}<span>Dabei seit</span>${c.since||"–"}<span>Vorlagen erhalten</span>${got}</div>
       <h4>NOTIZEN ZUM KUNDEN <small style="font-weight:400">(für alle Mitarbeiter)</small></h4><textarea class="input" id="note" placeholder="z. B. Hobbys, Familie, worüber zuletzt gesprochen wurde">${NMA.esc(notes[x.cust]||"")}</textarea>
-      <h4>DEIN PROFIL IN DIESEM GESPRÄCH</h4><div class="kv"><span>Name</span><b>${NMA.esc(p.name||x.profile)}</b><span>Alter</span>${p.age||"–"}<span>Ort</span>${NMA.esc(p.city||"–")}<span>Beruf</span>${NMA.esc(p.job||"–")}<span>Sucht</span>${p.looking||"–"}</div>
+      <h4>PROFIL IN DIESEM GESPRÄCH</h4><div class="kv"><span>Name</span><b>${NMA.esc(p.name||"")}</b><span>Rubrik</span>${p.sex==="m"?"Mann":"Frau"} · ${p.looking||""}<span>Alter</span>${p.age||"–"}<span>Ort</span>${NMA.esc(p.city||"–")}<span>Beruf</span>${NMA.esc(p.job||"–")}<span>Gehört</span>${NMA.esc(ownerName(p.owner))}</div>
       <p class="small muted" style="margin:8px 0 0">${NMA.esc(p.about||"")}</p>`;
-    $("note").addEventListener("input",e=>{notes[x.cust]=e.target.value;saveQ()});
+    $("note").addEventListener("input",e=>{notes[x.cust]=e.target.value;saveAll()});
   };
   const openQ=id=>{
-    const x=queue.find(q=>q.id===id);if(!x)return;cur=id;
-    $("ibxEmpty").hidden=true;$("ibxConv").hidden=false;$("ibxConv").style.display="contents";
-    $("cTitle").textContent=`${x.cust} ↔ ${x.profile}`;
-    $("cSub").textContent=isAdmin()?`Zugeteilt an ${modName(x.mod)}`:"Du antwortest als "+x.profile;
-    $("cWait").textContent="wartet "+waitTxt(x.t);$("cWait").className="wait "+waitCls(x.t);
-    $("cMsgs").innerHTML=x.hist.map(m=>`<div class="lm ${m[0]==="m"?"mod":"cust"}"><span class="meta">${m[0]==="m"?NMA.esc(x.profile)+(isAdmin()&&m[2]?" · ✎ "+NMA.esc(m[2]):""):NMA.esc(x.cust)}</span>${NMA.esc(m[1])}</div>`).join("");
-    $("cMsgs").scrollTop=1e6;renderQueue();renderInfo(x);$("reply").value="";$("charHint").textContent="0 Zeichen";
-    if(innerWidth>700)$("reply").focus();
+    const x=items.find(q=>q.id===id);if(!x)return;cur=id;insertedTpl=null;
+    const p=prof(x.pid),c=cust(x.cust);
+    if(x.kind==="msg"&&!x.read){x.read=true;saveAll()}
+    $("ibxEmpty").hidden=true;$("ibxConv").hidden=false;
+    $("cTitle").textContent=`${x.cust} ↔ ${p.name}`;
+    $("cSub").textContent=x.kind==="heart"?`hat „${p.name}“ ein Herzchen geschickt – jetzt anschreiben!`:mine(p)?"Du schreibst als "+p.name:"Profil gehört "+ownerName(p.owner);
+    $("cBadges").innerHTML=`<span class="kst ${c.st==="K"?"k":"t"}">${c.st}</span><span class="nr">#${c.nr}</span><span class="coin-b">${c.coins} Coins</span>`+(x.kind==="msg"?`<span class="wait ${waitCls(x.t)}">wartet ${waitTxt(x.t)}</span>`:"");
+    $("cMsgs").innerHTML=x.kind==="heart"&&!x.hist.length?`<div class="heart-note">♥ <b>${NMA.esc(x.cust)}</b> gefällt das Profil <b>${NMA.esc(p.name)}</b>.<br><span class="muted">Er hat ein Herzchen geschickt. Schreib ihn jetzt an – z. B. mit einer Vorlage.</span></div>`
+      :x.hist.map(m=>`<div class="lm ${m[0]==="m"?"mod":"cust"}"><span class="meta">${m[0]==="m"?NMA.esc(p.name)+(isAdmin()&&m[2]?" · ✎ "+NMA.esc(ownerName(m[2])):""):NMA.esc(x.cust)}</span>${NMA.esc(m[1])}</div>`).join("");
+    $("cMsgs").scrollTop=1e6;
+    const can=mine(p);
+    $("replyForm").hidden=!can;$("ownerLock").hidden=can;
+    if(!can)$("ownerLock").innerHTML=`🔒 Dieses Profil gehört <b>${NMA.esc(ownerName(p.owner))}</b>. Nur er/sie kann damit schreiben.${isAdmin()?` <button class="btn sm" id="takeOver">Profil zu mir verschieben</button>`:""}`;
+    if(!can&&isAdmin())$("takeOver").addEventListener("click",()=>moveProfile(p,"chef",()=>openQ(id)));
+    $("sendBtn").textContent=x.kind==="heart"?"Anschreiben":"Antworten";
+    renderTplPick();renderQueue();renderInfo(x);$("reply").value="";$("charHint").textContent="0 Zeichen";
+    if(can&&innerWidth>700)$("reply").focus();
   };
-  const hideConv=()=>{cur=null;$("ibxConv").hidden=true;$("ibxConv").style.display="none";$("ibxEmpty").hidden=false;$("infoPane").innerHTML='<p class="empty">Infos zu Kunde und Profil erscheinen hier.</p>'};
+  const hideConv=()=>{cur=null;$("ibxConv").hidden=true;$("ibxEmpty").hidden=false;$("infoPane").innerHTML='<p class="empty">Infos zu Kunde und Profil erscheinen hier.</p>'};
+
+  /* Vorlage erkennen: eingefügte Vorlage ODER Text, der einer Vorlage entspricht */
+  const detectTpl=text=>{
+    const n=norm(text);if(!n)return null;
+    if(insertedTpl){const t=tpls.find(x=>x.nr===insertedTpl);if(t&&n.includes(norm(t.text).slice(0,Math.min(40,norm(t.text).length))))return t}
+    return tpls.find(t=>{const tn=norm(t.text);return tn&&(n===tn||(tn.length>=25&&n.includes(tn))||(n.length>=25&&tn.includes(n)))})||null;
+  };
+
   $("queue").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b)openQ(b.dataset.q)});
-  $("reply").addEventListener("input",e=>{$("charHint").textContent=e.target.value.length+" Zeichen"});
+  $("boxChips").addEventListener("click",e=>{const b=e.target.closest("[data-box]");if(!b)return;box=b.dataset.box;$("boxChips").querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===b));hideConv();renderQueue()});
+  document.querySelectorAll("input[name=rub]").forEach(r=>r.addEventListener("change",()=>{rub=r.value;hideConv();renderQueue()}));
+  $("tplPick").addEventListener("change",e=>{const t=tpls.find(x=>x.nr==e.target.value);if(!t)return;
+    const x=items.find(q=>q.id===cur);
+    if(x&&(tplSent[x.cust]||[]).some(s=>s.nr===t.nr)){NMA.modal({title:`${tplNo(t.nr)} schon gesendet`,text:`${NMA.esc(x.cust)} hat diese Vorlage bereits bekommen. Bitte eine andere Vorlage nehmen oder selbst schreiben.`,ok:"Verstanden"});e.target.value="";return}
+    $("reply").value=t.text;insertedTpl=t.nr;$("charHint").textContent=t.text.length+" Zeichen · "+tplNo(t.nr);e.target.value="";$("reply").focus()});
+  $("reply").addEventListener("input",e=>{$("charHint").textContent=e.target.value.length+" Zeichen"+(insertedTpl?" · "+tplNo(insertedTpl):"")});
   $("reply").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("replyForm").requestSubmit()}});
   $("replyForm").addEventListener("submit",e=>{e.preventDefault();
-    const v=$("reply").value.trim(),x=queue.find(q=>q.id===cur);if(!x)return;
-    if(v.length<2){NMA.toast("Bitte eine Antwort schreiben.");return}
+    const v=$("reply").value.trim(),x=items.find(q=>q.id===cur);if(!x)return;
+    const p=prof(x.pid);if(!mine(p)){NMA.toast("Mit diesem Profil darfst du nicht schreiben.");return}
+    if(v.length<2){NMA.toast("Bitte eine Nachricht schreiben.");return}
+    const t=detectTpl(v);
+    if(t){const prevSent=(tplSent[x.cust]||[]).find(s=>s.nr===t.nr);
+      if(prevSent){NMA.modal({title:"Nicht gesendet – doppelte Vorlage",text:`<b>${NMA.esc(x.cust)}</b> hat <b>${tplNo(t.nr)}</b> („${NMA.esc(t.name||"Vorlage")}“) schon am ${new Date(prevSent.t).toLocaleDateString("de-DE")} von „${NMA.esc((prof(prevSent.pid)||{name:"?"}).name)}“ bekommen. Derselbe Text darf nicht zweimal an einen Kunden gehen.`,ok:"Text ändern"});return}}
     const took=Math.max(.5,(Date.now()-x.t)/60000);
     const st=staff.find(s=>s.user===(isAdmin()?"sandra":me));
-    if(st){[0,1,2].forEach(i=>{st.rt[i]=st.msg[i]?(st.rt[i]*st.msg[i]+took)/(st.msg[i]+1):took;st.msg[i]++});persist()}
-    queue=queue.filter(q=>q.id!==cur);saveQ();
-    NMA.toast(`Antwort gesendet (${took.toFixed(1).replace(".",",")} Min.)`);
-    const next=myQueue()[0];next?openQ(next.id):(hideConv(),renderQueue());renderStats();
+    if(st&&x.kind==="msg"){[0,1,2].forEach(i=>{st.rt[i]=st.msg[i]?(st.rt[i]*st.msg[i]+took)/(st.msg[i]+1):took;st.msg[i]++});persist()}
+    if(t)(tplSent[x.cust]=tplSent[x.cust]||[]).push({nr:t.nr,t:Date.now(),pid:x.pid});
+    sent.push({id:"s"+Date.now(),cust:x.cust,pid:x.pid,text:v,t:Date.now(),by:meKey(),tpl:t?t.nr:null});
+    items=items.filter(q=>q.id!==cur);saveAll();
+    NMA.toast(x.kind==="heart"?`${x.cust} wurde angeschrieben.`:`Antwort gesendet (${took.toFixed(1).replace(".",",")} Min.)`);
+    const next=listFor(box)[0];next?openQ(next.id):(hideConv(),renderQueue());renderStats();renderTpls();
   });
-  $("skip").addEventListener("click",()=>{const x=queue.find(q=>q.id===cur);if(!x)return;x.later=Date.now();saveQ();const next=myQueue().find(q=>q.id!==x.id);next?openQ(next.id):openQ(x.id);NMA.toast("Zurückgestellt – ans Ende der Liste.")});
-  setInterval(()=>{renderQueue();if(cur){const x=queue.find(q=>q.id===cur);if(x){$("cWait").textContent="wartet "+waitTxt(x.t);$("cWait").className="wait "+waitCls(x.t)}}},30000);
+  $("skip").addEventListener("click",()=>{const x=items.find(q=>q.id===cur);if(!x)return;x.later=Date.now();saveAll();const next=listFor(box).find(q=>q.id!==x.id);next?openQ(next.id):hideConv();renderQueue();NMA.toast("Zurückgestellt – ans Ende der Liste.")});
+
+  /* ---------- Meine Profile ---------- */
+  const groups=[["w","Beziehung","Frauen · Beziehung"],["w","Abenteuer","Frauen · Abenteuer"],["m","Beziehung","Männer · Beziehung"],["m","Abenteuer","Männer · Abenteuer"]];
+  let pOwnerSel="";
+  const renderProfiles=()=>{
+    const q=$("pq").value.trim().toLowerCase(),o=isAdmin()?pOwnerSel:meKey();
+    $("pOwner").innerHTML='<option value="">Alle Mitarbeiter</option>'+owners().map(x=>`<option value="${x.user}" ${x.user===o?"selected":""}>${NMA.esc(x.name)}</option>`).join("");
+    $("pRule").textContent=isAdmin()?"Als Chef siehst du alle Profile und kannst sie einem anderen Mitarbeiter oder dir selbst zuteilen.":"Diese Profile gehören nur dir – kein anderer Mitarbeiter kann mit ihnen schreiben.";
+    const list=profiles.filter(p=>(!o||p.owner===o)&&(!q||p.name.toLowerCase().includes(q)||(p.city||"").toLowerCase().includes(q)));
+    $("pGroups").innerHTML=groups.map(([sx,lk,title])=>{const g=list.filter(p=>p.sex===sx&&p.looking===lk);
+      return `<section class="pgroup"><h3>${title} <span class="muted small">${g.length}</span></h3>${g.length?`<div class="pcards">${g.map(p=>{const open=items.filter(i=>i.pid===p.id).length;
+        return `<article class="card pcard">${NMA.avatar(p,"lg",false)}<div class="grow"><b>${NMA.esc(p.name)}, ${p.age}</b><small>${NMA.esc(p.city||"")}${p.job?" · "+NMA.esc(p.job):""}</small><small>${open?`<span style="color:var(--accent)">${open} offen</span> · `:""}${isAdmin()?"gehört "+NMA.esc(ownerName(p.owner)):"dein Profil"}</small></div>
+        <div class="pacts"><button class="btn sm" data-pedit="${p.id}">Bearbeiten</button>${isAdmin()?`<select class="input sm-sel" data-pmove="${p.id}" aria-label="Profil verschieben">${owners().map(x=>`<option value="${x.user}" ${x.user===p.owner?"selected":""}>→ ${NMA.esc(x.name)}</option>`).join("")}</select>`:""}</div></article>`}).join("")}</div>`:'<p class="muted small" style="margin:6px 0 0">Noch keine Profile.</p>'}</section>`}).join("");
+  };
+  const moveProfile=(p,to,done)=>{
+    if(!isAdmin())return;
+    NMA.modal({title:"Profil verschieben?",text:`„${NMA.esc(p.name)}“ geht von ${NMA.esc(ownerName(p.owner))} an <b>${NMA.esc(ownerName(to))}</b>. Offene Nachrichten an dieses Profil wandern mit.`,cancel:"Abbrechen",ok:"Verschieben",
+      onOk:()=>{p.owner=to;saveProfiles();renderProfiles();renderQueue();NMA.toast(`„${p.name}“ gehört jetzt ${ownerName(to)}.`);done&&done()}});
+    renderProfiles();
+  };
+  const profileForm=p=>{
+    const isNew=!p;p=p||{sex:"w",looking:"Beziehung",age:"",city:"",job:"",about:"",tags:[],height:"",status:"Single"};
+    const m=document.createElement("div");m.className="modal form-modal";
+    m.innerHTML=`<form class="card" novalidate style="max-height:92svh;overflow:auto"><h2>${isNew?"Profil anlegen":"Profil bearbeiten"}</h2>
+      <div class="form-grid" style="margin-top:14px">
+        <div class="field full"><label for="pn">Nickname</label><input class="input" id="pn" required maxlength="30" value="${NMA.esc(p.name||"")}"><span class="hint" id="pnh">Jeder Name nur einmal, z. B. „Blonde Carola“.</span></div>
+        <div class="field"><span class="label">Geschlecht</span><div class="seg"><label><input type="radio" name="psx" value="w" ${p.sex!=="m"?"checked":""}> Frau</label><label><input type="radio" name="psx" value="m" ${p.sex==="m"?"checked":""}> Mann</label></div></div>
+        <div class="field"><span class="label">Sucht</span><div class="seg"><label><input type="radio" name="plk" value="Beziehung" ${p.looking!=="Abenteuer"?"checked":""}> Beziehung</label><label><input type="radio" name="plk" value="Abenteuer" ${p.looking==="Abenteuer"?"checked":""}> Abenteuer</label></div></div>
+        <div class="field"><label for="pa">Alter</label><input class="input" id="pa" type="number" min="18" max="99" required value="${p.age||""}"></div>
+        <div class="field"><label for="pc">Ort</label><input class="input" id="pc" required value="${NMA.esc(p.city||"")}"></div>
+        <div class="field"><label for="pj">Beruf</label><input class="input" id="pj" value="${NMA.esc(p.job||"")}"></div>
+        <div class="field"><label for="ps">Familienstand</label><select class="input" id="ps">${["Single","Geschieden","Verwitwet","Getrennt lebend"].map(x=>`<option ${x===p.status?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div class="field full"><label for="pab">Über mich</label><textarea class="input" id="pab" maxlength="800">${NMA.esc(p.about||"")}</textarea></div>
+        <div class="field full"><label for="pt">Interessen</label><input class="input" id="pt" value="${NMA.esc((p.tags||[]).join(", "))}" placeholder="Tanzen, Kochen, Reisen"></div>
+        ${isAdmin()?`<div class="field full"><label for="po">Gehört</label><select class="input" id="po">${owners().map(x=>`<option value="${x.user}" ${(p.owner||"chef")===x.user?"selected":""}>${NMA.esc(x.name)}</option>`).join("")}</select></div>`:""}
+      </div>
+      <div class="row">${!isNew&&isAdmin()?'<button type="button" class="btn danger" data-del style="margin-right:auto">Löschen</button>':""}<button type="button" class="btn ghost" data-x>Abbrechen</button><button class="btn primary">${isNew?"Anlegen":"Speichern"}</button></div></form>`;
+    document.body.appendChild(m);m.querySelector("#pn").focus();
+    m.addEventListener("click",e=>{if(e.target===m||e.target.hasAttribute("data-x"))m.remove()});
+    const del=m.querySelector("[data-del]");if(del)del.addEventListener("click",()=>{if(items.some(i=>i.pid===p.id)){NMA.toast("Profil hat noch offene Nachrichten – erst beantworten oder verschieben.");return}
+      const i=profiles.indexOf(p);profiles.splice(i,1);saveProfiles();m.remove();renderProfiles();NMA.toast("Profil gelöscht.")});
+    m.querySelector("form").addEventListener("submit",e=>{e.preventDefault();
+      const name=m.querySelector("#pn").value.replace(/\s+/g," ").trim(),age=+m.querySelector("#pa").value,city=m.querySelector("#pc").value.trim();
+      if(name.length<3){NMA.toast("Bitte einen Nickname eingeben.");return}
+      const taken=profiles.some(x=>x!==p&&x.name.toLowerCase()===name.toLowerCase())||Object.keys(customers).some(c=>c.toLowerCase()===name.toLowerCase())||(isNew||name.toLowerCase()!==(p.name||"").toLowerCase())&&!NMA.nickFree(name);
+      if(taken){m.querySelector("#pnh").className="hint bad";m.querySelector("#pnh").textContent=`„${name}“ ist schon vergeben.`;return}
+      if(!(age>=18&&age<=99)){NMA.toast("Alter muss zwischen 18 und 99 liegen.");return}
+      if(!city){NMA.toast("Bitte einen Ort eingeben.");return}
+      const data={name,age,city,sex:m.querySelector("input[name=psx]:checked").value,looking:m.querySelector("input[name=plk]:checked").value,job:m.querySelector("#pj").value.trim(),status:m.querySelector("#ps").value,about:m.querySelector("#pab").value.trim(),tags:m.querySelector("#pt").value.split(",").map(s=>s.trim()).filter(Boolean)};
+      if(isAdmin())data.owner=m.querySelector("#po").value;
+      if(isNew){const grads=["#c0796a,#4a2b2e","#8a6aa8,#2c2240","#c79a54,#4b3517","#4f8f87,#173a37","#b0566f,#3b1825","#5b7aa0,#1c2a3c"];
+        profiles.push(Object.assign({id:"p"+Date.now(),owner:meKey(),km:5+Math.floor(Math.random()*40),online:true,height:"",g:`linear-gradient(145deg,${grads[profiles.length%grads.length]})`},data));NMA.toast(`Profil „${name}“ angelegt – Kunden sehen es jetzt in der Suche.`)}
+      else{Object.assign(p,data);NMA.toast("Profil gespeichert.")}
+      saveProfiles();m.remove();renderProfiles();renderQueue()});
+  };
+  $("pAdd").addEventListener("click",()=>profileForm());
+  $("pq").addEventListener("input",renderProfiles);$("pOwner").addEventListener("change",e=>{pOwnerSel=e.target.value;renderProfiles()});
+  $("pGroups").addEventListener("click",e=>{const b=e.target.closest("[data-pedit]");if(b)profileForm(prof(b.dataset.pedit))});
+  $("pGroups").addEventListener("change",e=>{const s=e.target.closest("[data-pmove]");if(s){const p=prof(s.dataset.pmove);if(s.value!==p.owner)moveProfile(p,s.value)}});
+
+  /* ---------- Vorlagen ---------- */
+  let editTpl=null;
+  const renderTpls=()=>{
+    const list=tpls.filter(t=>isAdmin()||t.owner===meKey()).sort((a,b)=>b.nr-a.nr);
+    $("tplListTitle").textContent=isAdmin()?"Alle Vorlagen":"Meine Vorlagen";
+    $("tplList").innerHTML=list.length?list.map(t=>{const uses=Object.values(tplSent).filter(a=>a.some(s=>s.nr===t.nr)).length;
+      return `<article class="tpl"><div class="tpl-top"><span class="tpl-nr">${tplNo(t.nr)}</span><b>${NMA.esc(t.name||"Vorlage")}</b>${isAdmin()?`<small class="muted">· ${NMA.esc(ownerName(t.owner))}</small>`:""}<small class="muted" style="margin-left:auto">an ${uses} Kunde${uses===1?"":"n"} gesendet</small></div><p>${NMA.esc(t.text)}</p><div class="tpl-acts"><button class="btn sm" data-tedit="${t.nr}">Bearbeiten</button><button class="btn sm ghost" data-tdel="${t.nr}">Löschen</button></div></article>`}).join(""):'<p class="empty">Noch keine Vorlagen.</p>';
+    renderTplPick();
+  };
+  const resetTplForm=()=>{editTpl=null;$("tplForm").reset();$("tplFormTitle").textContent="Neue Vorlage";$("tplSave").textContent="Vorlage speichern";$("tplCancel").hidden=true};
+  $("tplForm").addEventListener("submit",e=>{e.preventDefault();
+    const text=$("tplText").value.trim(),name=$("tplName").value.trim();
+    if(text.length<10){NMA.toast("Der Text ist zu kurz (mind. 10 Zeichen).");return}
+    const dup=tpls.find(t=>t!==editTpl&&norm(t.text)===norm(text));
+    if(dup){NMA.toast(`Diesen Text gibt es schon als ${tplNo(dup.nr)}.`);return}
+    if(editTpl){Object.assign(editTpl,{text,name});NMA.toast(`${tplNo(editTpl.nr)} gespeichert.`)}
+    else{const nr=Math.max(0,...tpls.map(t=>t.nr))+1;tpls.push({nr,owner:meKey(),name,text});NMA.toast(`Vorlage ${tplNo(nr)} angelegt.`)}
+    saveAll();resetTplForm();renderTpls()});
+  $("tplCancel").addEventListener("click",resetTplForm);
+  $("tplList").addEventListener("click",e=>{const ed=e.target.closest("[data-tedit]"),dl=e.target.closest("[data-tdel]");
+    if(ed){editTpl=tpls.find(t=>t.nr==ed.dataset.tedit);$("tplName").value=editTpl.name||"";$("tplText").value=editTpl.text;$("tplFormTitle").textContent="Vorlage "+tplNo(editTpl.nr)+" bearbeiten";$("tplSave").textContent="Speichern";$("tplCancel").hidden=false;$("tplText").focus()}
+    if(dl){const t=tpls.find(x=>x.nr==dl.dataset.tdel);NMA.modal({title:`${tplNo(t.nr)} löschen?`,text:"Die Nummer wird nicht neu vergeben. Bereits gesendete Vorlagen bleiben gespeichert, damit die Doppel-Sperre weiter greift.",cancel:"Abbrechen",ok:"Löschen",onOk:()=>{tpls=tpls.filter(x=>x!==t);saveAll();renderTpls()}})}});
+
+  addEventListener("storage",e=>{if(e.key==="nma_hearts")pullHearts()});
+  setInterval(()=>{pullHearts();renderQueue()},20000);
+  pullHearts();
 
   /* ---------- Rollenansicht anwenden ---------- */
   const applyRole=()=>{
@@ -403,11 +656,12 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     $("hTitle").textContent=a?"Eingehende Nachrichten nach Uhrzeit":"Eingehende Nachrichten für deine Profile";
     $("hSub").textContent=a?"Alle Profile – hilft bei der Schichtplanung":"Nur Nachrichten an die Profile, die du betreust";
     $("pTitle").textContent=a?"Mitarbeiterbereich":"Hallo "+(meStaff()||{name:""}).name.split(" ")[0]+"!";
-    $("pSub").textContent=a?"Posteingang, Statistik und Verwaltung des Teams.":"Dein Posteingang und deine Zahlen.";
+    $("pSub").textContent=a?"Nachrichten, Profile, Vorlagen, Statistik und Team.":"Deine Nachrichten, Profile, Vorlagen und Zahlen.";
     if(!a){setLock(false);const vis=document.querySelector("[data-tab].on");if(vis&&vis.hidden)document.querySelector('[data-tab="inbox"]').click()}
-    hideConv();renderQueue();renderStats();
+    $("tabProf").textContent=a?"Profile":"Meine Profile";
+    hideConv();renderQueue();renderStats();renderProfiles();renderTpls();resetTplForm();
   };
-  $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+modName(me)+" (Moderator)")});
+  $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+ownerName(me)+" (Moderator)")});
 
   renderStats();renderStaff();applyRole();
 }</script>

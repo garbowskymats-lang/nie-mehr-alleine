@@ -45,3 +45,17 @@ Mitarbeiterbereich
 - Reiter "Verläufe": nur für Admins, zusätzlich mit Admin-Code geschützt; zeigt Chatverläufe mit dem Namen
   des Mitarbeiters an jeder Antwort. Zugriffe werden protokolliert (serverseitig umsetzen!).
 - Alles Demo-Daten; Login, Rollenrechte und Zahlen müssen serverseitig umgesetzt werden.
+
+Stand 16.11.2026 – Mitarbeiterbereich erweitert
+- Grundregel: Kunden sehen und schreiben NUR mit den angelegten Profilen. Kunden sehen niemals andere Kunden
+  und können nie miteinander schreiben. Der Server darf Kunden-Konten nie in Suche/Chat ausliefern.
+- Meine Profile: Jedes Profil gehört genau einem Mitarbeiter (Feld owner). Nur dieser schreibt damit.
+  Gruppiert nach Frau/Mann × Beziehung/Abenteuer. Nur der Chef (Admin) kann Profile verschieben – zu einem
+  anderen Mitarbeiter oder zu sich. Profilnamen sind einmalig (auch gegenüber Kunden-Nicknames).
+- Nachrichten: Ordner Ungelesen / Gelesen / Gesendet / ♥ Herzchen, Filter Rubrik Beziehung/Abenteuer.
+  Kopf zeigt Kunden-Nr., Status T (Tester) / K (Kunde, hat bezahlt) und Coins.
+- Herzchen: Kunde kann max. 5 Herzen pro Tag verschicken (serverseitig erzwingen!). Das Herz landet beim
+  Mitarbeiter, dem das Profil gehört ("hat dir ein Herzchen geschickt") – er kann den Kunden anschreiben.
+- Vorlagen: fortlaufende Nummer (V-001 …). Das System speichert, welcher Kunde welche Vorlage bekommen hat,
+  und blockiert dieselbe Vorlage an denselben Kunden – auch von anderen Profilen und auch, wenn der Text
+  per Hand eingefügt wird. Serverseitig ebenfalls prüfen.

@@ -33,8 +33,9 @@
     <p style="margin:0 0 16px;color:#cfe3e1">${NMA.esc(p.about)}</p>
     <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
     <p class="notice" style="margin:22px 0 0">Moderiertes Profil – wird von einem Moderator geführt.</p>
-    <div class="acts"><a class="btn primary" href="chat.html?mit=${p.id}">Chat starten</a><a class="btn" href="postfach.html?an=${p.id}">Mail schreiben</a><button class="btn ghost" id="report">Melden / Blockieren</button></div>
+    <div class="acts"><a class="btn primary" href="chat.html?mit=${p.id}">Chat starten</a><button class="btn like ${NMA.hasHeart(p.id)?"on":""}" id="heart">${NMA.hasHeart(p.id)?"♥ Herz gesendet":"♡ Herz schicken"}</button><a class="btn" href="postfach.html?an=${p.id}">Mail schreiben</a><button class="btn ghost" id="report">Melden / Blockieren</button></div>
   </div>`;
+  document.getElementById("heart").addEventListener("click",e=>{if(NMA.sendHeart(p.id)){e.currentTarget.classList.add("on");e.currentTarget.textContent="♥ Herz gesendet"}});
   document.getElementById("report").addEventListener("click",()=>NMA.modal({title:`${p.name} melden oder blockieren?`,text:"Blockierte Mitglieder können dir nicht mehr schreiben und dein Profil nicht mehr sehen. Meldungen prüft unser Support vertraulich.",cancel:"Abbrechen",ok:"Blockieren",onOk:()=>NMA.toast(`${p.name} wurde blockiert (Demo).`)}));
 }</script>
 </body>

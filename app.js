@@ -44,6 +44,37 @@ const store = {
   set(k,v){try{localStorage.setItem("nma_"+k,JSON.stringify(v))}catch(e){}}
 };
 NMA.store = store;
+
+/* Profile, die im Mitarbeiterbereich angelegt/geändert wurden, ersetzen die Demo-Profile.
+   WICHTIG: Kunden sehen in Suche und Chat ausschließlich diese Profile – niemals andere Kunden. */
+{
+  const owners={lena:"marco",sabine:"marco",monika:"marco",petra:"julia",andrea:"julia",thomas:"julia",karin:"chef",rainer:"tim"};
+  NMA.profiles.forEach(p=>{p.owner=p.owner||owners[p.id]||"chef"});
+  const tp=store.get("tProfiles",null);
+  if(Array.isArray(tp)&&tp.length) NMA.profiles=tp;
+}
+
+/* Herzchen: ein Kunde darf pro Tag höchstens 5 Herzen verschicken. Jedes Herz landet beim
+   Mitarbeiter, dem das Profil gehört (Mitarbeiterbereich → Nachrichten → Herzchen). */
+NMA.heartLimit = 5;
+NMA.heartState = () => {
+  const d=new Date().toISOString().slice(0,10), s=store.get("heartDay",{d,ids:[]});
+  return s.d===d ? s : {d,ids:[]};
+};
+NMA.heartsLeft = () => NMA.heartLimit - NMA.heartState().ids.length;
+NMA.hasHeart = id => NMA.heartState().ids.includes(id);
+NMA.sendHeart = id => {
+  const s=NMA.heartState(), p=NMA.get(id);
+  if (s.ids.includes(id)) { NMA.toast(`Du hast ${p.name} heute schon ein Herz geschickt.`); return false; }
+  if (s.ids.length >= NMA.heartLimit) {
+    NMA.modal({title:"Keine Herzen mehr für heute",text:`Du kannst pro Tag ${NMA.heartLimit} Herzen verschicken. Morgen geht es weiter – oder schreib ${NMA.esc(p.name)} einfach direkt.`,cancel:"Schließen",ok:"Nachricht schreiben",onOk:()=>location.href="chat.html?mit="+id});
+    return false;
+  }
+  s.ids.push(id); store.set("heartDay",s);
+  const all=store.get("hearts",[]); all.push({id:"h"+Date.now(),pid:id,cust:NMA.user().nick,t:Date.now()}); store.set("hearts",all);
+  NMA.toast(`♥ Herz an ${p.name} geschickt – noch ${NMA.heartsLeft()} für heute.`);
+  return true;
+};
 NMA.coins = () => store.get("coins",5);
 NMA.setCoins = n => {store.set("coins",n);document.querySelectorAll("[data-coins]").forEach(e=>e.textContent=n+" Coins")};
 NMA.user = () => store.get("user",{nick:"Michael Nordlicht",age:56,plz:"20095",city:"Hamburg",radius:"50",job:"Elektriker",about:"Ich freue mich auf nette Gespräche und vielleicht mehr.",looking:"Beziehung"});
@@ -64,7 +95,7 @@ NMA.photo = p => {
   return `<div class="photo" style="${bg}">${p.photo?"":`<span class="ini">${p.name[0]}</span>`}${st}</div>`;
 };
 NMA.toast = msg => {
-  const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=msg;
+  document.querySelectorAll(".toast").forEach(x=>x.remove());const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=msg;
   document.body.appendChild(t);setTimeout(()=>t.remove(),2800);
 };
 NMA.modal = ({title,text,ok="OK",cancel,onOk}) => {
