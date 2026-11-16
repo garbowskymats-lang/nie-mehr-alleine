@@ -277,6 +277,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
       <p class="hint" id="pinHint">Demo: beliebiger Code mit 4–6 Ziffern. Jeder Zugriff wird protokolliert.</p>
     </div>
     <div id="logView" hidden>
+      <div id="archCfg"></div>
       <div class="toolbar">
         <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="lq" placeholder="Kunde oder Profil suchen" aria-label="Verläufe durchsuchen"></label>
         <select class="input" id="lMod" style="width:auto" aria-label="Mitarbeiter filtern"><option value="">Alle Mitarbeiter</option></select></div>
@@ -443,12 +444,13 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("lMod").innerHTML+=mods.map(m=>`<option>${NMA.esc(m)}</option>`).join("");
   const renderLogs=()=>{
     const q=$("lq").value.trim().toLowerCase(),md=$("lMod").value;
-    const list=logs.filter(l=>(!q||l.cust.toLowerCase().includes(q)||l.profile.toLowerCase().includes(q))&&(!md||l.msgs.some(m=>m[3]===md)));
+    const all=window.ARCH?ARCH.convs(logs):logs;
+    const list=all.filter(l=>(!q||l.cust.toLowerCase().includes(q)||l.profile.toLowerCase().includes(q))&&(!md||l.msgs.some(m=>m[3]===md)));
     $("logList").innerHTML=list.length?list.map(l=>{const ms=[...new Set(l.msgs.filter(m=>m[3]).map(m=>m[3]))];const last=l.msgs[l.msgs.length-1];
       return `<button class="log-item ${l.id===curLog?"on":""}" data-log="${l.id}"><span class="top"><b>${NMA.esc(l.cust)}</b><small>${last[2]}</small></span><small>mit Profil „${NMA.esc(l.profile)}“ · ${l.msgs.length} Nachrichten</small><small>Geschrieben von: ${ms.map(NMA.esc).join(", ")}</small></button>`}).join(""):'<p class="empty">Keine Verläufe gefunden.</p>';
   };
-  const showLog=id=>{const l=logs.find(x=>x.id===id);curLog=id;renderLogs();
-    $("logDetail").innerHTML=`<div class="log-head"><h3>${NMA.esc(l.cust)} ↔ ${NMA.esc(l.profile)}</h3><small class="muted">Kunde links · Mitarbeiter-Antworten rechts mit Namen</small></div>
+  const showLog=id=>{const l=(window.ARCH?ARCH.convs(logs):logs).find(x=>x.id===id);if(!l)return;curLog=id;renderLogs();
+    $("logDetail").innerHTML=`<div class="log-head"><h3>${NMA.esc(l.cust)} ↔ ${NMA.esc(l.profile)}</h3><small class="muted">Kunde links · Mitarbeiter-Antworten rechts mit Namen</small>${window.ARCH?ARCH.tools(l):""}</div>
       <div class="log-msgs">${l.msgs.map(m=>`<div class="lm ${m[0]==="m"?"mod":"cust"}"><span class="meta">${m[0]==="m"?"✎ "+NMA.esc(m[3])+" als "+NMA.esc(l.profile):NMA.esc(l.cust)} · ${m[2]}</span>${NMA.esc(m[1])}</div>`).join("")}</div>`;
     audit.unshift(`${new Date().toTimeString().slice(0,5)} Admin hat Verlauf „${l.cust}“ geöffnet`);$("audit").textContent=audit.slice(0,3).join(" · ");
   };
@@ -610,6 +612,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(st&&x.kind==="msg"){[0,1,2].forEach(i=>{st.rt[i]=st.msg[i]?(st.rt[i]*st.msg[i]+took)/(st.msg[i]+1):took;st.msg[i]++});persist()}
     if(t)(tplSent[x.cust]=tplSent[x.cust]||[]).push({nr:t.nr,t:Date.now(),pid:x.pid});
     sent.push({id:"s"+Date.now(),cust:x.cust,pid:x.pid,text:v,t:Date.now(),by:meKey(),tpl:t?t.nr:null});
+    window.ARCH&&ARCH.addConv(x.cust,p,x.hist,v,isAdmin()?"Chef":ownerName(me),x.t);
     items=items.filter(q=>q.id!==cur);saveAll();
     NMA.toast(x.kind==="heart"?`${x.cust} wurde angeschrieben.`:`Antwort gesendet (${took.toFixed(1).replace(".",",")} Min.)`);
     const next=listFor(box)[0];next?openQ(next.id):(hideConv(),renderQueue());renderStats();renderTpls();
@@ -726,7 +729,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+ownerName(me)+" (Moderator)")});
 
   /* Schnittstelle für massenversand.js */
-  window.TEAM={get me(){return me},isAdmin,meKey,ownerName,owners,get staff(){return staff},persistStaff:()=>{persist();renderStaff()},
+  window.TEAM={renderLogs,logs,get me(){return me},isAdmin,meKey,ownerName,owners,get staff(){return staff},persistStaff:()=>{persist();renderStaff()},
     profiles,customers,cust,get notes(){return notes},get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff};
 
   renderStats();renderStaff();applyRole();
@@ -734,5 +737,6 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <script src="massenversand.js"></script>
 <script src="support.js"></script>
 <script src="kunden.js"></script>
+<script src="archiv.js"></script>
 </body>
 </html>

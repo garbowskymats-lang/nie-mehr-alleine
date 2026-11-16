@@ -41,7 +41,7 @@
       </section>
       <section class="card pad danger-zone">
         <h2 style="font-size:24px;margin-bottom:6px">Konto löschen</h2>
-        <p class="muted">Profil, Fotos und Nachrichten werden endgültig gelöscht. Nicht verbrauchte Coins verfallen.</p>
+        <p class="muted">Profil und Fotos werden sofort gelöscht. Nachrichtenverläufe und Zahlungsbelege werden wegen gesetzlicher Aufbewahrungsfristen gesperrt archiviert und danach automatisch gelöscht. Nicht verbrauchte Coins verfallen.</p>
         <button class="btn danger" id="del">Konto löschen</button>
       </section>
     </div>
@@ -67,7 +67,7 @@
     refresh();
   }
   document.getElementById("pw").addEventListener("click",()=>NMA.toast("Link zum Ändern des Passworts gesendet (Demo)."));
-  document.getElementById("del").addEventListener("click",()=>NMA.modal({title:"Konto wirklich löschen?",text:"Das kann nicht rückgängig gemacht werden. Profil, Fotos, Nachrichten und restliche Coins gehen verloren.",cancel:"Behalten",ok:"Endgültig löschen",onOk:()=>NMA.toast("In der echten Version wäre das Konto jetzt gelöscht.")}));
+  document.getElementById("del").addEventListener("click",()=>NMA.modal({title:"Konto wirklich löschen?",text:"Das kann nicht rückgängig gemacht werden. Profil, Fotos und restliche Coins gehen verloren. Nachrichtenverläufe und Zahlungsbelege werden gesperrt archiviert und nach Ablauf der Aufbewahrungsfrist gelöscht.",cancel:"Behalten",ok:"Endgültig löschen",onOk:()=>NMA.toast("In der echten Version wäre das Konto jetzt gelöscht.")}));
 }</script>
 </body>
 </html>

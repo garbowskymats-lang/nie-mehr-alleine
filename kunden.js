@@ -146,7 +146,9 @@
           <label><input type="checkbox" id="kdNews" ${c.newsletter !== false ? "checked" : ""}> Newsletter erlaubt</label>
           <label><input type="checkbox" id="kdNoMass" ${c.noMass ? "checked" : ""}> Keine Massennachrichten an diesen Kunden</label>
           <label><input type="checkbox" id="kdLock" ${c.gesperrt ? "checked" : ""}> Konto gesperrt</label>
-        </div></div>
+          <label><input type="checkbox" id="kdHold" ${c.legalHold ? "checked" : ""}> Löschsperre: Chatverläufe nie automatisch löschen (z. B. bei Streit)</label>
+        </div>
+        <button class="btn sm" id="kdLogs" style="margin-top:10px">🔒 Chatverläufe im Archiv öffnen</button></div>
         <div class="kd-box"><h4>BUCHUNGEN</h4>
           ${bu.length ? `<table class="kd-b"><thead><tr><th>Datum</th><th>Buchung</th><th>Zahlungsart</th><th class="num">Coins</th><th class="num">Betrag</th></tr></thead><tbody>
             ${bu.map(b => `<tr><td>${dt(b.t)}</td><td>${esc(b.nr || "–")}</td><td>${esc(b.art || "–")}</td><td class="num">${b.coins}</td><td class="num">${eur(b.eur)}</td></tr>`).join("")}
@@ -164,6 +166,8 @@
     m.querySelector("#kdNews").addEventListener("change", e => { c.newsletter = e.target.checked; save(); });
     m.querySelector("#kdNoMass").addEventListener("change", e => { c.noMass = e.target.checked; save(); NMA.toast(c.noMass ? "Kunde wird beim Massenversand übersprungen." : "Kunde bekommt wieder Massennachrichten."); });
     m.querySelector("#kdLock").addEventListener("change", e => { c.gesperrt = e.target.checked; save(); NMA.toast(c.gesperrt ? `${nick} ist gesperrt.` : `${nick} ist wieder freigeschaltet.`); });
+    m.querySelector("#kdHold").addEventListener("change", e => { c.legalHold = e.target.checked; if (c.legalHold) c.legalHoldSeit = Date.now(); save(); NMA.toast(c.legalHold ? "Löschsperre gesetzt – die Verläufe bleiben erhalten." : "Löschsperre aufgehoben – es gilt wieder die normale Aufbewahrungsdauer."); });
+    m.querySelector("#kdLogs").addEventListener("click", () => { m.remove(); window.ARCH && ARCH.openFor(nick); });
     m.querySelector("[data-pw]").addEventListener("click", () => NMA.toast(`Link zum Zurücksetzen an ${c.mail || "die E-Mail-Adresse"} gesendet (Demo).`));
     m.querySelector("#kdBook").addEventListener("click", () => {
       const n = Math.round(+m.querySelector("#kdAdd").value), grund = m.querySelector("#kdWhy").value.trim();

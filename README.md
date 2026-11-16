@@ -153,3 +153,16 @@ Stand 16.11.2026 – Kundenkarte (kunden.js, Reiter „👤 Kunden“, nur Admin
 - PASSWORT wird bewusst NICHT angezeigt: Server speichert nur einen Hash (bcrypt/argon2). Admin kann einen Link zum
   Zurücksetzen senden. (Klartext-Passwörter wären ein Datenschutzverstoß, Art. 32 DSGVO.)
 - SERVER: Kundendaten nur für Admins ausliefern; Buchungen aus dem Zahlungsanbieter; jede Änderung protokollieren.
+
+Stand 16.11.2026 – Archiv der Chatverläufe (archiv.js, Reiter „🔒 Verläufe“)
+- Jede Nachricht (Kunde, Antwort mit Mitarbeitername, Massenversand) wird mit Datum/Uhrzeit archiviert; Mitarbeiter
+  und Kunden können nichts löschen. Aufbewahrung vom Chef einstellbar (3/6/8/10 Jahre, Standard 10), danach
+  automatische Löschung – außer bei „Löschsperre“ (Kundenkarte, z. B. bei Streit).
+- Export eines Verlaufs als .txt mit SHA-256-Prüfsumme; „Kopieren“ als Alternative. Kundenkarte → „Chatverläufe öffnen“.
+- Konto löschen: Profil/Fotos sofort, Verläufe und Zahlungsbelege gesperrt archiviert bis Fristende (Texte angepasst).
+- RECHT: Buchungsbelege/Rechnungen 8 Jahre (§ 147 AO, § 257 HGB seit 2025), Bücher/Jahresabschlüsse 10 Jahre.
+  Für Chatinhalte gibt es keine Aufbewahrungspflicht; Speicherung zur Verteidigung von Rechtsansprüchen
+  (Art. 17 Abs. 3 lit. e DSGVO) orientiert sich meist an der Regelverjährung von 3 Jahren (§ 195 BGB).
+  10 Jahre für alle Chats vom Anwalt prüfen lassen und in der Datenschutzerklärung nennen.
+- SERVER: Archiv nur anhängen (keine Änderungen/Löschungen außer Fristlauf), Hash-Kette je Nachricht oder WORM-Speicher,
+  Zugriffe protokollieren, täglicher Löschlauf unter Beachtung der Löschsperre. Auch Kundennachrichten aus dem Chat archivieren.
