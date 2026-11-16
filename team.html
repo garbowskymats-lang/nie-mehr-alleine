@@ -620,6 +620,8 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(t)(tplSent[x.cust]=tplSent[x.cust]||[]).push({nr:t.nr,t:Date.now(),pid:x.pid});
     sent.push({id:"s"+Date.now(),cust:x.cust,pid:x.pid,text:v,t:Date.now(),by:meKey(),tpl:t?t.nr:null});
     window.ARCH&&ARCH.addConv(x.cust,p,x.hist,v,isAdmin()?"Chef":ownerName(me),x.t);
+    /* Live an den Kunden (Demo: angemeldeter Test-Kunde in einem anderen Tab; Server: WebSocket) */
+    if(x.cust===NMA.user().nick){const cm=NMA.store.get("custMsgs",[]);cm.push({id:"r"+Date.now(),to:x.cust,pid:x.pid,text:v,t:Date.now(),read:false});NMA.store.set("custMsgs",cm.slice(-500))}
     items=items.filter(q=>q.id!==cur);saveAll();
     NMA.toast(x.kind==="heart"?`${x.cust} wurde angeschrieben.`:`Antwort gesendet (${took.toFixed(1).replace(".",",")} Min.)`);
     const next=listFor(box)[0];next?openQ(next.id):(hideConv(),renderQueue());renderStats();renderTpls();
@@ -711,9 +713,23 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(ed){editTpl=tpls.find(t=>t.nr==ed.dataset.tedit);$("tplName").value=editTpl.name||"";$("tplText").value=editTpl.text;$("tplFormTitle").textContent="Vorlage "+tplNo(editTpl.nr)+" bearbeiten";$("tplSave").textContent="Speichern";$("tplCancel").hidden=false;$("tplText").focus()}
     if(dl){const t=tpls.find(x=>x.nr==dl.dataset.tdel);NMA.modal({title:`${tplNo(t.nr)} löschen?`,text:"Die Nummer wird nicht neu vergeben. Bereits gesendete Vorlagen bleiben gespeichert, damit die Doppel-Sperre weiter greift.",cancel:"Abbrechen",ok:"Löschen",onOk:()=>{tpls=tpls.filter(x=>x!==t);saveAll();renderTpls()}})}});
 
-  addEventListener("storage",e=>{if(e.key==="nma_hearts")pullHearts()});
-  setInterval(()=>{pullHearts();renderQueue()},20000);
-  pullHearts();
+  /* Live: Kundennachrichten kommen sofort in den Posteingang (Demo: aus einem Kunden-Tab; Server: WebSocket) */
+  const pullInbox=()=>{
+    const q=NMA.store.get("inboxQ",[]),seenQ=new Set(NMA.store.get("inboxSeen",[]));let n=0,last=null;
+    q.forEach(m=>{if(seenQ.has(m.id))return;seenQ.add(m.id);const p=prof(m.pid);if(!p)return;cust(m.cust);
+      let it=items.find(i=>i.kind==="msg"&&i.cust===m.cust&&i.pid===m.pid);
+      if(it){it.hist.push(["c",m.text]);it.read=false}
+      else{let hist=[];if(window.ARCH){const cv=ARCH.convs(logs).find(c=>c.cust===m.cust&&c.profile===p.name);if(cv)hist=cv.msgs.slice(-8).map(x=>x[0]==="m"?["m",x[1],x[3]]:["c",x[1]])}
+        hist.push(["c",m.text]);it={id:"q"+m.id,kind:"msg",cust:m.cust,pid:m.pid,t:m.t,read:false,hist};items.push(it)}
+      n++;last={m,p}});
+    NMA.store.set("inboxSeen",[...seenQ].slice(-600));
+    if(n){saveAll();renderQueue();if(cur){const x=items.find(i=>i.id===cur);if(x&&x.cust===last.m.cust&&x.pid===last.m.pid){$("cMsgs").insertAdjacentHTML("beforeend",`<div class="lm cust"><span class="meta">${NMA.esc(x.cust)} · gerade eben</span>${NMA.esc(last.m.text)}</div>`);$("cMsgs").scrollTop=1e6}}
+      NMA.toast(`💬 Neue Nachricht von ${last.m.cust} an „${last.p.name}“`)}
+  };
+  addEventListener("storage",e=>{if(e.key==="nma_hearts")pullHearts();if(e.key==="nma_inboxQ")pullInbox()});
+  setInterval(()=>{pullHearts();pullInbox();renderQueue()},20000);
+  setInterval(()=>NMA.store.set("teamAlive",Date.now()),4000);NMA.store.set("teamAlive",Date.now());
+  pullHearts();pullInbox();
 
   /* ---------- Rollenansicht anwenden ---------- */
   const applyRole=()=>{

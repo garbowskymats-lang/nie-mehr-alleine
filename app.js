@@ -345,15 +345,52 @@ NMA.me = () => { const u = NMA.user(); return { nick: u.nick, plz: u.plz, radius
   }
 }
 
-/* Nachrichten aus dem Massenversand an den angemeldeten Demo-Kunden in den Chat übernehmen */
+/* ---------------- LIVE-NACHRICHTEN (wie WhatsApp) ----------------
+   Neue Nachrichten erscheinen sofort, ohne die Seite neu zu laden.
+   Demo: zwischen offenen Tabs desselben Browsers (Kundenseite ↔ Mitarbeiterbereich) über den Browser-Speicher.
+   SERVER: NMA.liveConfig.url mit einer WebSocket-Adresse füllen, z. B. "wss://eure-domain.de/live".
+   Der Server schickt pro neuer Nachricht JSON: {type:"msg", id, pid, text, t}.
+   Kunde schreibt: Nachricht per API an den Server, der sie live an den zuständigen Mitarbeiter weitergibt. */
+NMA.liveConfig = { url: "" };
 NMA.markRead = pid => { const m = NMA.store.get("custMsgs", []); let ch = false; m.forEach(x => { if (x.pid === pid && !x.read) { x.read = true; ch = true; } }); if (ch) NMA.store.set("custMsgs", m); };
-{
-  const nick = NMA.user().nick, msgs = NMA.store.get("custMsgs", []).filter(m => m.to === nick && NMA.profiles.some(p => p.id === m.pid));
-  msgs.sort((a, b) => a.t - b.t).forEach(m => {
-    const c = NMA.chats[m.pid] || (NMA.chats[m.pid] = []);
-    const d = new Date(m.t), day = d.toDateString() === new Date().toDateString() ? "Heute" : d.toLocaleDateString("de-DE");
-    if (!c.some(x => x.d === day)) c.push({ d: day });
-    c.push({ t: "them", x: m.text, h: d.toTimeString().slice(0, 5) });
-    if (!m.read) NMA.unread[m.pid] = (NMA.unread[m.pid] || 0) + 1;
+NMA.chatBadge = () => {
+  const n = Object.values(NMA.unread).reduce((a, b) => a + b, 0);
+  document.querySelectorAll('a[href="chat.html"]').forEach(a => {
+    let b = a.querySelector(".badge"); if (!n) { b && b.remove(); return; }
+    if (!b) { b = document.createElement("span"); b.className = "badge"; const lbl = a.querySelector("svg") && a.querySelector("span:last-child"); lbl ? a.insertBefore(b, lbl) : a.appendChild(b); }
+    b.textContent = n;
   });
+};
+{
+  const me = NMA.user().nick, seen = new Set();
+  const day = t => { const d = new Date(t); return d.toDateString() === new Date().toDateString() ? "Heute" : d.toLocaleDateString("de-DE"); };
+  const put = (pid, msg) => { const c = NMA.chats[pid] || (NMA.chats[pid] = []); const dd = day(msg.t); if (!c.some(x => x.d === dd)) c.push({ d: dd }); c.push(msg); };
+  /* beim Laden: eigene gesendete + empfangene Nachrichten zeitlich sortiert einfügen */
+  const incoming = NMA.store.get("custMsgs", []).filter(m => m.to === me && NMA.profiles.some(p => p.id === m.pid));
+  const own = NMA.store.get("custOwn", []).filter(m => m.from === me);
+  [...incoming.map(m => ({ k: "in", ...m })), ...own.map(m => ({ k: "out", ...m }))].sort((a, b) => a.t - b.t).forEach(m => {
+    seen.add(m.id || m.t + m.text);
+    put(m.pid, { t: m.k === "in" ? "them" : "me", x: m.text, h: new Date(m.t).toTimeString().slice(0, 5) });
+    if (m.k === "in" && !m.read) NMA.unread[m.pid] = (NMA.unread[m.pid] || 0) + 1;
+  });
+  /* neue Nachricht empfangen → sofort anzeigen */
+  const receive = m => {
+    const key = m.id || m.t + m.text; if (seen.has(key)) return; seen.add(key);
+    const p = NMA.profiles.find(x => x.id === m.pid); if (!p) return;
+    put(m.pid, { t: "them", x: m.text, h: new Date(m.t).toTimeString().slice(0, 5) });
+    const open = document.body.dataset.page === "chat" && NMA.param("mit") === m.pid && !document.hidden;
+    if (!open) NMA.unread[m.pid] = (NMA.unread[m.pid] || 0) + 1;
+    NMA.chatBadge();
+    dispatchEvent(new CustomEvent("nma:msg", { detail: { pid: m.pid, open } }));
+    if (!open) NMA.toast(`💬 Neue Nachricht von ${p.name}`);
+    if (NMA.store.get("chatSound", false)) { try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; g.gain.setValueAtTime(.08, a.currentTime); g.gain.exponentialRampToValueAtTime(.0001, a.currentTime + .35); o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + .35); } catch (err) {} }
+    if (document.hidden) { const t0 = document.title; document.title = `(1) Neue Nachricht – ${p.name}`; addEventListener("focus", () => document.title = t0, { once: true }); }
+  };
+  addEventListener("storage", e => { if (e.key === "nma_custMsgs") NMA.store.get("custMsgs", []).filter(m => m.to === me).forEach(receive); });
+  /* echter Server: WebSocket */
+  if (NMA.liveConfig.url && !/^team/.test(document.body.dataset.page || "")) {
+    const connect = (wait = 1000) => { try { const ws = new WebSocket(NMA.liveConfig.url); ws.onmessage = e => { try { const d = JSON.parse(e.data); if (d.type === "msg") receive(d); } catch (err) {} }; ws.onclose = () => setTimeout(() => connect(Math.min(wait * 2, 30000)), wait); } catch (err) {} };
+    connect();
+  }
+  NMA.chatBadge();
 }

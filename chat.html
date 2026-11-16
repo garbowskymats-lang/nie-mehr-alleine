@@ -87,7 +87,15 @@
       chats[id].push({t:"them",x:answers[Math.floor(Math.random()*answers.length)],h:now()});
       if(current===id)renderMsgs();else unread[id]=(unread[id]||0)+1;renderList()},2200);
   };
-  const send=m=>{if(!pay())return;chats[current].push(Object.assign({t:"me",h:now()},m));renderMsgs();renderList();fakeReply(current)};
+  /* Senden: Nachricht geht live an den Mitarbeiter (Demo: Mitarbeiterbereich in einem anderen Tab).
+     Ist kein Mitarbeiterbereich offen, antwortet in der Demo eine Beispiel-Antwort. */
+  const send=m=>{if(!pay())return;const t=Date.now(),me=NMA.user().nick;
+    chats[current].push(Object.assign({t:"me",h:now()},m));renderMsgs();renderList();
+    if(m.x){const own=NMA.store.get("custOwn",[]);own.push({id:"o"+t,from:me,pid:current,text:m.x,t});NMA.store.set("custOwn",own.slice(-500));
+      const q=NMA.store.get("inboxQ",[]);q.push({id:"c"+t,cust:me,pid:current,text:m.x,t});NMA.store.set("inboxQ",q.slice(-300))}
+    if(Date.now()-NMA.store.get("teamAlive",0)>10000)fakeReply(current)};
+  /* Live: neue Nachricht ist angekommen */
+  addEventListener("nma:msg",e=>{if(e.detail.pid===current){renderMsgs();NMA.markRead(current)}renderList()});
 
   $("comp").addEventListener("submit",e=>{e.preventDefault();const v=$("txt").value.trim();if(!v)return;$("txt").value="";$("emojis").hidden=true;send({x:v})});
   $("convs").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(b)open(b.dataset.id)});

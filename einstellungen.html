@@ -25,7 +25,7 @@
         <div class="setting" id="pushPrevRow"><div><b>Text in der Mitteilung zeigen</b><p>Aus = diskret: Auf dem Sperrbildschirm steht nur „Du hast eine neue Nachricht“. An = mit Name und Text.</p></div><label class="switch"><input type="checkbox" id="pushPrev" aria-label="Text in der Mitteilung zeigen"><span></span></label></div>
         <div id="pushTestRow" hidden style="margin:4px 0 10px"><button class="btn sm" id="pushTest" type="button">Test-Benachrichtigung schicken</button></div>
         <div class="setting"><div><b>E-Mail bei neuen Nachrichten</b><p>Eine kurze Info, wenn du offline bist.</p></div><label class="switch"><input type="checkbox" checked aria-label="E-Mail-Benachrichtigung"><span></span></label></div>
-        <div class="setting"><div><b>Ton im Chat</b><p>Kurzer Hinweiston, wenn eine Nachricht eintrifft.</p></div><label class="switch"><input type="checkbox" aria-label="Ton im Chat"><span></span></label></div>
+        <div class="setting"><div><b>Ton im Chat</b><p>Kurzer Hinweiston, wenn eine Nachricht eintrifft.</p></div><label class="switch"><input type="checkbox" id="snd" aria-label="Ton im Chat"><span></span></label></div>
       </section>
       <section class="card pad">
         <h2 style="font-size:24px;margin-bottom:6px">Privatsphäre</h2>
@@ -50,6 +50,7 @@
 <script src="app.js"></script>
 <script src="push.js"></script>
 <script>{
+  {const s=document.getElementById("snd");s.checked=NMA.store.get("chatSound",false);s.addEventListener("change",()=>{NMA.store.set("chatSound",s.checked);NMA.toast(s.checked?"Hinweiston eingeschaltet.":"Hinweiston aus.")})}
   /* Push-Benachrichtigungen */
   {
     const $=id=>document.getElementById(id),on=$("pushOn"),prev=$("pushPrev"),hint=$("pushHint");

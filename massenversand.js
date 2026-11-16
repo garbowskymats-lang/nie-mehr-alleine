@@ -167,7 +167,7 @@
     const me = NMA.user().nick, inbox = S.get("custMsgs", []);
     rows.forEach((r, i) => {
       if (kontakt()) NMA.kontaktOrt(r.p, custRef(r.nick, r.c));      /* Ort jetzt fest für dieses Paar */
-      if (r.nick === me) inbox.push({ to: me, pid: r.p.id, text: fill(job.text, r.nick, r.p, r.c, r.ort), t, read: false });
+      if (r.nick === me) inbox.push({ id: "mv" + t + "_" + i, to: me, pid: r.p.id, text: fill(job.text, r.nick, r.p, r.c, r.ort), t, read: false });
       (msent[r.nick] = msent[r.nick] || []).push({ pid: r.p.id, t, job: job.nr, tpl: job.tpl || null });
       T.sent.push({ id: "m" + t + "_" + i, cust: r.nick, pid: r.p.id, text: fill(job.text, r.nick, r.p, r.c, r.ort), t, by: job.by, tpl: null, mass: job.nr });
     });

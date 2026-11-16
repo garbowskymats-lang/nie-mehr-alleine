@@ -170,3 +170,15 @@ Stand 16.11.2026 – Archiv der Chatverläufe (archiv.js, Reiter „🔒 Verläu
   10 Jahre für alle Chats vom Anwalt prüfen lassen und in der Datenschutzerklärung nennen.
 - SERVER: Archiv nur anhängen (keine Änderungen/Löschungen außer Fristlauf), Hash-Kette je Nachricht oder WORM-Speicher,
   Zugriffe protokollieren, täglicher Löschlauf unter Beachtung der Löschsperre. Auch Kundennachrichten aus dem Chat archivieren.
+
+Stand 16.11.2026 – Live-Nachrichten (wie WhatsApp)
+- Neue Nachrichten erscheinen sofort ohne Neuladen: im Chat direkt im Verlauf, auf anderen Seiten als Hinweis +
+  Zähler am „Chat“-Symbol, Tab-Titel „(1) Neue Nachricht“, optional Hinweiston (Einstellungen → „Ton im Chat“).
+- Mitarbeiterbereich: Kundennachrichten landen sofort im Posteingang (mit Hinweis); ist das Gespräch offen,
+  erscheint die Nachricht direkt, ohne den getippten Antworttext zu löschen. Verlauf aus dem Archiv als Kontext.
+- Eigene Nachrichten des Kunden bleiben nach dem Neuladen erhalten.
+- Demo: funktioniert zwischen zwei Tabs im selben Browser (Kundenseite + Mitarbeiterbereich). Ist kein
+  Mitarbeiterbereich offen, kommt wie bisher eine Beispiel-Antwort.
+- SERVER: WebSocket (oder Server-Sent Events). In app.js NMA.liveConfig.url = "wss://…/live" eintragen; der Server
+  schickt pro Nachricht {type:"msg", id, pid, text, t}; Mitarbeiterbereich bekommt Kundennachrichten ebenso live.
+  Ist der Kunde nicht online → Push-Benachrichtigung (siehe Push).
