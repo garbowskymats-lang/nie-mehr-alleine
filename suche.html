@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
-<head>
+<html lang="de"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Suche – Nie mehr alleine</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#071012">
 <link rel="icon" href="assets/icon-192.png">
@@ -13,27 +12,29 @@
 <meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
 <link rel="stylesheet" href="style.css">
 </head>
-<body class="member" data-page="suche">
+<body class="member" data-page="suche"><header class="topbar"><a class="brand" href="uebersicht.html" aria-label="Nie mehr alleine – Übersicht"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span></a>
+    <nav class="mainnav" aria-label="Hauptnavigation"><a href="uebersicht.html" class="">Übersicht</a><a href="suche.html" class="active">Suche</a><a href="chat.html" class="">Chat<span class="badge">2</span></a><a href="postfach.html" class="">Postfach<span class="badge">1</span></a><a href="mein-profil.html" class="">Mein Bereich</a></nav>
+    <div class="top-right"><a class="coins" href="coins.html" data-coins="" title="Coins aufladen">5 Coins</a><a class="me-av" href="mein-profil.html" title="Mein Bereich">M</a></div></header>
 <main class="page">
   <div class="page-head">
-    <div><h1>Menschen entdecken</h1><p><b id="count">0</b> Profile passen zu deiner Suche · <span id="hl">♥ 5</span> Herzen heute übrig</p></div>
+    <div><h1>Menschen entdecken</h1><p><b id="count">6</b> Profile passen zu deiner Suche · <span id="hl">♥ 5</span> Herzen heute übrig</p></div>
     <button class="btn filter-btn" id="filterBtn" aria-expanded="false" aria-controls="filters">Filter anzeigen</button>
   </div>
 
-  <p class="notice">Unterhaltungs-Chat: Alle Profile werden von Moderatoren geführt.</p>
+  <p class="notice"><br></p>
   <form class="card filters" id="filters">
     <div class="field"><label>Ich suche</label><select class="input" id="fSex"><option value="w">Frauen</option><option value="m">Männer</option><option value="">Alle</option></select></div>
     <div class="field"><label>Alter</label><div class="range"><input class="input" id="fMin" type="number" min="18" max="99" value="40" aria-label="Alter von"><span>–</span><input class="input" id="fMax" type="number" min="18" max="99" value="65" aria-label="Alter bis"></div></div>
-    <div class="field"><label for="fKm">Entfernung</label><select class="input" id="fKm"><option value="20">bis 20 km</option><option value="50" selected>bis 50 km</option><option value="100">bis 100 km</option><option value="9999">über 100 km</option></select></div>
+    <div class="field"><label for="fKm">Entfernung</label><select class="input" id="fKm"><option value="20">bis 20 km</option><option value="50" selected="">bis 50 km</option><option value="100">bis 100 km</option><option value="9999">über 100 km</option></select></div>
     <div class="field"><label for="fLook">Sucht</label><select class="input" id="fLook"><option value="">Beides</option><option>Beziehung</option><option>Abenteuer</option></select></div>
     <div class="field"><label for="fSort">Sortieren</label><select class="input" id="fSort"><option value="online">Online zuerst</option><option value="km">Nächste zuerst</option><option value="age">Jüngste zuerst</option></select></div>
     <label class="check"><input type="checkbox" id="fOnline"> Nur gerade online</label>
     <button class="btn primary" type="submit">Anzeigen</button>
   </form>
 
-  <div class="people" id="grid"></div>
+  <div class="people" id="grid"><article class="card person"><a href="profil.html?id=lena" aria-label="Profil von Gitarren Lena"><div class="photo" style="background-image:linear-gradient(transparent 55%,#071012cc),url('assets/hero-romance.png');background-position:24% 30%"><span class="status"><span class="dot"></span>Online</span></div></a><div class="body"><div class="title"><h3>Gitarren Lena, 52</h3><span class="small muted">8 km</span></div><p>Ich liebe Musik, spontane Ausflüge und Gespräche, bei denen man die Zeit vergisst.</p><div class="tags"><span class="tag">Gitarre</span><span class="tag">Konzerte</span><span class="tag">Natur</span></div><div class="acts"><button class="btn sm like " data-like="lena" aria-pressed="false">♡ Herz schicken</button><a class="btn sm primary" href="chat.html?mit=lena">Chatten</a></div></div></article><article class="card person"><a href="profil.html?id=sabine" aria-label="Profil von Sabine Herz"><div class="photo" style="--g:linear-gradient(145deg,#c0796a,#4a2b2e)"><span class="ini">S</span><span class="status"><span class="dot"></span>Online</span></div></a><div class="body"><div class="title"><h3>Sabine Herz, 58</h3><span class="small muted">14 km</span></div><p>Lebensfroh, neugierig und gern unterwegs.</p><div class="tags"><span class="tag">Kochen</span><span class="tag">Reisen</span><span class="tag">Garten</span></div><div class="acts"><button class="btn sm like " data-like="sabine" aria-pressed="false">♡ Herz schicken</button><a class="btn sm primary" href="chat.html?mit=sabine">Chatten</a></div></div></article><article class="card person"><a href="profil.html?id=karin" aria-label="Profil von Theater Karin"><div class="photo" style="--g:linear-gradient(145deg,#b0566f,#3b1825)"><span class="ini">T</span><span class="status"><span class="dot"></span>Online</span></div></a><div class="body"><div class="title"><h3>Theater Karin, 55</h3><span class="small muted">26 km</span></div><p>Ich gehe gern ins Theater, mag Städtereisen und suche einen Mann mit Herz und Zeit.</p><div class="tags"><span class="tag">Theater</span><span class="tag">Städtereisen</span><span class="tag">Wein</span></div><div class="acts"><button class="btn sm like " data-like="karin" aria-pressed="false">♡ Herz schicken</button><a class="btn sm primary" href="chat.html?mit=karin">Chatten</a></div></div></article><article class="card person"><a href="profil.html?id=monika" aria-label="Profil von Monika am Meer"><div class="photo" style="--g:linear-gradient(145deg,#c79a54,#4b3517)"><span class="ini">M</span><span class="status"><span class="dot"></span>Online</span></div></a><div class="body"><div class="title"><h3>Monika am Meer, 61</h3><span class="small muted">31 km</span></div><p>Ich bin gern draußen mit meinem Hund und freue mich über jemanden für Spaziergänge und gemütliche Abende.</p><div class="tags"><span class="tag">Hund</span><span class="tag">Wandern</span><span class="tag">Kaffee</span></div><div class="acts"><button class="btn sm like " data-like="monika" aria-pressed="false">♡ Herz schicken</button><a class="btn sm primary" href="chat.html?mit=monika">Chatten</a></div></div></article><article class="card person"><a href="profil.html?id=andrea" aria-label="Profil von Andrea Lächeln"><div class="photo" style="--g:linear-gradient(145deg,#4f8f87,#173a37)"><span class="ini">A</span><span class="status"><span class="dot off"></span>Zuletzt online gestern</span></div></a><div class="body"><div class="title"><h3>Andrea Lächeln, 45</h3><span class="small muted">18 km</span></div><p>Humor mit Tiefgang, Meer und Fotografie.</p><div class="tags"><span class="tag">Meer</span><span class="tag">Fotografie</span><span class="tag">Kino</span></div><div class="acts"><button class="btn sm like " data-like="andrea" aria-pressed="false">♡ Herz schicken</button><a class="btn sm primary" href="chat.html?mit=andrea">Chatten</a></div></div></article><article class="card person"><a href="profil.html?id=petra" aria-label="Profil von Tanzmaus Petra"><div class="photo" style="--g:linear-gradient(145deg,#8a6aa8,#2c2240)"><span class="ini">T</span><span class="status"><span class="dot off"></span>Zuletzt online vor 2 Std.</span></div></a><div class="body"><div class="title"><h3>Tanzmaus Petra, 49</h3><span class="small muted">22 km</span></div><p>Tanzen, Radfahren und ein gutes Buch auf dem Balkon.</p><div class="tags"><span class="tag">Tanzen</span><span class="tag">Radfahren</span><span class="tag">Lesen</span></div><div class="acts"><button class="btn sm like " data-like="petra" aria-pressed="false">♡ Herz schicken</button><a class="btn sm primary" href="chat.html?mit=petra">Chatten</a></div></div></article></div>
 </main>
-<script src="app.js"></script>
+<script src="app.js"></script><nav class="tabbar" aria-label="Navigation"><a href="uebersicht.html" class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg><span>Übersicht</span></a><a href="suche.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg><span>Suche</span></a><a href="chat.html" class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H8l-4 4z"></path></svg><span class="badge">2</span><span>Chat</span></a><a href="postfach.html" class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span class="badge">1</span><span>Postfach</span></a><a href="mein-profil.html" class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1-4 4-6 8-6s7 2 8 6"></path></svg><span>Ich</span></a></nav><footer class="foot"><span>© 2026 Nie mehr alleine · Unterhaltungs-Chat mit moderierten Profilen · ab 18</span><nav><a href="rechtliches.html#impressum">Impressum</a><a href="rechtliches.html#datenschutz">Datenschutz</a><a href="rechtliches.html#agb">AGB</a><a href="hilfe.html">Hilfe</a></nav></footer>
 <script>{
   const $=id=>document.getElementById(id);
   const render=()=>{
@@ -50,5 +51,7 @@
     if(NMA.sendHeart(id))render()});
   render();
 }</script>
-</body>
-</html>
+<script src="bearbeiten.js"></script>
+
+
+</body></html>
