@@ -40,6 +40,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 .staff tr.off td{opacity:.5}
 .who{display:flex;align-items:center;gap:10px}
 .role{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:#10292a;color:#bdf3ee}
+.mv-tag{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#2a2112;color:#f6d79f}.mv-tag.frei{background:#123a2a;color:#9be8bf}
 .role.admin{background:#2a2112;color:#f6d79f}
 .st{white-space:nowrap}
 .st::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#5d7472}
@@ -153,7 +154,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <main class="page">
   <div class="page-head">
     <div><h1 id="pTitle">Mitarbeiterbereich</h1><p id="pSub">Statistik und Verwaltung des Moderatoren-Teams.</p></div>
-    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
+    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="mass" role="tab" id="tabMass" hidden>📣 Massenversand <span class="badge" id="mvBadge" hidden>0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
   </div>
 
   <!-- ================= STATISTIK ================= -->
@@ -219,6 +220,9 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     </div>
   </section>
 
+  <!-- ================= MASSENVERSAND (massenversand.js) ================= -->
+  <section id="mass" hidden></section>
+
   <section id="stats" hidden>
     <div class="toolbar">
       <div class="tabs" id="range"><button class="on" data-r="1">Heute</button><button data-r="7">7 Tage</button><button data-r="30">30 Tage</button></div>
@@ -280,7 +284,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   const KEY="staff";
   const seed=[
     {id:1,name:"Sandra K.",user:"sandra",role:"Admin",status:"online",last:"Heute, 08:02",msg:[64,402,1690],rt:[3.1,3.4,3.6],active:true,g:"linear-gradient(145deg,#c79a54,#4b3517)"},
-    {id:2,name:"Marco B.",user:"marco",role:"Moderator",status:"online",last:"Heute, 12:15",msg:[81,515,2120],rt:[2.6,2.9,3.0],active:true,g:"linear-gradient(145deg,#5b7aa0,#1c2a3c)"},
+    {id:2,name:"Marco B.",user:"marco",role:"Moderator",mass:"kontrolle",status:"online",last:"Heute, 12:15",msg:[81,515,2120],rt:[2.6,2.9,3.0],active:true,g:"linear-gradient(145deg,#5b7aa0,#1c2a3c)"},
     {id:3,name:"Julia W.",user:"julia",role:"Moderator",status:"pause",last:"Heute, 10:40",msg:[47,388,1610],rt:[4.2,3.9,4.1],active:true,g:"linear-gradient(145deg,#b0566f,#3b1825)"},
     {id:4,name:"Tim R.",user:"tim",role:"Moderator",status:"online",last:"Heute, 14:01",msg:[29,301,1302],rt:[5.8,5.1,4.9],active:true,g:"linear-gradient(145deg,#4f8f87,#173a37)"},
     {id:5,name:"Nicole H.",user:"nicole",role:"Moderator",status:"offline",last:"Gestern, 22:47",msg:[0,276,1188],rt:[0,3.7,3.8],active:true,g:"linear-gradient(145deg,#8a6aa8,#2c2240)"},
@@ -325,7 +329,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     const list=staff.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.user.includes(q))&&(!r||s.role===r));
     $("rows").innerHTML=list.length?list.map(s=>`<tr class="${s.active?"":"off"}">
       <td data-l="Name"><span class="who"><span class="avatar" style="--g:${s.g};width:38px;height:38px;font-size:14px">${NMA.esc(s.name[0])}</span><span><b>${NMA.esc(s.name)}</b><br><span class="muted small">@${NMA.esc(s.user)}${s.active?"":" · deaktiviert"}</span></span></span></td>
-      <td data-l="Rolle"><span class="role ${s.role==="Admin"?"admin":""}">${s.role}</span></td>
+      <td data-l="Rolle"><span class="role ${s.role==="Admin"?"admin":""}">${s.role}</span>${s.role!=="Admin"&&s.mass&&s.mass!=="aus"?`<br><span class="mv-tag ${s.mass}" title="Massenversand">📣 ${s.mass==="frei"?"selbstständig":"mit Kontrolle"}</span>`:""}</td>
       <td data-l="Status"><span class="st ${s.status}">${s.active?stLabel[s.status]:"Gesperrt"}</span></td>
       <td data-l="Letzter Login">${s.last}</td>
       <td data-l="Nachrichten (7 T.)" class="num">${nf(s.msg[1])}</td>
@@ -342,6 +346,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
         <div class="field"><label for="fu">Benutzername</label><input class="input" id="fu" required pattern="[a-z0-9._-]{3,}" value="${NMA.esc(s.user)}"><span class="hint">Kleinbuchstaben, mind. 3 Zeichen</span></div>
         <div class="field"><label for="fr">Rolle</label><select class="input" id="fr"><option ${s.role==="Moderator"?"selected":""}>Moderator</option><option ${s.role==="Admin"?"selected":""}>Admin</option></select></div>
         <div class="field"><label for="fe">E-Mail</label><input class="input" id="fe" type="email" value="${NMA.esc(s.mail||"")}" placeholder="für das Einladungs-Passwort"></div>
+        <div class="field full"><label for="fm">Massenversand</label><select class="input" id="fm">${[["aus","Nicht erlaubt"],["kontrolle","Erlaubt – jede Aussendung muss der Chef freigeben"],["frei","Erlaubt – darf selbst senden (erfahren)"]].map(([v,t])=>`<option value="${v}" ${(s.mass||"aus")===v?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Gilt nur für Moderatoren. Admins dürfen immer.</span></div>
       </div>
       ${isNew?'<p class="hint">Der neue Mitarbeiter bekommt per E-Mail einen Link, um sein Passwort selbst festzulegen.</p>':""}
       <div class="row"><button type="button" class="btn ghost" data-x>Abbrechen</button><button class="btn primary">${isNew?"Anlegen":"Speichern"}</button></div></form>`;
@@ -352,10 +357,10 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
       const name=m.querySelector("#fn").value.trim(),user=m.querySelector("#fu").value.trim().toLowerCase();
       if(!name||!/^[a-z0-9._-]{3,}$/.test(user)){NMA.toast("Bitte Name und gültigen Benutzernamen eingeben.");return}
       if(staff.some(x=>x.user===user&&x.id!==s.id)){NMA.toast(`@${user} ist schon vergeben.`);return}
-      const data={name,user,role:m.querySelector("#fr").value,mail:m.querySelector("#fe").value.trim()};
+      const data={name,user,role:m.querySelector("#fr").value,mail:m.querySelector("#fe").value.trim(),mass:m.querySelector("#fm").value};
       if(isNew){staff.push(Object.assign({id:Date.now(),status:"offline",last:"noch nie",msg:[0,0,0],rt:[0,0,0],active:true,g:"linear-gradient(145deg,#2f6f69,#123234)"},data));NMA.toast(`${name} wurde angelegt (Demo).`)}
       else{Object.assign(s,data);NMA.toast("Gespeichert.")}
-      persist();m.remove();renderStaff();renderStats()});
+      persist();m.remove();renderStaff();renderStats();window.MV&&MV.render()});
   };
 
   $("rows").addEventListener("click",e=>{
@@ -364,13 +369,13 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(tg){const s=staff.find(x=>x.id==tg.dataset.toggle);
       if(s.role==="Admin"&&s.active&&staff.filter(x=>x.role==="Admin"&&x.active).length===1){NMA.toast("Der letzte Admin kann nicht gesperrt werden.");return}
       NMA.modal({title:s.active?`${s.name} sperren?`:`${s.name} freischalten?`,text:s.active?"Der Zugang wird sofort gesperrt. Statistiken bleiben erhalten.":"Der Zugang wird wieder freigegeben.",cancel:"Abbrechen",ok:s.active?"Sperren":"Freischalten",
-        onOk:()=>{s.active=!s.active;if(!s.active)s.status="offline";persist();renderStaff();renderStats()}})}
+        onOk:()=>{s.active=!s.active;if(!s.active)s.status="offline";persist();renderStaff();renderStats();window.MV&&MV.render()}})}
   });
   $("add").addEventListener("click",()=>form());
   $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
-    ["inbox","profiles","templates","stats","staff","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
+    ["inbox","profiles","templates","mass","stats","staff","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
   $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
     $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
   /* ---------- Verläufe (nur Admin, mit Zusatzcode) ---------- */
@@ -587,6 +592,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
         <div class="field"><span class="label">Sucht</span><div class="seg"><label><input type="radio" name="plk" value="Beziehung" ${p.looking!=="Abenteuer"?"checked":""}> Beziehung</label><label><input type="radio" name="plk" value="Abenteuer" ${p.looking==="Abenteuer"?"checked":""}> Abenteuer</label></div></div>
         <div class="field"><label for="pa">Alter</label><input class="input" id="pa" type="number" min="18" max="99" required value="${p.age||""}"></div>
         <div class="field"><label for="pc">Ort</label><input class="input" id="pc" required value="${NMA.esc(p.city||"")}"></div>
+        <div class="field"><label for="pz">PLZ</label><input class="input" id="pz" inputmode="numeric" maxlength="5" pattern="\\d{5}" value="${NMA.esc(p.plz||"")}"><span class="hint">Für den Massenversand (Umkreis)</span></div>
         <div class="field"><label for="pj">Beruf</label><input class="input" id="pj" value="${NMA.esc(p.job||"")}"></div>
         <div class="field"><label for="ps">Familienstand</label><select class="input" id="ps">${["Single","Geschieden","Verwitwet","Getrennt lebend"].map(x=>`<option ${x===p.status?"selected":""}>${x}</option>`).join("")}</select></div>
         <div class="field full"><label for="pab">Über mich</label><textarea class="input" id="pab" maxlength="800">${NMA.esc(p.about||"")}</textarea></div>
@@ -605,7 +611,8 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
       if(taken){m.querySelector("#pnh").className="hint bad";m.querySelector("#pnh").textContent=`„${name}“ ist schon vergeben.`;return}
       if(!(age>=18&&age<=99)){NMA.toast("Alter muss zwischen 18 und 99 liegen.");return}
       if(!city){NMA.toast("Bitte einen Ort eingeben.");return}
-      const data={name,age,city,sex:m.querySelector("input[name=psx]:checked").value,looking:m.querySelector("input[name=plk]:checked").value,job:m.querySelector("#pj").value.trim(),status:m.querySelector("#ps").value,about:m.querySelector("#pab").value.trim(),tags:m.querySelector("#pt").value.split(",").map(s=>s.trim()).filter(Boolean)};
+      const plz=m.querySelector("#pz").value.trim();if(plz&&!/^\d{5}$/.test(plz)){NMA.toast("Die PLZ muss 5 Ziffern haben.");return}
+      const data={name,age,city,sex:m.querySelector("input[name=psx]:checked").value,looking:m.querySelector("input[name=plk]:checked").value,job:m.querySelector("#pj").value.trim(),status:m.querySelector("#ps").value,about:m.querySelector("#pab").value.trim(),tags:m.querySelector("#pt").value.split(",").map(s=>s.trim()).filter(Boolean),plz};
       if(isAdmin())data.owner=m.querySelector("#po").value;
       if(isNew){const grads=["#c0796a,#4a2b2e","#8a6aa8,#2c2240","#c79a54,#4b3517","#4f8f87,#173a37","#b0566f,#3b1825","#5b7aa0,#1c2a3c"];
         profiles.push(Object.assign({id:"p"+Date.now(),owner:meKey(),km:5+Math.floor(Math.random()*40),online:true,height:"",g:`linear-gradient(145deg,${grads[profiles.length%grads.length]})`},data));NMA.toast(`Profil „${name}“ angelegt – Kunden sehen es jetzt in der Suche.`)}
@@ -660,10 +667,16 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(!a){setLock(false);const vis=document.querySelector("[data-tab].on");if(vis&&vis.hidden)document.querySelector('[data-tab="inbox"]').click()}
     $("tabProf").textContent=a?"Profile":"Meine Profile";
     hideConv();renderQueue();renderStats();renderProfiles();renderTpls();resetTplForm();
+    window.MV&&MV.render();
   };
   $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+ownerName(me)+" (Moderator)")});
 
+  /* Schnittstelle für massenversand.js */
+  window.TEAM={get me(){return me},isAdmin,meKey,ownerName,owners,get staff(){return staff},persistStaff:()=>{persist();renderStaff()},
+    profiles,customers,cust,get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff};
+
   renderStats();renderStaff();applyRole();
 }</script>
+<script src="massenversand.js"></script>
 </body>
 </html>

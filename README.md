@@ -54,3 +54,22 @@ Stand 16.11.2026 – Mitarbeiterbereich erweitert
 - Vorlagen: fortlaufende Nummer (V-001 …). Das System speichert, welcher Kunde welche Vorlage bekommen hat,
   und blockiert dieselbe Vorlage an denselben Kunden – auch von anderen Profilen und auch, wenn der Text
   per Hand eingefügt wird. Serverseitig ebenfalls prüfen.
+
+Stand 16.11.2026 – Massenversand (massenversand.js, Reiter „📣 Massenversand“ in team.html)
+- Zielgruppen (früher WAA/WAB/WABF/WA-Testmitglied):
+  Abenteuer · Männer (Frauen-Profile Abenteuer schreiben Männer an, die Abenteuer suchen) ·
+  Beziehung · Frau sucht Mann · Beziehung · Mann sucht Frau ·
+  Testmitglieder (alle Registrierten, die noch nie gekauft haben; es schreibt das andere Geschlecht).
+- Ablauf: Zielgruppe → Text/Massenvorlage (Platzhalter {name}, {profil}, {ort}) → Empfänger (alle / nur Tester /
+  nur zahlende) + Umkreis → Vorschau mit Zuordnung Kunde → Profil + Entfernung → senden.
+- Profil-Zuordnung: für jeden Kunden das nächstgelegene passende Profil (PLZ), das ihn noch nie angeschrieben hat
+  (keine Massennachricht, keine normale Nachricht, kein Chat). Optional: kein Profil im Umkreis → nächstes nehmen.
+- Rechte pro Mitarbeiter (nur Chef, unter „Rechte & Regeln“ oder Mitarbeiter → Bearbeiten):
+  Nicht erlaubt / Mit Kontrolle (jede Aussendung geht erst in „Freigaben“ an den Chef) / Selbstständig.
+  Moderatoren schreiben nur mit ihren eigenen Profilen, der Chef mit allen. Antworten landen beim Profil-Besitzer.
+- Regeln: Pause pro Kunde (z. B. höchstens 1 Massennachricht pro Tag), dieselbe Massenvorlage (M-…) nie zweimal
+  an denselben Kunden. Aussendungen haben Nummern (A-…) und stehen im Verlauf (wer, wann, wie viele, wer freigegeben hat).
+- Profile haben jetzt ein Feld PLZ. Entfernungen in der Demo sind Näherungen über die ersten 2 Stellen der PLZ.
+- SERVER: Empfänger serverseitig berechnen (echte PLZ-Geodaten), Rechte und Pause serverseitig prüfen,
+  Versand als Hintergrund-Job, Nachrichten in Postfach/Chat der Kunden zustellen. Profile müssen für Kunden
+  als moderierte Profile gekennzeichnet bleiben (AGB/Hinweis).
