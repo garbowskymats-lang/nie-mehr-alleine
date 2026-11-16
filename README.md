@@ -124,3 +124,11 @@ Stand 16.11.2026 – Push-Benachrichtigungen („neue Nachricht im Chat“)
   Tippen öffnet den Chat), server/push-beispiel.js (Node + web-push: subscribe/unsubscribe, neueNachrichtPush()).
 - SERVER: VAPID-Schlüssel erzeugen (npx web-push generate-vapid-keys), öffentlichen in push.js eintragen,
   Endpunkte bauen, bei jeder neuen Nachricht an den Kunden neueNachrichtPush() aufrufen (auch beim Massenversand).
+
+Stand 16.11.2026 – Statistik: Umsatz & Verdienst
+- Chef: Umsatz (Coin-Käufe), im Chat verbrauchte Coins, Verdienst der Mitarbeiter, „Bleibt nach Vergütung“,
+  Tabelle pro Mitarbeiter (Nachrichten, Coins, erzeugter Umsatz, Satz pro Nachricht, Verdienst). „Ø Erlös pro Coin“ einstellbar.
+- Moderator: sieht nur seinen eigenen Verdienst (beantwortete Nachrichten × sein Satz).
+- Satz pro beantworteter Nachricht je Mitarbeiter unter Mitarbeiter → Bearbeiten (Standard 0,10 €; Admins 0 €).
+- SERVER: Coin-Käufe aus dem Zahlungsanbieter, verbrauchte Coins und beantwortete Nachrichten pro Mitarbeiter
+  zählen; Beträge brutto (vor Gebühren und Steuern). Coin-Käufe in der Demo sind Beispielzahlen.

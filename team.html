@@ -49,6 +49,9 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 .toolbar .search{min-width:240px}
 .form-modal .card{width:min(520px,100%)}
 .kpis.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpis.two-k{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ekpi{padding:16px 18px;background:var(--card-2)}.ekpi small{display:block;color:var(--muted);font-size:13px}.ekpi strong{display:block;font:700 clamp(22px,2.6vw,30px)/1.15 var(--serif);margin-top:4px;white-space:nowrap}.ekpi .delta{font-size:12px;margin-top:3px;color:var(--muted)}
+.ekpi.gold strong{color:var(--gold)}.ekpi.ok strong{color:var(--ok)}
 @media(max-width:900px){.kpis.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ibx{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,300px);gap:16px;height:min(720px,calc(100svh - 230px));min-height:520px}
 .ibx-list,.ibx-info{overflow:auto}
@@ -234,6 +237,12 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
       <div class="card kpi" id="onCard"><small>Mitarbeiter online</small><strong id="kOn">–</strong><div class="delta muted" id="dOn"></div></div>
       <div class="card kpi"><small id="lWait">Wartende Nachrichten</small><strong id="kWait">–</strong><div class="delta muted">älteste: <span id="kOld">–</span></div></div>
     </div>
+    <div class="card pad panel" id="earnCard" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><h2 id="eTitle">Umsatz &amp; Verdienst</h2><p id="eSub" style="margin:0 0 16px;color:var(--muted);font-size:14px"></p></div>
+        <label class="small muted" id="eRateBox" data-admin>Ø Erlös pro Coin <input class="input" id="eCoin" type="number" min="0.1" max="5" step="0.01" style="width:90px;min-height:36px;padding:4px 8px;margin-left:6px"> €</label></div>
+      <div class="kpis" id="eKpis" style="margin-bottom:16px"></div>
+      <div id="eTable"></div>
+    </div>
     <div class="two" id="perMod">
       <div class="card pad panel"><h2>Nachrichten pro Mitarbeiter</h2><p id="barsSub">Beantwortete Nachrichten im gewählten Zeitraum</p><div class="bars" id="bars"></div></div>
       <div class="card pad panel"><h2>Antwortzeit pro Mitarbeiter</h2><p>Durchschnitt in Minuten – kürzer ist besser</p><div class="bars" id="rt"></div></div>
@@ -285,8 +294,8 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   const $=id=>document.getElementById(id);
   const KEY="staff";
   const seed=[
-    {id:1,name:"Sandra K.",user:"sandra",role:"Admin",status:"online",last:"Heute, 08:02",msg:[64,402,1690],rt:[3.1,3.4,3.6],active:true,g:"linear-gradient(145deg,#c79a54,#4b3517)"},
-    {id:2,name:"Marco B.",user:"marco",role:"Moderator",mass:"kontrolle",status:"online",last:"Heute, 12:15",msg:[81,515,2120],rt:[2.6,2.9,3.0],active:true,g:"linear-gradient(145deg,#5b7aa0,#1c2a3c)"},
+    {id:1,name:"Sandra K.",user:"sandra",role:"Admin",rate:0,status:"online",last:"Heute, 08:02",msg:[64,402,1690],rt:[3.1,3.4,3.6],active:true,g:"linear-gradient(145deg,#c79a54,#4b3517)"},
+    {id:2,name:"Marco B.",user:"marco",role:"Moderator",mass:"kontrolle",rate:0.12,status:"online",last:"Heute, 12:15",msg:[81,515,2120],rt:[2.6,2.9,3.0],active:true,g:"linear-gradient(145deg,#5b7aa0,#1c2a3c)"},
     {id:3,name:"Julia W.",user:"julia",role:"Moderator",status:"pause",last:"Heute, 10:40",msg:[47,388,1610],rt:[4.2,3.9,4.1],active:true,g:"linear-gradient(145deg,#b0566f,#3b1825)"},
     {id:4,name:"Tim R.",user:"tim",role:"Moderator",status:"online",last:"Heute, 14:01",msg:[29,301,1302],rt:[5.8,5.1,4.9],active:true,g:"linear-gradient(145deg,#4f8f87,#173a37)"},
     {id:5,name:"Nicole H.",user:"nicole",role:"Moderator",status:"offline",last:"Gestern, 22:47",msg:[0,276,1188],rt:[0,3.7,3.8],active:true,g:"linear-gradient(145deg,#8a6aa8,#2c2240)"},
@@ -322,6 +331,43 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     const own=(typeof me!=="undefined"&&me!=="admin")?.25:1;const h=[2,1,1,0,0,0,1,2,4,6,7,8,9,9,8,8,10,12,15,19,22,24,18,9].map(v=>Math.round(v*(range===1?4:range*4)*own));
     const hm=Math.max(...h);
     $("hours").innerHTML=h.map((v,k)=>`<div title="${k}–${k+1} Uhr: ${nf(v)} Nachrichten"><i class="${v>=hm*.8?"peak":""}" style="height:${v/hm*100}%"></i><span>${k%3===0?k:""}</span></div>`).join("");
+    renderEarn(i,act);
+  };
+
+  /* ---------- Umsatz & Verdienst ----------
+     Demo-Rechnung: jede beantwortete Nachricht = 1 vom Kunden bezahlte Chatnachricht (NMA.costPerChat Coins).
+     Verdienst Mitarbeiter = beantwortete Nachrichten × Vergütung pro Nachricht (pro Mitarbeiter einstellbar).
+     Coin-Käufe (Einzahlungen) sind Beispielzahlen – echte Zahlen liefert später der Zahlungsanbieter/Server. */
+  const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+  const ecfg=Object.assign({coin:0.70},NMA.store.get("earnCfg",{}));
+  const buys={0:[6,455],1:[41,3190],2:[176,13480]};      /* [Käufe, Euro] je Zeitraum – Beispiel */
+  const rateOf=s=>s.role==="Admin"?(s.rate||0):(s.rate??0.10);
+  const renderEarn=(i,act)=>{
+    const admin=typeof me!=="undefined"&&me==="admin",per=range===1?"heute":"letzte "+range+" Tage";
+    const rows=act.filter(s=>s.role!=="Admin"||rateOf(s)>0).map(s=>{const coins=s.msg[i]*NMA.costPerChat;return{s,msgs:s.msg[i],coins,ums:coins*ecfg.coin,pay:s.msg[i]*rateOf(s)}}).sort((a,b)=>b.ums-a.ums);
+    $("eCoin").value=ecfg.coin.toFixed(2);
+    if(admin){
+      const used=act.reduce((a,s)=>a+s.msg[i]*NMA.costPerChat,0),pay=rows.reduce((a,r)=>a+r.pay,0),[nb,in_]=buys[i];
+      $("eTitle").textContent="Umsatz & Verdienst";
+      $("eSub").textContent=`Zeitraum: ${per} · Beträge brutto, vor Gebühren des Zahlungsanbieters und Steuern`;
+      $("eKpis").className="kpis";
+      $("eKpis").innerHTML=`<div class="ekpi card gold"><small>Umsatz (Coins gekauft)</small><strong>${eur(in_)}</strong><div class="delta">${nf(nb)} Käufe · Beispielzahl</div></div>
+        <div class="ekpi card"><small>Coins im Chat verbraucht</small><strong>${nf(used)}</strong><div class="delta">≈ ${eur(used*ecfg.coin)}</div></div>
+        <div class="ekpi card"><small>Verdienst Mitarbeiter</small><strong>${eur(pay)}</strong><div class="delta">für ${nf(rows.reduce((a,r)=>a+r.msgs,0))} Nachrichten</div></div>
+        <div class="ekpi card ok"><small>Bleibt nach Vergütung</small><strong>${eur(in_-pay)}</strong><div class="delta">Umsatz − Verdienst Mitarbeiter</div></div>`;
+      $("eTable").innerHTML=rows.length?`<table class="staff"><thead><tr><th>Mitarbeiter</th><th class="num">Nachrichten</th><th class="num">Coins verbraucht</th><th class="num">Umsatz erzeugt</th><th class="num">Satz / Nachricht</th><th class="num">Verdienst</th></tr></thead><tbody>
+        ${rows.map(r=>`<tr><td data-l="Mitarbeiter"><b>${NMA.esc(r.s.name)}</b></td><td data-l="Nachrichten" class="num">${nf(r.msgs)}</td><td data-l="Coins verbraucht" class="num">${nf(r.coins)}</td><td data-l="Umsatz erzeugt" class="num">${eur(r.ums)}</td><td data-l="Satz / Nachricht" class="num">${eur(rateOf(r.s))}</td><td data-l="Verdienst" class="num"><b>${eur(r.pay)}</b></td></tr>`).join("")}
+        </tbody></table><p class="hint" style="margin-top:10px">Den Satz pro Nachricht stellst du unter Mitarbeiter → Bearbeiten ein. „Umsatz erzeugt“ = verbrauchte Coins × Ø Erlös pro Coin.</p>`:'<p class="muted">Keine Daten.</p>';
+    }else{
+      const r=rows.find(x=>x.s.user===me)||{msgs:0,pay:0,s:{rate:0}};
+      $("eTitle").textContent="Dein Verdienst";
+      $("eSub").textContent=`Zeitraum: ${per} · Die Abrechnung macht der Chef.`;
+      $("eKpis").className="kpis three";
+      $("eKpis").innerHTML=`<div class="ekpi card ok"><small>Dein Verdienst</small><strong>${eur(r.pay)}</strong><div class="delta">${per}</div></div>
+        <div class="ekpi card"><small>Beantwortete Nachrichten</small><strong>${nf(r.msgs)}</strong></div>
+        <div class="ekpi card"><small>Satz pro Nachricht</small><strong>${eur(rateOf(r.s))}</strong></div>`;
+      $("eTable").innerHTML="";
+    }
   };
 
   /* ---------- Mitarbeiter ---------- */
@@ -348,6 +394,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
         <div class="field"><label for="fu">Benutzername</label><input class="input" id="fu" required pattern="[a-z0-9._-]{3,}" value="${NMA.esc(s.user)}"><span class="hint">Kleinbuchstaben, mind. 3 Zeichen</span></div>
         <div class="field"><label for="fr">Rolle</label><select class="input" id="fr"><option ${s.role==="Moderator"?"selected":""}>Moderator</option><option ${s.role==="Admin"?"selected":""}>Admin</option></select></div>
         <div class="field"><label for="fe">E-Mail</label><input class="input" id="fe" type="email" value="${NMA.esc(s.mail||"")}" placeholder="für das Einladungs-Passwort"></div>
+        <div class="field"><label for="frate">Vergütung pro beantworteter Nachricht (€)</label><input class="input" id="frate" type="number" min="0" max="5" step="0.01" value="${s.rate??0.10}"><span class="hint">Für die Verdienst-Anzeige in der Statistik.</span></div>
         <div class="field full"><label for="fm">Massenversand</label><select class="input" id="fm">${[["aus","Nicht erlaubt"],["kontrolle","Erlaubt – jede Aussendung muss der Chef freigeben"],["frei","Erlaubt – darf selbst senden (erfahren)"]].map(([v,t])=>`<option value="${v}" ${(s.mass||"aus")===v?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Gilt nur für Moderatoren. Admins dürfen immer.</span></div>
       </div>
       ${isNew?'<p class="hint">Der neue Mitarbeiter bekommt per E-Mail einen Link, um sein Passwort selbst festzulegen.</p>':""}
@@ -359,7 +406,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
       const name=m.querySelector("#fn").value.trim(),user=m.querySelector("#fu").value.trim().toLowerCase();
       if(!name||!/^[a-z0-9._-]{3,}$/.test(user)){NMA.toast("Bitte Name und gültigen Benutzernamen eingeben.");return}
       if(staff.some(x=>x.user===user&&x.id!==s.id)){NMA.toast(`@${user} ist schon vergeben.`);return}
-      const data={name,user,role:m.querySelector("#fr").value,mail:m.querySelector("#fe").value.trim(),mass:m.querySelector("#fm").value};
+      const data={name,user,role:m.querySelector("#fr").value,mail:m.querySelector("#fe").value.trim(),mass:m.querySelector("#fm").value,rate:Math.max(0,+m.querySelector("#frate").value||0)};
       if(isNew){staff.push(Object.assign({id:Date.now(),status:"offline",last:"noch nie",msg:[0,0,0],rt:[0,0,0],active:true,g:"linear-gradient(145deg,#2f6f69,#123234)"},data));NMA.toast(`${name} wurde angelegt (Demo).`)}
       else{Object.assign(s,data);NMA.toast("Gespeichert.")}
       persist();m.remove();renderStaff();renderStats();window.MV&&MV.render()});
@@ -378,6 +425,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
     ["inbox","profiles","templates","mass","stats","staff","support","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
+  $("eCoin").addEventListener("change",e=>{const v=+e.target.value;if(v>0){ecfg.coin=v;NMA.store.set("earnCfg",ecfg);renderStats();NMA.toast("Gespeichert.")}});
   $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
     $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
   /* ---------- Verläufe (nur Admin, mit Zusatzcode) ---------- */
