@@ -33,3 +33,4 @@ App installieren (PWA)
 - Android/Chrome/Edge: Knopf "App installieren" öffnet den echten Installationsdialog.
   iPhone: Safari kann das nicht automatisch – der Knopf zeigt die Anleitung (Teilen → Zum Home-Bildschirm).
 - Push-Benachrichtigungen bei neuen Nachrichten werden später im sw.js ergänzt (Server nötig).
+- app-installieren.html: Anleitung getrennt nach Android, iPhone/iPad, PC – inkl. Hinweis, dass Firefox am PC nicht installieren kann.

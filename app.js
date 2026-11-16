@@ -94,7 +94,7 @@ if (document.body.classList.contains("member")) {
     ["uebersicht","Übersicht","home",0],["suche","Suche","search",0],
     ["chat","Chat","chat",chatUnread],["postfach","Postfach","mail",mailUnread],["mein-profil","Mein Bereich","me",0]
   ];
-  const isActive = k => k===page || (k==="mein-profil" && ["einstellungen","hilfe"].includes(page)) || (k==="suche" && page==="profil");
+  const isActive = k => k===page || (k==="mein-profil" && ["einstellungen","hilfe","app-installieren"].includes(page)) || (k==="suche" && page==="profil");
   const top = document.createElement("header");
   top.className="topbar";
   top.innerHTML = `<a class="brand" href="uebersicht.html" aria-label="Nie mehr alleine – Übersicht"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span></a>
@@ -200,7 +200,7 @@ document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",e
     b.id = "appBanner"; b.className = "card app-banner";
     b.innerHTML = `<img src="assets/icon-192.png" alt="" width="64" height="64">
       <div class="grow"><h2>Nie mehr alleine als App</h2><p class="muted">Mit einem Tipp auf deinem Startbildschirm – und Benachrichtigungen bei neuen Nachrichten.</p></div>
-      <div class="acts"><button class="btn primary" id="appInstall">App installieren</button><button class="btn ghost" id="appLater">Später</button></div>`;
+      <div class="acts"><button class="btn primary" id="appInstall">App installieren</button><a class="btn" href="app-installieren.html">Anleitung</a><button class="btn ghost" id="appLater">Später</button></div>`;
     const main = document.querySelector("main");
     const notice = main && main.querySelector(".notice");
     if (main) (notice ? notice.after(b) : main.prepend(b));
