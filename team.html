@@ -47,6 +47,32 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px}
 .toolbar .search{min-width:240px}
 .form-modal .card{width:min(520px,100%)}
+.kpis.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:900px){.kpis.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ibx{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,300px);gap:16px;height:min(720px,calc(100svh - 230px));min-height:520px}
+.ibx-list,.ibx-info{overflow:auto}
+.ibx-head{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;border-bottom:1px solid var(--line)}
+.q-item{width:100%;display:grid;gap:3px;padding:13px 16px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;cursor:pointer}
+.q-item:hover{background:#ffffff07}.q-item.on{background:#0f2a2b}
+.q-item .top{display:flex;justify-content:space-between;gap:8px}
+.q-item small{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wait{white-space:nowrap;font-size:13px;font-weight:700;padding:3px 9px;border-radius:20px;background:#10292a;color:#bdf3ee}
+.wait.warn{background:#2a2112;color:#f6d79f}.wait.late{background:#3a1714;color:#ffb3a8}
+.ibx-chat{display:flex;flex-direction:column;min-height:0}
+.ibx-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ibx-reply{border-top:1px solid var(--line);padding:12px 14px}
+.ibx-reply textarea{min-height:80px}
+.ibx-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
+.ibx-actions .hint{flex:1}
+.ibx-info{padding:16px}
+.ibx-info h4{font:700 13px/1 var(--sans);color:var(--muted);margin:18px 0 8px}
+.ibx-info h4:first-child{margin-top:0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv span{color:var(--muted)}
+.ibx-info textarea{min-height:90px;font-size:14px}
+.assignee{font-size:12px;color:var(--gold)}
+@media(max-width:1100px){.ibx{grid-template-columns:minmax(0,260px) minmax(0,1fr)}.ibx-info{grid-column:1/-1;max-height:none}.ibx{height:auto}.ibx-chat{min-height:520px}}
+@media(max-width:700px){.ibx{grid-template-columns:1fr}.ibx-list{max-height:260px}}
 .lockbox{max-width:520px;margin:20px auto;text-align:center}
 .lockbox h2{font-size:26px;margin-bottom:8px}
 .pin-row{display:flex;gap:10px;margin:18px 0 8px}
@@ -76,7 +102,8 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   .staff td:first-child{grid-column:1/-1}.staff td:first-child::before{display:none}
   .staff td:last-child{grid-column:1/-1;flex-direction:row;gap:8px}.staff td:last-child::before{display:none}
   .bar{grid-template-columns:minmax(0,96px) minmax(0,1fr) 46px}
-  #me,.tb-tag{display:none}
+  .tb-tag,#me .lbl{display:none}
+  #me select{max-width:150px}
   .staff .role{align-self:flex-start}
 }
 </style>
@@ -84,32 +111,49 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <body data-page="team">
 <header class="topbar">
   <a class="brand" href="team.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span><span class="tb-tag">Team</span></a>
-  <div class="top-right"><label class="muted small" id="me">Ansicht (Demo): <select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option>Admin</option><option>Moderator</option></select></label><a class="btn sm ghost" href="mitarbeiter-login.html">Abmelden</a></div>
+  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><a class="btn sm ghost" href="mitarbeiter-login.html">Abmelden</a></div>
 </header>
 
 <main class="page">
   <div class="page-head">
-    <div><h1>Mitarbeiterbereich</h1><p>Statistik und Verwaltung des Moderatoren-Teams.</p></div>
-    <div class="tabs" role="tablist"><button class="on" data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab">Mitarbeiter</button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
+    <div><h1 id="pTitle">Mitarbeiterbereich</h1><p id="pSub">Statistik und Verwaltung des Moderatoren-Teams.</p></div>
+    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Posteingang <span class="badge" id="qBadge">0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
   </div>
 
   <!-- ================= STATISTIK ================= -->
-  <section id="stats">
+  <!-- ================= POSTEINGANG ================= -->
+  <section id="inbox">
+    <div class="ibx">
+      <aside class="card ibx-list"><div class="ibx-head"><b id="qTitle">Wartende Nachrichten</b><small class="muted">älteste zuerst</small></div><div id="queue"></div></aside>
+      <div class="card ibx-chat">
+        <div id="ibxEmpty" class="empty" style="margin:auto">Wähle links eine wartende Nachricht.</div>
+        <div id="ibxConv" hidden style="display:contents">
+          <div class="log-head ibx-top"><div><h3 id="cTitle"></h3><small class="muted" id="cSub"></small></div><span class="wait" id="cWait"></span></div>
+          <div class="log-msgs" id="cMsgs"></div>
+          <form class="ibx-reply" id="replyForm"><textarea class="input" id="reply" rows="3" placeholder="Antwort schreiben … (Strg+Enter sendet)" aria-label="Antwort"></textarea>
+            <div class="ibx-actions"><span class="hint" id="charHint">0 Zeichen</span><button type="button" class="btn ghost sm" id="skip">Zurückstellen</button><button class="btn primary">Antworten</button></div></form>
+        </div>
+      </div>
+      <aside class="card ibx-info" id="infoPane"><p class="empty">Infos zu Kunde und Profil erscheinen hier.</p></aside>
+    </div>
+  </section>
+
+  <section id="stats" hidden>
     <div class="toolbar">
       <div class="tabs" id="range"><button class="on" data-r="1">Heute</button><button data-r="7">7 Tage</button><button data-r="30">30 Tage</button></div>
       <span class="demo">Beispieldaten – echte Zahlen liefert später der Server.</span>
     </div>
     <div class="kpis">
-      <div class="card kpi"><small>Beantwortete Nachrichten</small><strong id="kMsg">–</strong><div class="delta" id="dMsg"></div></div>
-      <div class="card kpi"><small>Ø Antwortzeit</small><strong id="kTime">–</strong><div class="delta" id="dTime"></div></div>
-      <div class="card kpi"><small>Mitarbeiter online</small><strong id="kOn">–</strong><div class="delta muted" id="dOn"></div></div>
-      <div class="card kpi"><small>Wartende Nachrichten</small><strong id="kWait">–</strong><div class="delta muted">älteste: <span id="kOld">–</span></div></div>
+      <div class="card kpi"><small id="lMsg">Beantwortete Nachrichten</small><strong id="kMsg">–</strong><div class="delta" id="dMsg"></div></div>
+      <div class="card kpi"><small id="lTime">Ø Antwortzeit</small><strong id="kTime">–</strong><div class="delta" id="dTime"></div></div>
+      <div class="card kpi" id="onCard"><small>Mitarbeiter online</small><strong id="kOn">–</strong><div class="delta muted" id="dOn"></div></div>
+      <div class="card kpi"><small id="lWait">Wartende Nachrichten</small><strong id="kWait">–</strong><div class="delta muted">älteste: <span id="kOld">–</span></div></div>
     </div>
-    <div class="two">
+    <div class="two" id="perMod">
       <div class="card pad panel"><h2>Nachrichten pro Mitarbeiter</h2><p id="barsSub">Beantwortete Nachrichten im gewählten Zeitraum</p><div class="bars" id="bars"></div></div>
       <div class="card pad panel"><h2>Antwortzeit pro Mitarbeiter</h2><p>Durchschnitt in Minuten – kürzer ist besser</p><div class="bars" id="rt"></div></div>
     </div>
-    <div class="card pad panel" style="margin-top:20px"><h2>Eingehende Nachrichten nach Uhrzeit</h2><p>Wann am meisten los ist – hilft bei der Schichtplanung</p><div class="hours" id="hours"></div></div>
+    <div class="card pad panel" id="hoursCard" style="margin-top:20px"><h2 id="hTitle">Eingehende Nachrichten nach Uhrzeit</h2><p id="hSub">Wann am meisten los ist – hilft bei der Schichtplanung</p><div class="hours" id="hours"></div></div>
   </section>
 
   <!-- ================= MITARBEITER ================= -->
@@ -169,11 +213,11 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 
   /* ---------- Statistik ---------- */
   const renderStats=()=>{
-    const i=ri(),act=staff.filter(s=>s.active);
+    const i=ri(),act=(typeof me!=="undefined"&&me!=="admin")?staff.filter(s=>s.user===me):staff.filter(s=>s.active);
     const total=act.reduce((a,s)=>a+s.msg[i],0);
     const withRt=act.filter(s=>s.rt[i]);
     const avg=withRt.length?withRt.reduce((a,s)=>a+s.rt[i]*s.msg[i],0)/Math.max(1,withRt.reduce((a,s)=>a+s.msg[i],0)):0;
-    const prev={0:[198,3.6],1:[1730,3.8],2:[7900,4.0]}[i];
+    let prev={0:[198,3.6],1:[1730,3.8],2:[7900,4.0]}[i];if(typeof me!=="undefined"&&me!=="admin")prev=[Math.max(1,Math.round(total*.9)),avg+.3];
     $("kMsg").textContent=nf(total);
     const dm=Math.round((total-prev[0])/prev[0]*100);
     $("dMsg").innerHTML=`<span class="${dm>=0?"up":"down"}">${dm>=0?"▲":"▼"} ${Math.abs(dm)} %</span> <span class="muted">zum Vorzeitraum</span>`;
@@ -182,13 +226,13 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     $("dTime").innerHTML=`<span class="${dt<=0?"up":"down"}">${dt<=0?"▼":"▲"} ${Math.abs(dt).toFixed(1).replace(".",",")} Min.</span> <span class="muted">zum Vorzeitraum</span>`;
     const on=act.filter(s=>s.status==="online").length,pause=act.filter(s=>s.status==="pause").length;
     $("kOn").textContent=`${on} von ${act.length}`;$("dOn").textContent=pause?`${pause} in Pause`:"niemand in Pause";
-    $("kWait").textContent="12";$("kOld").textContent="4 Min.";
+    {const mq=typeof myQueue==="function"?myQueue():[];$("kWait").textContent=mq.length;$("kOld").textContent=mq.length?waitTxt(mq[0].t):"–";}
     $("barsSub").textContent=`Beantwortete Nachrichten – ${range===1?"heute":"letzte "+range+" Tage"}`;
     const sorted=[...act].sort((a,b)=>b.msg[i]-a.msg[i]),max=Math.max(1,...sorted.map(s=>s.msg[i]));
     $("bars").innerHTML=sorted.map(s=>`<div class="bar"><span>${NMA.esc(s.name)}</span><span class="track"><span class="fill" style="display:block;width:${s.msg[i]/max*100}%"></span></span><b>${nf(s.msg[i])}</b></div>`).join("");
     const rs=act.filter(s=>s.rt[i]).sort((a,b)=>a.rt[i]-b.rt[i]),rmax=Math.max(1,...rs.map(s=>s.rt[i]));
     $("rt").innerHTML=rs.length?rs.map(s=>`<div class="bar"><span>${NMA.esc(s.name)}</span><span class="track"><span class="fill" style="display:block;width:${s.rt[i]/rmax*100}%;background:${s.rt[i]>5?"linear-gradient(90deg,#9a5a30,#e3b26a)":""}"></span></span><b>${s.rt[i].toFixed(1).replace(".",",")}</b></div>`).join(""):'<p class="muted">Keine Daten.</p>';
-    const h=[2,1,1,0,0,0,1,2,4,6,7,8,9,9,8,8,10,12,15,19,22,24,18,9].map(v=>v*(range===1?1:range));
+    const own=(typeof me!=="undefined"&&me!=="admin")?.25:1;const h=[2,1,1,0,0,0,1,2,4,6,7,8,9,9,8,8,10,12,15,19,22,24,18,9].map(v=>Math.round(v*(range===1?4:range*4)*own));
     const hm=Math.max(...h);
     $("hours").innerHTML=h.map((v,k)=>`<div title="${k}–${k+1} Uhr: ${nf(v)} Nachrichten"><i class="${v>=hm*.8?"peak":""}" style="height:${v/hm*100}%"></i><span>${k%3===0?k:""}</span></div>`).join("");
   };
@@ -245,7 +289,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
-    ["stats","staff","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
+    ["inbox","stats","staff","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
   $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
     $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
   /* ---------- Verläufe (nur Admin, mit Zusatzcode) ---------- */
@@ -256,7 +300,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     {id:"l4",cust:"Wanderfreund",profile:"Andrea Lächeln",msgs:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?","Montag 09:05"],["m","Das war an der Ostsee, im letzten Sommer.","Montag 09:12","Nicole H."]]}
   ];
   const audit=[];
-  let unlocked=false,viewAs="Admin",curLog=null;
+  let unlocked=false,curLog=null;
   const mods=[...new Set(logs.flatMap(l=>l.msgs.filter(m=>m[0]==="m").map(m=>m[3])))];
   $("lMod").innerHTML+=mods.map(m=>`<option>${NMA.esc(m)}</option>`).join("");
   const renderLogs=()=>{
@@ -277,13 +321,95 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("relock").addEventListener("click",()=>setLock(false));
   $("logList").addEventListener("click",e=>{const b=e.target.closest("[data-log]");if(b)showLog(b.dataset.log)});
   $("lq").addEventListener("input",renderLogs);$("lMod").addEventListener("change",renderLogs);
-  /* Rollen-Ansicht (Demo): Moderator sieht keine Verläufe und keine Verwaltung */
-  $("viewAs").addEventListener("change",e=>{viewAs=e.target.value;
-    document.querySelectorAll("[data-admin]").forEach(b=>b.hidden=viewAs!=="Admin");
-    document.querySelector('[data-tab="staff"]').hidden=viewAs!=="Admin";
-    if(viewAs!=="Admin"){setLock(false);document.querySelector('[data-tab="stats"]').click()}
-    NMA.toast(viewAs==="Admin"?"Ansicht: Admin":"Ansicht: Moderator – Verläufe und Verwaltung sind ausgeblendet")});
-  renderStats();renderStaff();
+
+  /* ---------- Rollen ---------- */
+  let me="admin";                       /* admin | marco | julia (Demo) */
+  const isAdmin=()=>me==="admin";
+  const meStaff=()=>staff.find(x=>x.user===me);
+
+  /* ---------- Posteingang ---------- */
+  const customers={
+    "Michael Nordlicht":{age:56,ort:"20095 Hamburg",job:"Elektriker",coins:5,since:"12.11.2026",look:"Beziehung"},
+    "Sonnenschein63":{age:63,ort:"34508 Willingen",job:"Rentner",coins:42,since:"02.10.2026",look:"Beziehung"},
+    "Rolf aus Kassel":{age:59,ort:"34117 Kassel",job:"Busfahrer",coins:118,since:"14.08.2026",look:"Abenteuer"},
+    "Wanderfreund":{age:61,ort:"– (keine Angabe)",job:"Lehrer",coins:12,since:"30.10.2026",look:"Beziehung"},
+    "Berti_K":{age:67,ort:"60311 Frankfurt",job:"",coins:7,since:"15.11.2026",look:"Abenteuer"}
+  };
+  let notes=NMA.store.get("teamNotes",{"Rolf aus Kassel":"Hat einen Garten, mag Labradore. Geburtstag im März.","Sonnenschein63":"Witwer seit 2022, sehr höflich."});
+  const mins=m=>Date.now()-m*60000;
+  let queue=NMA.store.get("teamQueue",null)||[
+    {id:"q1",cust:"Sonnenschein63",profile:"Sabine Herz",mod:"marco",t:mins(9),hist:[["c","Guten Abend, wie war dein Tag?"],["m","Ganz entspannt, ich war im Garten. Und deiner?","Julia W."],["c","Lang, aber jetzt wird er besser 🙂 Was machst du am Wochenende?"]]},
+    {id:"q2",cust:"Rolf aus Kassel",profile:"Monika am Meer",mod:"marco",t:mins(4),hist:[["c","Hallo Monika, wie heißt denn dein Hund?"],["m","Er heißt Bruno und ist ein echter Schatz.","Tim R."],["c","Schöner Name! Gehst du morgen früh mit ihm raus?"]]},
+    {id:"q3",cust:"Berti_K",profile:"Tanzmaus Petra",mod:"marco",t:mins(2),hist:[["c","Hallo Petra, tanzt du auch Discofox?"]]},
+    {id:"q4",cust:"Michael Nordlicht",profile:"Gitarren Lena",mod:"julia",t:mins(6),hist:[["c","Hallo! Dein Profil klingt sympathisch."],["m","Hallo! Spielst du auch ein Instrument?","Marco B."],["c","Ein bisschen Gitarre. Und welche Musik hörst du am liebsten?"]]},
+    {id:"q5",cust:"Wanderfreund",profile:"Andrea Lächeln",mod:"julia",t:mins(1),hist:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?"]]}
+  ];
+  const saveQ=()=>{NMA.store.set("teamQueue",queue);NMA.store.set("teamNotes",notes)};
+  let cur=null;
+  const myQueue=()=>(isAdmin()?queue:queue.filter(q=>q.mod===me)).slice().sort((a,b)=>(a.later||a.t)-(b.later||b.t));
+  const waitTxt=t=>{const m=Math.max(0,Math.round((Date.now()-t)/60000));return m<1?"gerade eben":m+" Min."};
+  const waitCls=t=>{const m=(Date.now()-t)/60000;return m>=8?"late":m>=5?"warn":""};
+  const modName=u=>(staff.find(x=>x.user===u)||{name:u}).name;
+  const renderQueue=()=>{
+    const q=myQueue();$("qBadge").textContent=q.length;$("qBadge").hidden=!q.length;
+    $("qTitle").textContent=isAdmin()?"Alle wartenden Nachrichten":"Deine wartenden Nachrichten";
+    $("queue").innerHTML=q.length?q.map(x=>{const last=x.hist[x.hist.length-1];
+      return `<button class="q-item ${x.id===cur?"on":""}" data-q="${x.id}"><span class="top"><b>${NMA.esc(x.cust)}</b><span class="wait ${waitCls(x.t)}">${waitTxt(x.t)}</span></span><small>an „${NMA.esc(x.profile)}“</small><small>${NMA.esc(last[1])}</small>${isAdmin()?`<span class="assignee">→ ${NMA.esc(modName(x.mod))}</span>`:""}</button>`}).join(""):'<p class="empty">Keine wartenden Nachrichten 🎉</p>';
+  };
+  const renderInfo=x=>{
+    const c=customers[x.cust]||{},p=NMA.profiles.find(pp=>pp.name===x.profile)||{};
+    $("infoPane").innerHTML=`<h4>KUNDE</h4><div class="kv"><span>Nickname</span><b>${NMA.esc(x.cust)}</b><span>Alter</span>${c.age||"–"}<span>Wohnort</span>${NMA.esc(c.ort||"–")}<span>Beruf</span>${NMA.esc(c.job||"–")}<span>Sucht</span>${c.look||"–"}<span>Coins</span>${c.coins??"–"}<span>Dabei seit</span>${c.since||"–"}</div>
+      <h4>NOTIZEN ZUM KUNDEN <small style="font-weight:400">(für alle Mitarbeiter)</small></h4><textarea class="input" id="note" placeholder="z. B. Hobbys, Familie, worüber zuletzt gesprochen wurde">${NMA.esc(notes[x.cust]||"")}</textarea>
+      <h4>DEIN PROFIL IN DIESEM GESPRÄCH</h4><div class="kv"><span>Name</span><b>${NMA.esc(p.name||x.profile)}</b><span>Alter</span>${p.age||"–"}<span>Ort</span>${NMA.esc(p.city||"–")}<span>Beruf</span>${NMA.esc(p.job||"–")}<span>Sucht</span>${p.looking||"–"}</div>
+      <p class="small muted" style="margin:8px 0 0">${NMA.esc(p.about||"")}</p>`;
+    $("note").addEventListener("input",e=>{notes[x.cust]=e.target.value;saveQ()});
+  };
+  const openQ=id=>{
+    const x=queue.find(q=>q.id===id);if(!x)return;cur=id;
+    $("ibxEmpty").hidden=true;$("ibxConv").hidden=false;$("ibxConv").style.display="contents";
+    $("cTitle").textContent=`${x.cust} ↔ ${x.profile}`;
+    $("cSub").textContent=isAdmin()?`Zugeteilt an ${modName(x.mod)}`:"Du antwortest als "+x.profile;
+    $("cWait").textContent="wartet "+waitTxt(x.t);$("cWait").className="wait "+waitCls(x.t);
+    $("cMsgs").innerHTML=x.hist.map(m=>`<div class="lm ${m[0]==="m"?"mod":"cust"}"><span class="meta">${m[0]==="m"?NMA.esc(x.profile)+(isAdmin()&&m[2]?" · ✎ "+NMA.esc(m[2]):""):NMA.esc(x.cust)}</span>${NMA.esc(m[1])}</div>`).join("");
+    $("cMsgs").scrollTop=1e6;renderQueue();renderInfo(x);$("reply").value="";$("charHint").textContent="0 Zeichen";
+    if(innerWidth>700)$("reply").focus();
+  };
+  const hideConv=()=>{cur=null;$("ibxConv").hidden=true;$("ibxConv").style.display="none";$("ibxEmpty").hidden=false;$("infoPane").innerHTML='<p class="empty">Infos zu Kunde und Profil erscheinen hier.</p>'};
+  $("queue").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b)openQ(b.dataset.q)});
+  $("reply").addEventListener("input",e=>{$("charHint").textContent=e.target.value.length+" Zeichen"});
+  $("reply").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("replyForm").requestSubmit()}});
+  $("replyForm").addEventListener("submit",e=>{e.preventDefault();
+    const v=$("reply").value.trim(),x=queue.find(q=>q.id===cur);if(!x)return;
+    if(v.length<2){NMA.toast("Bitte eine Antwort schreiben.");return}
+    const took=Math.max(.5,(Date.now()-x.t)/60000);
+    const st=staff.find(s=>s.user===(isAdmin()?"sandra":me));
+    if(st){[0,1,2].forEach(i=>{st.rt[i]=st.msg[i]?(st.rt[i]*st.msg[i]+took)/(st.msg[i]+1):took;st.msg[i]++});persist()}
+    queue=queue.filter(q=>q.id!==cur);saveQ();
+    NMA.toast(`Antwort gesendet (${took.toFixed(1).replace(".",",")} Min.)`);
+    const next=myQueue()[0];next?openQ(next.id):(hideConv(),renderQueue());renderStats();
+  });
+  $("skip").addEventListener("click",()=>{const x=queue.find(q=>q.id===cur);if(!x)return;x.later=Date.now();saveQ();const next=myQueue().find(q=>q.id!==x.id);next?openQ(next.id):openQ(x.id);NMA.toast("Zurückgestellt – ans Ende der Liste.")});
+  setInterval(()=>{renderQueue();if(cur){const x=queue.find(q=>q.id===cur);if(x){$("cWait").textContent="wartet "+waitTxt(x.t);$("cWait").className="wait "+waitCls(x.t)}}},30000);
+
+  /* ---------- Rollenansicht anwenden ---------- */
+  const applyRole=()=>{
+    const a=isAdmin();
+    document.querySelectorAll("[data-admin]").forEach(b=>b.hidden=!a);
+    $("onCard").hidden=!a;document.querySelector(".kpis").classList.toggle("three",!a);
+    $("perMod").hidden=!a;
+    $("lMsg").textContent=a?"Beantwortete Nachrichten (alle)":"Deine beantworteten Nachrichten";
+    $("lTime").textContent=a?"Ø Antwortzeit (alle)":"Deine Ø Antwortzeit";
+    $("lWait").textContent=a?"Wartende Nachrichten (alle)":"Deine wartenden Nachrichten";
+    $("hTitle").textContent=a?"Eingehende Nachrichten nach Uhrzeit":"Eingehende Nachrichten für deine Profile";
+    $("hSub").textContent=a?"Alle Profile – hilft bei der Schichtplanung":"Nur Nachrichten an die Profile, die du betreust";
+    $("pTitle").textContent=a?"Mitarbeiterbereich":"Hallo "+(meStaff()||{name:""}).name.split(" ")[0]+"!";
+    $("pSub").textContent=a?"Posteingang, Statistik und Verwaltung des Teams.":"Dein Posteingang und deine Zahlen.";
+    if(!a){setLock(false);const vis=document.querySelector("[data-tab].on");if(vis&&vis.hidden)document.querySelector('[data-tab="inbox"]').click()}
+    hideConv();renderQueue();renderStats();
+  };
+  $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+modName(me)+" (Moderator)")});
+
+  renderStats();renderStaff();applyRole();
 }</script>
 </body>
 </html>

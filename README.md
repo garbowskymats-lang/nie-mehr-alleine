@@ -38,6 +38,10 @@ App installieren (PWA)
 Mitarbeiterbereich
 - mitarbeiter-login.html → team.html: Statistik (Nachrichten, Antwortzeiten, Auslastung nach Uhrzeit)
   und Mitarbeiterverwaltung (anlegen, bearbeiten, sperren, Rollen Admin/Moderator).
+- Posteingang: wartende Kundennachrichten (älteste zuerst, Wartezeit farbig), Antwort als Profil,
+  Kunden-Infos + gemeinsame Notizen, Profil-Infos. Moderator sieht nur seine eigene Warteschlange, der Chef alle.
+- Statistik je Rolle: Moderator sieht nur eigene Nachrichten, Antwortzeit, Warteschlange und Uhrzeit-Verteilung
+  seiner Profile. Nur der Chef sieht "Mitarbeiter online", Nachrichten und Antwortzeit pro Mitarbeiter.
 - Reiter "Verläufe": nur für Admins, zusätzlich mit Admin-Code geschützt; zeigt Chatverläufe mit dem Namen
   des Mitarbeiters an jeder Antwort. Zugriffe werden protokolliert (serverseitig umsetzen!).
 - Alles Demo-Daten; Login, Rollenrechte und Zahlen müssen serverseitig umgesetzt werden.
