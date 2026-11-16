@@ -34,9 +34,9 @@
       <div class="field"><label for="birth">Geburtsdatum</label><input class="input" id="birth" type="date" required><span class="hint" id="ageHint">Dein Alter wird automatisch berechnet. Anmeldung ab 18 Jahren.</span></div>
       <div class="field"><label for="job">Beruf <span class="muted">(freiwillig)</span></label><input class="input" id="job" autocomplete="organization-title" placeholder="z. B. Elektriker"></div>
 
-      <div class="field"><label for="plz">Postleitzahl <span class="muted">(freiwillig)</span></label>
-        <div class="range"><input class="input" id="plz" inputmode="numeric" pattern="[0-9]{4,5}" maxlength="5" placeholder="z. B. 34508" style="flex:1"><select class="input" id="radius" aria-label="Umkreis" style="flex:1"><option value="20">bis 20 km</option><option value="50" selected>bis 50 km</option><option value="100">bis 100 km</option><option value="999">über 100 km</option></select></div>
-        <span class="hint">Für die Umkreissuche. Bei einem Umzug änderst du sie im Profil.</span></div>
+      <div class="field"><label for="plz">Postleitzahl</label>
+        <div class="range"><input class="input" id="plz" inputmode="numeric" pattern="[0-9]{4,5}" maxlength="5" placeholder="z. B. 34508" required autocomplete="postal-code" style="flex:1"><select class="input" id="radius" aria-label="Umkreis" style="flex:1"><option value="20">bis 20 km</option><option value="50" selected>bis 50 km</option><option value="100">bis 100 km</option><option value="999">über 100 km</option></select></div>
+        <span class="hint">Pflichtfeld – für die Umkreissuche. Bei einem Umzug änderst du sie im Profil.</span></div>
 
       <label class="check" style="margin-bottom:18px"><input type="checkbox" id="ok" required disabled> <span>Ich bin mindestens 18 Jahre alt, habe verstanden, dass die Profile von Moderatoren geführt werden, und akzeptiere die <a class="link" href="rechtliches.html#agb">AGB</a> und <a class="link" href="rechtliches.html#datenschutz">Datenschutzhinweise</a>.</span></label>
       <button class="btn primary wide" type="submit">Kostenlos starten</button>
@@ -65,7 +65,7 @@
   $("plz").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,"")});
   f.addEventListener("submit",e=>{e.preventDefault();checkAge();checkNick();
     if(!f.checkValidity()){const bad=f.querySelector(":invalid");bad&&bad.focus();
-      NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?"Die Postleitzahl hat 4 oder 5 Ziffern.":"Bitte fülle alle Pflichtfelder aus.");return}
+      NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?"Bitte gib deine Postleitzahl ein (4 oder 5 Ziffern).":"Bitte fülle alle Pflichtfelder aus.");return}
     NMA.store.set("user",{nick:nick.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,job:$("job").value.trim(),plz:$("plz").value,radius:$("radius").value,city:"",about:""});
     NMA.setCoins(5); location.href="uebersicht.html?neu=1";
   });
