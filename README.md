@@ -27,7 +27,7 @@ App installieren (PWA)
 - Funktioniert nur über https auf eurer echten Domain (nicht in der Claude-Vorschau).
 - Android/Chrome/Edge: Knopf "App installieren" öffnet den echten Installationsdialog.
   iPhone: Safari kann das nicht automatisch – der Knopf zeigt die Anleitung (Teilen → Zum Home-Bildschirm).
-- Push-Benachrichtigungen bei neuen Nachrichten werden später im sw.js ergänzt (Server nötig).
+- Push-Benachrichtigungen: siehe Abschnitt „Push“ weiter unten.
 - app-installieren.html: Anleitung getrennt nach Android, iPhone/iPad, PC – inkl. Hinweis, dass Firefox am PC nicht installieren kann.
 
 Mitarbeiterbereich
@@ -113,3 +113,14 @@ GEPLANT – Profile wachsen mit den Regionen („Region aufbauen“)
 - KI darf Profiltexte als Entwurf vorschlagen (Mitarbeiter prüft). Grundlage: Region, Altersklasse, Rubrik –
   NICHT das persönliche Profil eines einzelnen Kunden.
 - Zusammen mit „Kontakt-Ort“ (oben): einmal festgelegte Orte bleiben für den jeweiligen Kunden gleich.
+
+Stand 16.11.2026 – Push-Benachrichtigungen („neue Nachricht im Chat“)
+- Kunde schaltet unter Einstellungen → „Benachrichtigung bei neuen Chatnachrichten“ ein; das Handy fragt
+  „Benachrichtigungen zulassen?“. Zusätzlich: „Text in der Mitteilung zeigen“ (Standard AUS = diskret,
+  nur „Du hast eine neue Nachricht“). Test-Knopf zeigt, wie es aussieht.
+- Geräte: Android/PC im Browser und als App; iPhone/iPad ab iOS 16.4 NUR als App vom Home-Bildschirm.
+  Nur über https auf der echten Domain (nicht in der Claude-Vorschau).
+- Dateien: push.js (Anmelden/Abmelden, DEMO-Modus solange kein Schlüssel eingetragen), sw.js (empfängt Push,
+  Tippen öffnet den Chat), server/push-beispiel.js (Node + web-push: subscribe/unsubscribe, neueNachrichtPush()).
+- SERVER: VAPID-Schlüssel erzeugen (npx web-push generate-vapid-keys), öffentlichen in push.js eintragen,
+  Endpunkte bauen, bei jeder neuen Nachricht an den Kunden neueNachrichtPush() aufrufen (auch beim Massenversand).

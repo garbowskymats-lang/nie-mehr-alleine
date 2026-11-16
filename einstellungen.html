@@ -21,7 +21,9 @@
     <div style="display:grid;gap:20px">
       <section class="card pad">
         <h2 style="font-size:24px;margin-bottom:6px">Benachrichtigungen</h2>
-        <div class="setting"><div><b>Neue Chatnachrichten aufs Handy</b><p>Wie bei WhatsApp: Du bekommst eine Mitteilung, auch wenn die Seite geschlossen ist.</p></div><label class="switch"><input type="checkbox" checked aria-label="Handy-Benachrichtigungen"><span></span></label></div>
+        <div class="setting"><div><b>Benachrichtigung bei neuen Chatnachrichten</b><p>Wie bei WhatsApp: Du bekommst eine Mitteilung aufs Handy, auch wenn die App geschlossen ist.</p><p class="hint" id="pushHint" hidden></p></div><label class="switch"><input type="checkbox" id="pushOn" aria-label="Benachrichtigungen erhalten"><span></span></label></div>
+        <div class="setting" id="pushPrevRow"><div><b>Text in der Mitteilung zeigen</b><p>Aus = diskret: Auf dem Sperrbildschirm steht nur „Du hast eine neue Nachricht“. An = mit Name und Text.</p></div><label class="switch"><input type="checkbox" id="pushPrev" aria-label="Text in der Mitteilung zeigen"><span></span></label></div>
+        <div id="pushTestRow" hidden style="margin:4px 0 10px"><button class="btn sm" id="pushTest" type="button">Test-Benachrichtigung schicken</button></div>
         <div class="setting"><div><b>E-Mail bei neuen Nachrichten</b><p>Eine kurze Info, wenn du offline bist.</p></div><label class="switch"><input type="checkbox" checked aria-label="E-Mail-Benachrichtigung"><span></span></label></div>
         <div class="setting"><div><b>Ton im Chat</b><p>Kurzer Hinweiston, wenn eine Nachricht eintrifft.</p></div><label class="switch"><input type="checkbox" aria-label="Ton im Chat"><span></span></label></div>
       </section>
@@ -46,7 +48,24 @@
   </div>
 </main>
 <script src="app.js"></script>
+<script src="push.js"></script>
 <script>{
+  /* Push-Benachrichtigungen */
+  {
+    const $=id=>document.getElementById(id),on=$("pushOn"),prev=$("pushPrev"),hint=$("pushHint");
+    prev.checked=NMA.store.get("pushPreview",false);
+    const show=(t,bad)=>{hint.hidden=!t;hint.textContent=t||"";hint.className="hint"+(bad?" bad":"")};
+    const refresh=async()=>{const c=NMA.push.check(),is=await NMA.push.isOn();on.checked=is;$("pushTestRow").hidden=!is;
+      on.disabled=!c.ok;
+      if(!c.ok)show(c.why,!!c.denied);else show(is?"Eingeschaltet für dieses Gerät.":"")};
+    on.addEventListener("change",async()=>{
+      if(on.checked){try{const r=await NMA.push.enable(prev.checked);NMA.toast(r==="demo"?"Benachrichtigungen erlaubt (Demo – der Server sendet später die echten).":"Benachrichtigungen eingeschaltet.")}catch(e){on.checked=false;show(e.message,true);NMA.toast(e.message)}}
+      else{await NMA.push.disable();NMA.toast("Benachrichtigungen ausgeschaltet.")}
+      refresh()});
+    prev.addEventListener("change",async()=>{NMA.store.set("pushPreview",prev.checked);if(await NMA.push.isOn()){try{await NMA.push.enable(prev.checked)}catch(e){}}});
+    $("pushTest").addEventListener("click",async()=>{try{await NMA.push.test(prev.checked);NMA.toast("Test-Benachrichtigung geschickt.")}catch(e){NMA.toast("Das hat nicht geklappt.")}});
+    refresh();
+  }
   document.getElementById("pw").addEventListener("click",()=>NMA.toast("Link zum Ändern des Passworts gesendet (Demo)."));
   document.getElementById("del").addEventListener("click",()=>NMA.modal({title:"Konto wirklich löschen?",text:"Das kann nicht rückgängig gemacht werden. Profil, Fotos, Nachrichten und restliche Coins gehen verloren.",cancel:"Behalten",ok:"Endgültig löschen",onOk:()=>NMA.toast("In der echten Version wäre das Konto jetzt gelöscht.")}));
 }</script>
