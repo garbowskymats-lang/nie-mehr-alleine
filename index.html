@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="de"><head>
+<html lang="de">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Nie mehr alleine</title>
 <meta name="description" content="Nie mehr alleine – nette Menschen in deiner Nähe kennenlernen und chatten.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#071012">
 <link rel="icon" href="assets/icon-192.png">
@@ -25,7 +26,7 @@
     <div>
       <h1>Nie mehr <span>alleine</span> –<br>finde jemanden, der zu dir passt.</h1>
       <p class="intro">Hier findet dein Herz Gleichgesinnte. Flirten und chatten in Ruhe – diskret und respektvoll. Ein Unterhaltungs-Chat mit moderierten Profilen.</p>
-      <div class="trust"><span>Diskret &amp; vertraulich</span><span><br></span><span>Nur ab 18 Jahren</span></div>
+      <div class="trust"><span>Diskret &amp; vertraulich</span><span>Moderierte Profile</span><span>Nur ab 18 Jahren</span></div>
     </div>
 
     <section class="card entry" aria-labelledby="entry-title">
@@ -33,7 +34,7 @@
       <p class="muted" style="margin:0">Melde dich an oder erstelle in zwei Minuten dein kostenloses Profil.</p>
       <a class="btn primary wide" href="register.html"><span>Kostenlos registrieren<small>Neues Profil erstellen</small></span><span aria-hidden="true">→</span></a>
       <a class="btn wide" href="login.html"><span>Anmelden<small>Ich habe schon ein Konto</small></span><span aria-hidden="true">→</span></a>
-      <div class="online-now"><span class="stack-av" id="stack"><span class="avatar " style="background-image:url('assets/hero-romance.png');background-position:22% 25%;background-size:260%"></span><span class="avatar " style="--g:linear-gradient(145deg,#c0796a,#4a2b2e)">S</span><span class="avatar " style="--g:linear-gradient(145deg,#c79a54,#4b3517)">M</span><span class="avatar " style="--g:linear-gradient(145deg,#b0566f,#3b1825)">T</span></span><span><br></span></div>
+      <div class="online-now"><span class="stack-av" id="stack"></span><span>Unterhaltungs-Chat: Die Profile werden von Moderatoren geführt.</span></div>
     </section>
   </section>
 
@@ -51,18 +52,16 @@
     <div><p class="kicker">Vertrauen von Anfang an</p><h2>Kennenlernen mit einem guten Gefühl.</h2></div>
     <ul>
       <li>Deine Daten werden vertraulich behandelt und nie öffentlich angezeigt.</li>
-      <li><br></li>
+      <li>Transparent: Alle Profile sind moderiert und werden von Moderatoren geführt.</li>
       <li>Du entscheidest, wer dir schreiben und Bilder schicken darf.</li>
       <li>Jedes Profil und jede Nachricht kann gemeldet oder blockiert werden.</li>
       <li>Ein freundlicher Support ist für dich da.</li>
     </ul>
   </section>
 </main>
-<script src="app.js"></script><footer class="foot"><span>© 2026 Nie mehr alleine · Unterhaltungs-Chat mit moderierten Profilen · ab 18</span><nav><a href="rechtliches.html#impressum">Impressum</a><a href="rechtliches.html#datenschutz">Datenschutz</a><a href="rechtliches.html#agb">AGB</a><a href="hilfe.html">Hilfe</a></nav></footer>
+<script src="app.js"></script>
 <script>{
   document.getElementById("stack").innerHTML = NMA.profiles.filter(p=>p.online).slice(0,4).map(p=>NMA.avatar(p,"",false)).join("");
 }</script>
-<script src="bearbeiten.js"></script>
-
-
-</body></html>
+</body>
+</html>
