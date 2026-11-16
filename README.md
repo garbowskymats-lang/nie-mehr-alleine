@@ -59,6 +59,3 @@ Stand 16.11.2026 – Mitarbeiterbereich erweitert
 - Vorlagen: fortlaufende Nummer (V-001 …). Das System speichert, welcher Kunde welche Vorlage bekommen hat,
   und blockiert dieselbe Vorlage an denselben Kunden – auch von anderen Profilen und auch, wenn der Text
   per Hand eingefügt wird. Serverseitig ebenfalls prüfen.
-- Profil-Generator ("🎲 Profile vorschlagen" in Meine Profile): erzeugt 5/10/20 Zufalls-Entwürfe nach Geschlecht,
-  Rubrik, Alter und Region (einmaliger Name, Ort, Beruf, Text, Interessen). Erst nach Bestätigung angelegt.
-  Keine Fotos – nur eigene oder lizenzierte Bilder verwenden.
