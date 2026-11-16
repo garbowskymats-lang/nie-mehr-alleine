@@ -23,7 +23,7 @@
       <p>Kostenlos und in zwei Minuten erledigt.</p>
       <p class="notice">Unterhaltungs-Chat mit moderierten Profilen: Die Profile auf dieser Seite werden von Moderatoren geführt.</p>
 
-      <div class="field"><label for="nick">Nickname</label><input class="input" id="nick" autocomplete="nickname" required minlength="3" maxlength="30" placeholder="z. B. NordlichtMichael" autocapitalize="off" spellcheck="false"><span class="hint" id="nickHint">Ohne Leerzeichen. Jeder Nickname existiert nur einmal.</span></div>
+      <div class="field"><label for="nick">Nickname</label><input class="input" id="nick" autocomplete="nickname" required minlength="3" maxlength="30" placeholder="z. B. NordlichtMichael" autocapitalize="off" spellcheck="false"><span class="hint" id="nickHint">Ohne Leerzeichen und ohne #. Jeder Nickname existiert nur einmal.</span></div>
       <div class="field"><label for="vorname">Vorname</label><input class="input" id="vorname" autocomplete="given-name" required maxlength="30" placeholder="z. B. Michael"><span class="hint" id="vnHint">Mindestens 2 Buchstaben. Kann später nur der Support ändern.</span></div>
       <div class="field"><label for="mail">E-Mail-Adresse</label><input class="input" id="mail" type="email" autocomplete="email" required></div>
       <div class="field"><label for="pw">Passwort</label><input class="input" id="pw" type="password" autocomplete="new-password" required minlength="8"><span class="hint">Mindestens 8 Zeichen.</span></div>
@@ -59,11 +59,13 @@
     if(a>110){hint.className="hint bad";hint.textContent="Bitte prüfe das Geburtsdatum.";ok.disabled=true;birth.setCustomValidity("unplausibel");return}
     hint.className="hint good";hint.textContent=`Du bist ${a} Jahre alt.`;ok.disabled=false;birth.setCustomValidity("")};
   let hadSpace=false;
-  const checkNick=()=>{if(/\s/.test(nick.value)){nick.value=nick.value.replace(/\s+/g,"");hadSpace=true}const v=nick.value;
-    if(v.length<3){nh.className=hadSpace?"hint bad":"hint";nh.textContent=hadSpace?"Leerzeichen sind im Nickname nicht erlaubt.":"Ohne Leerzeichen. Jeder Nickname existiert nur einmal.";nick.setCustomValidity("kurz");return}
+  let hadHash=false;
+  const checkNick=()=>{if(/\s/.test(nick.value)){nick.value=nick.value.replace(/\s+/g,"");hadSpace=true}
+    if(!nick.value)hadHash=false;if(nick.value.includes("#")){nick.value=nick.value.replace(/#/g,"");hadHash=true}const v=nick.value;
+    if(v.length<3){nh.className=hadSpace||hadHash?"hint bad":"hint";nh.textContent=hadHash?"Das Zeichen # ist im Nickname nicht erlaubt.":hadSpace?"Leerzeichen sind im Nickname nicht erlaubt.":"Ohne Leerzeichen und ohne #. Jeder Nickname existiert nur einmal.";nick.setCustomValidity("kurz");return}
     if(!NMA.nickOk(v)){nh.className="hint bad";nh.textContent="Nur Buchstaben, Ziffern sowie _ - . erlaubt – keine Leerzeichen.";nick.setCustomValidity("zeichen");return}
     if(!NMA.nickFree(v)){nh.className="hint bad";nh.textContent=`„${v}“ ist leider schon vergeben. Wie wäre es mit „${v}${Math.floor(Math.random()*90+10)}“?`;nick.setCustomValidity("vergeben");return}
-    nh.className="hint good";nh.textContent=`„${v}“ ist noch frei.`+(hadSpace?" (Leerzeichen wurden entfernt)":"");hadSpace=false;nick.setCustomValidity("")};
+    nh.className="hint good";nh.textContent=`„${v}“ ist noch frei.`+(hadSpace?" (Leerzeichen wurden entfernt)":"")+(hadHash?" Das Zeichen # ist nicht erlaubt und wurde entfernt.":"");hadSpace=false;nick.setCustomValidity("")};
   const vn=$("vorname"),vh=$("vnHint");
   const checkVn=()=>{const v=vn.value.replace(/\s+/g," ").trim();
     const okV=/^[\p{L}][\p{L}' -]*[\p{L}]$/u.test(v)&&(v.match(/\p{L}/gu)||[]).length>=2;
