@@ -249,11 +249,23 @@ document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",e
 NMA.P2 = {"01":[51.05,13.74],"02":[51.18,14.42],"03":[51.76,14.33],"04":[51.34,12.37],"06":[51.48,11.97],"07":[50.88,12.08],"08":[50.72,12.49],"09":[50.83,12.92],"10":[52.52,13.40],"12":[52.45,13.45],"13":[52.57,13.35],"14":[52.40,13.06],"15":[52.34,14.55],"16":[52.83,13.82],"17":[53.56,13.26],"18":[54.09,12.10],"19":[53.63,11.41],"20":[53.55,10.00],"21":[53.40,9.90],"22":[53.62,10.05],"23":[53.87,10.69],"24":[54.32,10.13],"25":[53.90,9.50],"26":[53.14,8.21],"27":[53.40,8.80],"28":[53.08,8.80],"29":[52.62,10.08],"30":[52.37,9.73],"31":[52.15,9.95],"32":[52.12,8.67],"33":[52.02,8.53],"34":[51.31,9.48],"35":[50.58,8.68],"36":[50.55,9.68],"37":[51.54,9.93],"38":[52.27,10.52],"39":[52.13,11.63],"40":[51.23,6.78],"41":[51.19,6.44],"42":[51.26,7.15],"44":[51.51,7.47],"45":[51.46,7.01],"46":[51.60,6.90],"47":[51.40,6.70],"48":[51.96,7.63],"49":[52.28,8.05],"50":[50.94,6.96],"51":[50.95,7.10],"52":[50.78,6.08],"53":[50.73,7.10],"54":[49.75,6.64],"55":[49.99,8.25],"56":[50.36,7.59],"57":[50.87,8.02],"58":[51.36,7.47],"59":[51.60,7.90],"60":[50.11,8.68],"61":[50.23,8.62],"63":[50.10,8.90],"64":[49.87,8.65],"65":[50.08,8.24],"66":[49.24,6.99],"67":[49.45,8.00],"68":[49.49,8.47],"69":[49.40,8.69],"70":[48.78,9.18],"71":[48.80,9.10],"72":[48.50,9.10],"73":[48.70,9.60],"74":[49.14,9.22],"75":[48.89,8.70],"76":[49.01,8.40],"77":[48.47,7.94],"78":[47.90,8.60],"79":[47.99,7.84],"80":[48.14,11.58],"81":[48.12,11.62],"82":[48.00,11.30],"83":[47.86,12.12],"84":[48.54,12.15],"85":[48.60,11.60],"86":[48.37,10.90],"87":[47.73,10.31],"88":[47.78,9.61],"89":[48.40,9.99],"90":[49.45,11.08],"91":[49.60,10.90],"92":[49.45,11.86],"93":[49.01,12.10],"94":[48.57,13.43],"95":[50.00,11.60],"96":[49.90,10.90],"97":[49.79,9.95],"98":[50.60,10.70],"99":[50.98,11.03]};
 NMA.P5 = {"20095":[53.55,10.00],"20457":[53.54,9.99],"22041":[53.57,10.08],"21335":[53.25,10.41],"21614":[53.48,9.70],"21680":[53.60,9.48],"21682":[53.60,9.48],"22846":[53.70,10.01],"25421":[53.66,9.80],"25335":[53.75,9.65],"24103":[54.32,10.13],"23552":[53.87,10.69],"29221":[52.62,10.08],"34117":[51.31,9.48],"34508":[51.29,8.61],"34537":[51.12,9.12],"28195":[53.08,8.80],"60311":[50.11,8.68],"80331":[48.14,11.57],"10115":[52.53,13.38]};
 NMA.CITYPLZ = {"hamburg":"20095","lüneburg":"21335","buxtehude":"21614","stade":"21682","norderstedt":"22846","pinneberg":"25421","elmshorn":"25335","kiel":"24103","lübeck":"23552","celle":"29221","kassel":"34117","bremen":"28195","frankfurt":"60311","münchen":"80331","berlin":"10115"};
-NMA.geoOf = (plz, city) => {
-  if (!plz && city) plz = NMA.CITYPLZ[String(city).trim().toLowerCase()];
-  plz = String(plz || ""); if (/^\d{4}$/.test(plz)) plz = "0" + plz;
-  if (!/^\d{5}$/.test(plz)) return null;
-  return NMA.P5[plz] || NMA.P2[plz.slice(0, 2)] || null;
+/* Länder: Deutschland 5-stellige PLZ, Grundlage = erste 3 Ziffern; Österreich/Schweiz 4-stellig, Grundlage = erste 2 Ziffern */
+NMA.LAND = { DE: { name: "Deutschland", len: 5, pre: 3 }, AT: { name: "Österreich", len: 4, pre: 2 }, CH: { name: "Schweiz", len: 4, pre: 2 } };
+NMA.plzOk = (land, plz) => { const L = NMA.LAND[land || "DE"]; return !!L && new RegExp("^\\d{" + L.len + "}$").test(String(plz || "")); };
+NMA.region = (land, plz) => { land = land || "DE"; const L = NMA.LAND[land]; return L && plz ? land + "-" + String(plz).slice(0, L.pre) : ""; };
+/* Deutschland: Koordinaten je PLZ-Bereich (erste 3 Ziffern) – Demo-Auswahl, sonst Näherung über 2 Ziffern */
+NMA.P3 = {"101":[52.52,13.40],"125":[52.45,13.58],"135":[52.54,13.20],"144":[52.40,13.06],"200":[53.55,10.00],"204":[53.54,9.99],"220":[53.57,10.08],"213":[53.25,10.41],"216":[53.52,9.62],"217":[53.60,9.48],"228":[53.70,10.01],"235":[53.87,10.69],"241":[54.32,10.13],"253":[53.75,9.65],"254":[53.66,9.80],"281":[53.08,8.80],"292":[52.62,10.08],"341":[51.31,9.48],"345":[51.20,8.90],"603":[50.11,8.68],"803":[48.14,11.57],"804":[48.16,11.58],"852":[48.26,11.43],"854":[48.40,11.75],"880":[47.65,9.48],"881":[47.55,9.68],"882":[47.78,9.61],"883":[47.81,9.64],"884":[48.10,9.79]};
+/* Österreich und Schweiz: Koordinaten je PLZ-Bereich (erste 2 Ziffern) */
+NMA.AT2 = {"10":[48.21,16.37],"11":[48.19,16.40],"12":[48.24,16.40],"20":[48.38,16.21],"21":[48.34,16.33],"22":[48.34,16.72],"23":[48.09,16.28],"24":[48.03,16.78],"25":[48.01,16.23],"26":[47.72,16.08],"27":[47.81,16.24],"28":[47.70,16.15],"30":[48.33,16.05],"31":[48.20,15.63],"32":[48.01,15.60],"33":[48.12,14.87],"34":[48.33,16.05],"35":[48.41,15.60],"36":[48.23,15.33],"37":[48.66,15.66],"38":[48.77,14.98],"39":[48.60,15.17],"40":[48.31,14.29],"41":[48.57,13.99],"42":[48.51,14.50],"43":[48.25,14.63],"44":[48.04,14.42],"45":[47.91,14.12],"46":[48.16,14.03],"47":[48.23,13.83],"48":[47.98,13.70],"49":[48.21,13.49],"50":[47.80,13.04],"51":[47.95,13.00],"52":[48.26,13.03],"53":[47.90,13.20],"54":[47.68,13.10],"55":[47.42,13.22],"56":[47.35,13.20],"57":[47.32,12.80],"60":[47.27,11.39],"61":[47.28,11.50],"62":[47.35,11.71],"63":[47.58,12.17],"64":[47.24,10.74],"65":[47.14,10.57],"66":[47.49,10.72],"67":[47.15,9.82],"68":[47.32,9.67],"69":[47.50,9.75],"70":[47.85,16.52],"71":[47.95,16.84],"72":[47.74,16.40],"73":[47.50,16.50],"74":[47.29,16.21],"75":[47.06,16.32],"80":[47.07,15.44],"81":[47.22,15.62],"82":[47.28,15.97],"83":[46.95,15.89],"84":[46.78,15.54],"85":[46.82,15.22],"86":[47.41,15.27],"87":[47.38,15.09],"88":[47.11,14.17],"89":[47.57,14.24],"90":[46.62,14.31],"91":[46.66,14.63],"92":[46.72,14.10],"93":[46.77,14.36],"94":[46.84,14.84],"95":[46.61,13.85],"96":[46.63,13.37],"97":[46.80,13.50],"98":[46.80,13.50],"99":[46.83,12.77]};
+NMA.CH2 = {"10":[46.52,6.63],"11":[46.51,6.50],"12":[46.20,6.15],"13":[46.61,6.51],"14":[46.78,6.64],"15":[46.82,6.94],"16":[46.62,7.06],"17":[46.81,7.15],"18":[46.46,6.85],"19":[46.23,7.36],"20":[46.99,6.93],"21":[46.91,6.61],"22":[46.99,6.93],"23":[47.10,6.83],"24":[47.06,6.75],"25":[47.14,7.25],"26":[47.15,6.99],"27":[47.28,7.37],"28":[47.36,7.34],"29":[47.42,7.08],"30":[46.95,7.45],"31":[46.90,7.50],"32":[47.07,7.31],"33":[47.06,7.62],"34":[47.00,7.70],"35":[46.88,7.62],"36":[46.76,7.63],"37":[46.69,7.68],"38":[46.69,7.86],"39":[46.32,7.99],"40":[47.56,7.59],"41":[47.48,7.73],"42":[47.42,7.50],"43":[47.55,7.79],"44":[47.48,7.73],"45":[47.21,7.54],"46":[47.35,7.90],"47":[47.29,7.71],"48":[47.29,7.95],"49":[47.21,7.79],"50":[47.39,8.04],"51":[47.48,8.21],"52":[47.39,8.18],"53":[47.59,8.29],"54":[47.47,8.31],"55":[47.39,8.18],"56":[47.35,8.28],"57":[47.26,8.18],"60":[47.05,8.31],"61":[47.10,8.20],"62":[47.17,8.11],"63":[47.17,8.52],"64":[47.02,8.65],"65":[46.19,9.02],"66":[46.17,8.80],"67":[46.36,8.97],"68":[46.00,8.95],"69":[46.00,8.95],"70":[46.85,9.53],"71":[46.77,9.20],"72":[46.97,9.56],"73":[47.00,9.50],"74":[46.70,9.44],"75":[46.50,9.84],"80":[47.38,8.54],"81":[47.45,8.58],"82":[47.70,8.63],"83":[47.35,8.72],"84":[47.50,8.72],"85":[47.56,8.90],"86":[47.32,8.80],"87":[47.23,8.82],"88":[47.23,8.67],"89":[47.40,8.40],"90":[47.42,9.37],"91":[47.39,9.28],"92":[47.46,9.05],"93":[47.48,9.48],"94":[47.38,9.55],"95":[47.46,9.05],"96":[47.30,9.10],"97":[47.17,9.47]};
+NMA.geoOf = (plz, city, land) => {
+  land = land || "DE";
+  if (!plz && city && land === "DE") plz = NMA.CITYPLZ[String(city).trim().toLowerCase()];
+  plz = String(plz || "");
+  if (!NMA.plzOk(land, plz)) return null;
+  if (land === "AT") return NMA.AT2[plz.slice(0, 2)] || null;
+  if (land === "CH") return NMA.CH2[plz.slice(0, 2)] || null;
+  return NMA.P5[plz] || NMA.P3[plz.slice(0, 3)] || NMA.P2[plz.slice(0, 2)] || null;
 };
 NMA.km = (a, b) => {
   if (!a || !b) return null;
@@ -262,7 +274,7 @@ NMA.km = (a, b) => {
   return Math.round(12742 * Math.asin(Math.sqrt(h)));
 };
 /* Orte, in denen ein Profil "wohnen" kann (Demo-Auswahl; Server: alle Orte Deutschlands) */
-NMA.TOWNS = ("Hamburg-Altona,53.55,9.94;Pinneberg,53.66,9.80;Elmshorn,53.75,9.65;Norderstedt,53.70,10.01;Ahrensburg,53.67,10.24;Reinbek,53.51,10.25;Geesthacht,53.44,10.37;Buxtehude,53.48,9.70;Stade,53.60,9.48;Lüneburg,53.25,10.41;Buchholz,53.33,9.87;Winsen (Luhe),53.36,10.21;Bad Oldesloe,53.81,10.38;Quickborn,53.73,9.91;Wedel,53.58,9.70;Bargteheide,53.73,10.27;Seevetal,53.40,10.03;Tostedt,53.28,9.71;"
+NMA.TOWNS_DE = ("Hamburg-Altona,53.55,9.94;Pinneberg,53.66,9.80;Elmshorn,53.75,9.65;Norderstedt,53.70,10.01;Ahrensburg,53.67,10.24;Reinbek,53.51,10.25;Geesthacht,53.44,10.37;Buxtehude,53.48,9.70;Stade,53.60,9.48;Lüneburg,53.25,10.41;Buchholz,53.33,9.87;Winsen (Luhe),53.36,10.21;Bad Oldesloe,53.81,10.38;Quickborn,53.73,9.91;Wedel,53.58,9.70;Bargteheide,53.73,10.27;Seevetal,53.40,10.03;Tostedt,53.28,9.71;"
  + "Berlin-Spandau,52.54,13.20;Berlin-Köpenick,52.45,13.58;Berlin-Pankow,52.57,13.40;Potsdam,52.40,13.06;Oranienburg,52.75,13.24;Bernau,52.68,13.59;Königs Wusterhausen,52.30,13.63;Falkensee,52.56,13.08;Strausberg,52.58,13.88;Ludwigsfelde,52.30,13.26;Erkner,52.42,13.75;Nauen,52.61,12.88;"
  + "Dachau,48.26,11.43;Freising,48.40,11.75;Erding,48.31,11.91;Starnberg,48.00,11.34;Fürstenfeldbruck,48.18,11.25;Germering,48.13,11.37;Unterschleißheim,48.28,11.58;Ottobrunn,48.06,11.66;Wolfratshausen,47.91,11.42;Ebersberg,48.08,11.97;Markt Schwaben,48.19,11.87;Holzkirchen,47.88,11.70;Augsburg,48.37,10.90;Rosenheim,47.86,12.12;"
  + "Ravensburg,47.78,9.61;Friedrichshafen,47.65,9.48;Lindau,47.55,9.68;Wangen,47.69,9.83;Weingarten,47.81,9.64;Biberach,48.10,9.79;Leutkirch,47.83,10.02;Memmingen,47.98,10.18;Kempten,47.73,10.31;Überlingen,47.77,9.16;"
@@ -277,23 +289,41 @@ NMA.TOWNS = ("Hamburg-Altona,53.55,9.94;Pinneberg,53.66,9.80;Elmshorn,53.75,9.65
  + "Markkleeberg,51.28,12.37;Schkeuditz,51.40,12.22;Taucha,51.38,12.49;Grimma,51.24,12.73;Halle (Saale),51.48,11.97;Delitzsch,51.53,12.34;Borna,51.12,12.50;"
  + "Radebeul,51.11,13.66;Pirna,50.96,13.94;Freital,51.00,13.65;Meißen,51.16,13.47;Coswig,51.13,13.58;Radeberg,51.12,13.92;"
  + "Kiel,54.32,10.13;Lübeck,53.87,10.69;Neumünster,54.07,9.98;Rendsburg,54.30,9.66;Eckernförde,54.47,9.84;Bad Segeberg,53.94,10.31;Plön,54.16,10.42;"
- + "Münster,51.96,7.63;Osnabrück,52.28,8.05;Bielefeld,52.02,8.53;Rostock,54.09,12.10;Schwerin,53.63,11.41;Magdeburg,52.13,11.63;Erfurt,50.98,11.03;Saarbrücken,49.24,6.99;Karlsruhe,49.01,8.40;Freiburg,47.99,7.84;Regensburg,49.01,12.10;Würzburg,49.79,9.95;Mannheim,49.49,8.47;Heidelberg,49.40,8.69;Koblenz,50.36,7.59;Trier,49.75,6.64;Braunschweig,52.27,10.52;Wolfsburg,52.42,10.79;Aachen,50.78,6.08;Paderborn,51.72,8.75;Fulda,50.55,9.68;Gießen,50.58,8.68;Ulm,48.40,9.99;Ingolstadt,48.77,11.43;Passau,48.57,13.43;Chemnitz,50.83,12.92;Cottbus,51.76,14.33;Jena,50.93,11.59;Siegen,50.87,8.02")
- .split(";").map(x => { const a = x.split(","); return { ort: a[0], g: [+a[1], +a[2]] }; });
+ + "Münster,51.96,7.63;Osnabrück,52.28,8.05;Bielefeld,52.02,8.53;Rostock,54.09,12.10;Schwerin,53.63,11.41;Magdeburg,52.13,11.63;Erfurt,50.98,11.03;Saarbrücken,49.24,6.99;Karlsruhe,49.01,8.40;Freiburg,47.99,7.84;Regensburg,49.01,12.10;Würzburg,49.79,9.95;Mannheim,49.49,8.47;Heidelberg,49.40,8.69;Koblenz,50.36,7.59;Trier,49.75,6.64;Braunschweig,52.27,10.52;Wolfsburg,52.42,10.79;Aachen,50.78,6.08;Paderborn,51.72,8.75;Fulda,50.55,9.68;Gießen,50.58,8.68;Ulm,48.40,9.99;Ingolstadt,48.77,11.43;Passau,48.57,13.43;Chemnitz,50.83,12.92;Cottbus,51.76,14.33;Jena,50.93,11.59;Siegen,50.87,8.02");
+NMA.TOWNS_AT = "Wien-Favoriten,48.17,16.38;Wien-Floridsdorf,48.26,16.40;Wien-Döbling,48.25,16.34;Klosterneuburg,48.31,16.33;Korneuburg,48.34,16.33;Stockerau,48.38,16.21;Mödling,48.09,16.28;Baden,48.01,16.23;Schwechat,48.14,16.48;Wiener Neustadt,47.81,16.24;Neunkirchen,47.72,16.08;Tulln,48.33,16.05;St. Pölten,48.20,15.63;Krems,48.41,15.60;Melk,48.23,15.33;Amstetten,48.12,14.87;Zwettl,48.60,15.17;Gmünd,48.77,14.98;Horn,48.66,15.66;Gänserndorf,48.34,16.72;"
+ + "Linz,48.31,14.29;Leonding,48.28,14.25;Traun,48.22,14.24;Wels,48.16,14.03;Steyr,48.04,14.42;Enns,48.21,14.48;Freistadt,48.51,14.50;Perg,48.25,14.63;Gmunden,47.92,13.80;Vöcklabruck,48.00,13.66;Ried im Innkreis,48.21,13.49;Braunau,48.26,13.03;Grieskirchen,48.23,13.83;Kirchdorf,47.91,14.12;"
+ + "Salzburg,47.80,13.04;Wals-Siezenheim,47.79,12.98;Hallein,47.68,13.10;Seekirchen,47.90,13.13;Bischofshofen,47.42,13.22;St. Johann im Pongau,47.35,13.20;Zell am See,47.32,12.80;Saalfelden,47.43,12.85;"
+ + "Innsbruck,47.27,11.39;Hall in Tirol,47.28,11.51;Telfs,47.31,11.07;Schwaz,47.35,11.71;Wörgl,47.49,12.06;Kufstein,47.58,12.17;Kitzbühel,47.45,12.39;Imst,47.24,10.74;Landeck,47.14,10.57;Reutte,47.49,10.72;Lienz,46.83,12.77;"
+ + "Bregenz,47.50,9.75;Dornbirn,47.41,9.74;Hohenems,47.36,9.69;Feldkirch,47.24,9.60;Bludenz,47.15,9.82;"
+ + "Eisenstadt,47.85,16.52;Neusiedl am See,47.95,16.84;Mattersburg,47.74,16.40;Oberpullendorf,47.50,16.50;Oberwart,47.29,16.21;Güssing,47.06,16.32;"
+ + "Graz,47.07,15.44;Gratwein,47.13,15.33;Gleisdorf,47.10,15.71;Weiz,47.22,15.62;Hartberg,47.28,15.97;Feldbach,46.95,15.89;Leibnitz,46.78,15.54;Deutschlandsberg,46.82,15.22;Voitsberg,47.04,15.15;Bruck an der Mur,47.41,15.27;Kapfenberg,47.44,15.29;Leoben,47.38,15.09;Judenburg,47.17,14.66;Murau,47.11,14.17;Liezen,47.57,14.24;"
+ + "Klagenfurt,46.62,14.31;Villach,46.61,13.85;Feldkirchen in Kärnten,46.72,14.10;St. Veit an der Glan,46.77,14.36;Völkermarkt,46.66,14.63;Wolfsberg,46.84,14.84;Spittal an der Drau,46.80,13.50;Hermagor,46.63,13.37";
+NMA.TOWNS_CH = "Zürich-Oerlikon,47.41,8.54;Zürich-Altstetten,47.39,8.49;Kloten,47.45,8.58;Dübendorf,47.40,8.62;Uster,47.35,8.72;Wetzikon,47.32,8.80;Winterthur,47.50,8.72;Dietikon,47.40,8.40;Horgen,47.26,8.60;Wädenswil,47.23,8.67;Bülach,47.52,8.54;Rapperswil-Jona,47.23,8.82;Schaffhausen,47.70,8.63;Frauenfeld,47.56,8.90;"
+ + "Baden,47.47,8.31;Wettingen,47.47,8.33;Aarau,47.39,8.04;Lenzburg,47.39,8.18;Brugg,47.48,8.21;Wohlen,47.35,8.28;Zofingen,47.29,7.95;Olten,47.35,7.90;Solothurn,47.21,7.54;Grenchen,47.19,7.40;"
+ + "Basel-Kleinbasel,47.57,7.60;Riehen,47.58,7.65;Allschwil,47.55,7.54;Muttenz,47.52,7.65;Liestal,47.48,7.73;Rheinfelden,47.55,7.79;Laufen,47.42,7.50;"
+ + "Bern-Bümpliz,46.94,7.39;Köniz,46.92,7.41;Ostermundigen,46.96,7.49;Burgdorf,47.06,7.62;Langenthal,47.21,7.79;Lyss,47.07,7.31;Biel,47.14,7.25;Thun,46.76,7.63;Spiez,46.69,7.68;Interlaken,46.69,7.86;Münsingen,46.87,7.56;"
+ + "Luzern,47.05,8.31;Kriens,47.03,8.28;Emmen,47.08,8.30;Sursee,47.17,8.11;Zug,47.17,8.52;Baar,47.20,8.53;Cham,47.18,8.46;Schwyz,47.02,8.65;Einsiedeln,47.13,8.75;Glarus,47.04,9.07;"
+ + "St. Gallen,47.42,9.37;Gossau,47.42,9.25;Wil,47.46,9.05;Herisau,47.39,9.28;Rorschach,47.48,9.49;Arbon,47.52,9.43;Altstätten,47.38,9.55;Buchs SG,47.17,9.47;Kreuzlingen,47.65,9.17;"
+ + "Chur,46.85,9.53;Landquart,46.97,9.56;Davos,46.80,9.84;St. Moritz,46.50,9.84;"
+ + "Lausanne,46.52,6.63;Morges,46.51,6.50;Renens,46.54,6.59;Vevey,46.46,6.85;Montreux,46.43,6.91;Yverdon-les-Bains,46.78,6.64;Nyon,46.38,6.24;Genf,46.20,6.15;Carouge,46.18,6.14;Fribourg,46.81,7.15;Bulle,46.62,7.06;Neuenburg,46.99,6.93;La Chaux-de-Fonds,47.10,6.83;Sitten,46.23,7.36;Martigny,46.10,7.07;Brig,46.32,7.99;"
+ + "Lugano,46.00,8.95;Mendrisio,45.87,8.98;Bellinzona,46.19,9.02;Locarno,46.17,8.80";
+NMA.TOWNS = [["DE", NMA.TOWNS_DE], ["AT", NMA.TOWNS_AT], ["CH", NMA.TOWNS_CH]].flatMap(([land, str]) =>
+  str.split(";").map(x => { const a = x.split(","); return { ort: a[0], g: [+a[1], +a[2]], land }; }));
 
 /* ---------------- KONTAKT-ORT ----------------
    Ein Profil "wohnt" für jeden Kunden in dessen Umkreis – festgelegt beim ersten Kontakt
    (erstes Ansehen, Herz, Massenversand, Chat) und danach für diesen Kunden nie mehr geändert.
    Gespeichert pro Paar Kunde + Profil (Demo: localStorage "kOrt"; Server: Tabelle kontakt_ort).
-   cust = {nick, plz, radius, city}. dry=true: nur berechnen, nicht festlegen (z. B. Vorschau). */
+   cust = {nick, plz, radius, city, land}. Profile wohnen immer im Land des Kunden. dry=true: nur berechnen, nicht festlegen (z. B. Vorschau). */
 NMA.wohnortModus = () => (NMA.store.get("mvCfg", {}).wohnort || "kontakt");
 NMA.kontaktOrt = (p, cust, dry) => {
   if (!p || !cust || !cust.nick) return null;
   const all = NMA.store.get("kOrt", {}), mine = all[cust.nick] || (all[cust.nick] = {});
   if (mine[p.id]) return mine[p.id];
-  const cg = NMA.geoOf(cust.plz, cust.city); if (!cg) return null;
+  const land = cust.land || "DE", cg = NMA.geoOf(cust.plz, cust.city, land); if (!cg) return null;
   let R = +cust.radius || 50; if (R > 150) R = 80;
   const own = String(cust.city || "").toLowerCase();
-  const near = NMA.TOWNS.map(t => ({ ort: t.ort, km: NMA.km(cg, t.g) })).filter(t => t.ort.toLowerCase() !== own).sort((a, b) => a.km - b.km);
+  const near = NMA.TOWNS.filter(t => t.land === land).map(t => ({ ort: t.ort, km: NMA.km(cg, t.g) })).filter(t => t.ort.toLowerCase() !== own).sort((a, b) => a.km - b.km);
   let pool = near.filter(t => t.km >= 5 && t.km <= R);
   if (!pool.length) pool = near.filter(t => t.km >= 3).slice(0, 3);
   if (!pool.length) pool = near.slice(0, 1);
@@ -304,7 +334,7 @@ NMA.kontaktOrt = (p, cust, dry) => {
   mine[p.id] = res; NMA.store.set("kOrt", all);
   return res;
 };
-NMA.me = () => { const u = NMA.user(); return { nick: u.nick, plz: u.plz, radius: u.radius, city: u.city }; };
+NMA.me = () => { const u = NMA.user(); return { nick: u.nick, plz: u.plz, radius: u.radius, city: u.city, land: u.land || "DE" }; };
 
 /* Kundenseiten: Wohnort und Entfernung jedes Profils für DIESEN Kunden anzeigen (nur im Speicher, nie zurückschreiben) */
 {

@@ -45,8 +45,9 @@
 
   /* Orte & Entfernungen kommen aus app.js (NMA.geoOf, NMA.km, NMA.kontaktOrt) */
   const geo = NMA.geoOf, km = NMA.km;
-  const custPlz = c => (String(c.ort || "").match(/\d{5}/) || [])[0];
-  const custCity = c => String(c.ort || "").replace(/\d{5}/, "").trim();
+  const custPlz = c => (String(c.ort || "").match(/\d{4,5}/) || [])[0];
+  const custCity = c => String(c.ort || "").replace(/\d{4,5}/, "").trim();
+  const custLand = c => c.land || "DE";
 
   /* ---------- Demo-Kunden ergänzen (Geschlecht + ein paar mehr für die Vorschau) ---------- */
   {
@@ -60,6 +61,11 @@
       "KlausL":            { nr: 10467, st: "T", age: 58, ort: "21335 Lüneburg",    job: "Koch",        coins: 9,  since: "07.11.2026", look: "Beziehung", sex: "m" },
       "Peter_Pinneberg": { nr: 10301, st: "K", age: 61, ort: "25421 Pinneberg",   job: "Maler",       coins: 17, since: "01.10.2026", look: "Abenteuer", sex: "m" },
       "Norbert65":           { nr: 10552, st: "T", age: 65, ort: "25335 Elmshorn",    job: "",            coins: 5,  since: "15.11.2026", look: "Abenteuer", sex: "m" },
+      "Wiener_Franz":        { nr: 10570, st: "T", age: 63, ort: "1100 Wien",         land: "AT", job: "Straßenbahnfahrer", coins: 5, since: "14.11.2026", look: "Beziehung", sex: "m", vorname: "Franz" },
+      "Tiroler_Sepp":        { nr: 10571, st: "T", age: 58, ort: "6020 Innsbruck",    land: "AT", job: "Skilehrer", coins: 5, since: "15.11.2026", look: "Abenteuer", sex: "m", vorname: "Josef" },
+      "Grazerin_Maria":      { nr: 10572, st: "K", age: 61, ort: "8010 Graz",         land: "AT", job: "Apothekerin", coins: 26, since: "20.10.2026", look: "Beziehung", sex: "w", vorname: "Maria" },
+      "Ruedi_ZH":            { nr: 10573, st: "T", age: 60, ort: "8004 Zürich",       land: "CH", job: "Banker", coins: 5, since: "13.11.2026", look: "Abenteuer", sex: "m", vorname: "Rudolf" },
+      "Berner_Hans":         { nr: 10574, st: "K", age: 66, ort: "3011 Bern",         land: "CH", job: "Rentner", coins: 40, since: "05.10.2026", look: "Beziehung", sex: "m", vorname: "Hans" },
       "DieterK":           { nr: 10489, st: "T", age: 57, ort: "24103 Kiel",        job: "Hausmeister", coins: 5,  since: "09.11.2026", look: "Beziehung", sex: "m" }
     };
     let ch = false;
@@ -73,7 +79,7 @@
     if (u && u.nick) {
       const c = T.customers[u.nick] || (T.customers[u.nick] = { nr: 10600, st: "T", coins: NMA.coins(), since: new Date().toLocaleDateString("de-DE") });
       Object.assign(c, { vorname: u.vorname || c.vorname, age: u.age || c.age, job: u.job || c.job || "", look: u.looking || c.look || "Beziehung", radius: +u.radius || 50,
-        sex: /^eine Frau/.test(u.sex || "") ? "w" : "m", ort: ((u.plz || "") + " " + (u.city || "")).trim() || c.ort });
+        sex: /^eine Frau/.test(u.sex || "") ? "w" : "m", land: u.land || "DE", ort: ((u.plz || "") + " " + (u.city || "")).trim() || c.ort });
       ch = true;
     }
     if (ch) T.saveAll();
@@ -82,7 +88,7 @@
   /* ---------- Speicher ---------- */
   let cfg   = Object.assign({ radius: 50, fallback: true, pause: 1, wohnort: "kontakt" }, S.get("mvCfg", {}));
   const kontakt = () => cfg.wohnort !== "fest";
-  const custRef = (nick, c) => ({ nick, plz: custPlz(c), radius: c.radius || 50, city: custCity(c) });
+  const custRef = (nick, c) => ({ nick, plz: custPlz(c), radius: c.radius || 50, city: custCity(c), land: custLand(c) });
   let tpls  = S.get("mvTpls", null) || [
     { nr: 1, group: "abenteuer-m",  owner: "chef",  name: "Neugierig",       text: "Hallo {vorname}, dein Profil ist mir gerade aufgefallen 😊 Ich wohne gar nicht weit weg und bin für ein kleines Abenteuer immer zu haben. Schreibst du mir?" },
     { nr: 2, group: "beziehung-fm", owner: "chef",  name: "Sonntagsfrage",   text: "Hallo {vorname}, ich bin {profil} aus {ort}. Ich suche jemanden für gemütliche Sonntage und ehrliche Gespräche – vielleicht ja dich?" },
@@ -124,7 +130,7 @@
       const last = hist.reduce((a, x) => Math.max(a, x.t), 0);
       if (pauseMs && last && now - last < pauseMs) { skip.push({ nick, c, why: `hatte am ${fmt(last)} schon eine Massennachricht (Pause ${cfg.pause} Tag${cfg.pause == 1 ? "" : "e"})` }); return; }
       if (job.tpl && hist.some(x => x.tpl === job.tpl)) { skip.push({ nick, c, why: `hat ${mNo(job.tpl)} schon bekommen` }); return; }
-      const cg = geo(custPlz(c), custCity(c));
+      const cg = geo(custPlz(c), custCity(c), custLand(c));
       if (!cg) { skip.push({ nick, c, why: "PLZ unbekannt" }); return; }
       const f = G.from(c), had = done[nick] || new Set();
       const fit = pool.filter(p => p.sex === f.sex && (!f.looking || p.looking === f.looking) && !had.has(p.id));
@@ -139,7 +145,7 @@
         rows.push({ nick, c, p: pick.p, d: pick.k.km, ort: pick.k.ort, far: false });
         return;
       }
-      const cands = fit.map(p => ({ p, d: km(cg, geo(p.plz, p.city)) })).filter(x => x.d !== null).sort((a, b) => a.d - b.d);
+      const cands = fit.filter(p => (p.land || "DE") === custLand(c)).map(p => ({ p, d: km(cg, geo(p.plz, p.city, p.land || "DE")) })).filter(x => x.d !== null).sort((a, b) => a.d - b.d);
       if (!cands.length) { skip.push({ nick, c, why: "keine Profile mit bekanntem Ort" }); return; }
       let pick = cands.find(x => x.d <= job.radius);
       if (!pick) {
@@ -344,7 +350,7 @@
       ${far ? `<p class="mv-warn">${far} Empfänger ${far === 1 ? "bekommt" : "bekommen"} eine Nachricht von einem Profil außerhalb von ${job.radius} km (gelb markiert).</p>` : ""}
       ${first ? `<div class="mv-prev"><small>Beispiel: „${esc(first.p.name)}“ an ${esc(first.nick)}</small>${esc(fill(job.text, first.nick, first.p, first.c, first.ort))}</div>` : `<p class="mv-warn">Aktuell gibt es keinen Empfänger für diese Auswahl.</p>`}
       ${pl.rows.length ? `<table class="mv"><thead><tr><th>Kunde</th><th class="hide-sm">Wohnort</th><th>schreibt an ihn/sie</th><th class="num">${kontakt() ? "wohnt für ihn/sie" : "Entfernung"}</th>${T.isAdmin() ? `<th class="hide-sm">Profil gehört</th>` : ""}</tr></thead><tbody>
-        ${pl.rows.slice(0, 100).map(r => `<tr><td>${esc(r.nick)} ${stBadge(r.c)}</td><td class="hide-sm">${esc(r.c.ort || "–")}</td><td>${esc(r.p.name)}${kontakt() ? "" : `<br><small class="muted">${esc(r.p.city || "")}</small>`}</td><td class="num ${r.far ? "far" : ""}">${kontakt() ? `${esc(r.ort)}<br><small class="muted">${r.d} km</small>` : r.d + " km"}</td>${T.isAdmin() ? `<td class="hide-sm">${esc(T.ownerName(r.p.owner))}</td>` : ""}</tr>`).join("")}
+        ${pl.rows.slice(0, 100).map(r => `<tr><td>${esc(r.nick)} ${stBadge(r.c)}</td><td class="hide-sm">${esc(r.c.ort || "–")}${r.c.land && r.c.land !== "DE" ? ` <small class="muted">${r.c.land}</small>` : ""}</td><td>${esc(r.p.name)}${kontakt() ? "" : `<br><small class="muted">${esc(r.p.city || "")}</small>`}</td><td class="num ${r.far ? "far" : ""}">${kontakt() ? `${esc(r.ort)}<br><small class="muted">${r.d} km</small>` : r.d + " km"}</td>${T.isAdmin() ? `<td class="hide-sm">${esc(T.ownerName(r.p.owner))}</td>` : ""}</tr>`).join("")}
         </tbody></table>${pl.rows.length > 100 ? `<p class="hint">… und ${pl.rows.length - 100} weitere.</p>` : ""}` : ""}
       ${pl.skip.length ? `<details class="mv-skip"><summary>${pl.skip.length} übersprungen – warum?</summary><table class="mv"><tbody>${pl.skip.map(s => `<tr><td>${esc(s.nick)} ${stBadge(s.c)}</td><td>${esc(s.why)}</td></tr>`).join("")}</tbody></table></details>` : ""}`;
   };

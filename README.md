@@ -132,3 +132,12 @@ Stand 16.11.2026 – Statistik: Umsatz & Verdienst
 - Satz pro beantworteter Nachricht je Mitarbeiter unter Mitarbeiter → Bearbeiten (Standard 0,10 €; Admins 0 €).
 - SERVER: Coin-Käufe aus dem Zahlungsanbieter, verbrauchte Coins und beantwortete Nachrichten pro Mitarbeiter
   zählen; Beträge brutto (vor Gebühren und Steuern). Coin-Käufe in der Demo sind Beispielzahlen.
+
+Stand 16.11.2026 – Deutschland, Österreich, Schweiz
+- Registrierung und Mein Profil: Pflichtfeld Land (DE/AT/CH). PLZ: Deutschland 5 Ziffern, Österreich/Schweiz 4 Ziffern.
+- Grundlage für die Region: Deutschland die ersten 3 Ziffern der PLZ (z. B. DE-803), Österreich/Schweiz die ersten 2
+  (z. B. AT-11, CH-80). Funktionen in app.js: NMA.LAND, NMA.plzOk(land, plz), NMA.region(land, plz), NMA.geoOf(plz, ort, land).
+- Kontakt-Ort: Profile wohnen immer im Land des Kunden (Ortslisten NMA.TOWNS_DE/_AT/_CH). Mitarbeiter sehen im Chat
+  Land und PLZ-Bereich des Kunden. Profile haben ein Feld Land (für den Modus „fester Ort“).
+- SERVER: Koordinaten je PLZ-Bereich aus echten Daten (OpenPLZ deckt DE, AT, CH ab); in der Demo sind die Werte
+  Näherungen (DE-3er-Bereiche nur eine Auswahl, sonst 2 Ziffern).

@@ -30,6 +30,7 @@
         <p class="hint full" style="margin:-6px 0 16px">Nickname und Vorname kann nur der Support ändern. <a class="link" href="hilfe.html?thema=name">Support kostenlos anschreiben</a></p>
         <div class="field"><label for="looking">Ich suche</label><select class="input" id="looking"><option>Beziehung</option><option>Abenteuer</option></select></div>
         <div class="field"><label for="job">Beruf</label><input class="input" id="job" placeholder="z. B. Elektriker"></div>
+        <div class="field"><label for="land">Land</label><select class="input" id="land" aria-label="Land" required><option value="DE">Deutschland</option><option value="AT">Österreich</option><option value="CH">Schweiz</option></select></div>
         <div class="field"><label for="plz">Postleitzahl</label><input class="input" id="plz" inputmode="numeric" maxlength="5" placeholder="z. B. 34508" required autocomplete="postal-code"><span class="hint">Umgezogen? Einfach die neue PLZ eintragen.</span></div>
         <div class="field"><label for="radius">Umkreis für die Suche</label><select class="input" id="radius"><option value="20">bis 20 km</option><option value="50">bis 50 km</option><option value="100">bis 100 km</option><option value="999">über 100 km</option></select></div>
         <div class="field"><label for="city">Wohnort</label><input class="input" id="city" placeholder="z. B. Hamburg"></div>
@@ -45,14 +46,15 @@
 <script>{
   const $=id=>document.getElementById(id),u=NMA.user();
   $("nick").value=u.nick;$("vorname").value=u.vorname||"";$("city").value=u.city||"";$("about").value=u.about||"";$("looking").value=u.looking==="Abenteuer"?"Abenteuer":"Beziehung";$("job").value=u.job||"";$("plz").value=u.plz||"";$("radius").value=u.radius||"50";
+  $("land").value=u.land||"DE";const plzMax=()=>{$("plz").maxLength=NMA.LAND[$("land").value].len};plzMax();$("land").addEventListener("change",plzMax);
   $("plz").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,"")});$("tags").value=(u.tags||[]).join(", ");
   if(u.status)$("status").value=u.status;
   $("av").textContent=u.nick[0];
   const cnt=()=>$("n").textContent=$("about").value.length;$("about").addEventListener("input",cnt);cnt();
   $("file").addEventListener("change",()=>{const f=$("file").files[0];if(!f)return;if(!f.type.startsWith("image/")||f.size>8e6){NMA.toast("Bitte ein Bild bis 8 MB wählen.");return}
     $("av").style.backgroundImage=`url(${URL.createObjectURL(f)})`;$("av").textContent="";NMA.toast("Foto ausgewählt – es wird nach dem Speichern geprüft.")});
-  $("f").addEventListener("submit",e=>{e.preventDefault();    if(!/^\d{4,5}$/.test($("plz").value)){NMA.toast("Bitte gib deine Postleitzahl ein (4 oder 5 Ziffern).");$("plz").focus();return}
-    NMA.store.set("user",Object.assign(u,{job:$("job").value.trim(),plz:$("plz").value,radius:$("radius").value,city:$("city").value.trim(),about:$("about").value.trim(),looking:$("looking").value,status:$("status").value,tags:$("tags").value.split(",").map(s=>s.trim()).filter(Boolean)}));
+  $("f").addEventListener("submit",e=>{e.preventDefault();    if(!NMA.plzOk($("land").value,$("plz").value)){const L=NMA.LAND[$("land").value];NMA.toast(`Bitte gib deine Postleitzahl ein (${L.len} Ziffern für ${L.name}).`);$("plz").focus();return}
+    NMA.store.set("user",Object.assign(u,{job:$("job").value.trim(),land:$("land").value,plz:$("plz").value,radius:$("radius").value,city:$("city").value.trim(),about:$("about").value.trim(),looking:$("looking").value,status:$("status").value,tags:$("tags").value.split(",").map(s=>s.trim()).filter(Boolean)}));
     NMA.toast("Profil gespeichert (Demo).")});
   $("preview").addEventListener("click",e=>{e.preventDefault();NMA.modal({title:`${$("nick").value}${u.age?", "+u.age:""}`,text:`${NMA.esc($("city").value||"Wohnort fehlt")} · sucht: ${NMA.esc($("looking").value)}<br><br>${NMA.esc($("about").value||"Noch kein Text über dich.")}`,ok:"Schließen"})});
 }</script>
