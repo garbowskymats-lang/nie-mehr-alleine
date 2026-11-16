@@ -74,7 +74,10 @@ Stand 16.11.2026 – Massenversand (massenversand.js, Reiter „📣 Massenversa
   Versand als Hintergrund-Job, Nachrichten in Postfach/Chat der Kunden zustellen. Profile müssen für Kunden
   als moderierte Profile gekennzeichnet bleiben (AGB/Hinweis).
 
-GEPLANT (Konzept 16.11.2026) – Wohnort der Profile pro Kunde („Kontakt-Ort“)
+UMGESETZT (Demo, 16.11.2026) – Wohnort der Profile pro Kunde („Kontakt-Ort“)
+- Demo-Umsetzung: NMA.kontaktOrt in app.js (Speicher „kOrt“), Ortsliste NMA.TOWNS (Auswahl), Chef-Schalter unter
+  Massenversand → Rechte & Regeln → „Wohnort der Profile“ (Kontakt-Ort / fest). Kundenseiten zeigen Ort + km je Kunde,
+  Mitarbeiter sehen im Chat rechts „Wohnt für ihn“. Massennachrichten an den angemeldeten Demo-Kunden landen in seinem Chat.
 - Ziel: Ein Profil wohnt für JEDEN Kunden fest in dessen Nähe – Susi für den Berliner Kunden in Spandau,
   für den Münchner Kunden in Dachau – und bleibt dort für diesen Kunden für immer.
 - Pflichtangaben bei der Registrierung (schon vorhanden): PLZ, Umkreis, wer sucht wen, Beziehung/Abenteuer.

@@ -68,7 +68,7 @@
 
   const open=id=>{
     current=id; if(!chats[id])chats[id]=[];
-    delete unread[id];
+    delete unread[id];NMA.markRead&&NMA.markRead(id);
     const p=NMA.get(id);
     $("none").hidden=true;["head","msgs","comp"].forEach(x=>$(x).hidden=false);
     $("who").href=$("info").href=`profil.html?id=${id}`;

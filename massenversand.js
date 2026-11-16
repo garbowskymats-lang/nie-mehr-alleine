@@ -43,22 +43,8 @@
   const grp = id => GROUPS.find(g => g.id === id) || GROUPS[0];
   const PERM = { aus: "Nicht erlaubt", kontrolle: "Mit Kontrolle durch den Chef", frei: "Selbstständig" };
 
-  /* ---------- Postleitzahlen → Koordinaten (Demo-Näherung) ----------
-     Server: echte PLZ-Geodaten verwenden (z. B. OpenGeoDB / OpenPLZ). */
-  const P2 = {"01":[51.05,13.74],"02":[51.18,14.42],"03":[51.76,14.33],"04":[51.34,12.37],"06":[51.48,11.97],"07":[50.88,12.08],"08":[50.72,12.49],"09":[50.83,12.92],"10":[52.52,13.40],"12":[52.45,13.45],"13":[52.57,13.35],"14":[52.40,13.06],"15":[52.34,14.55],"16":[52.83,13.82],"17":[53.56,13.26],"18":[54.09,12.10],"19":[53.63,11.41],"20":[53.55,10.00],"21":[53.40,9.90],"22":[53.62,10.05],"23":[53.87,10.69],"24":[54.32,10.13],"25":[53.90,9.50],"26":[53.14,8.21],"27":[53.40,8.80],"28":[53.08,8.80],"29":[52.62,10.08],"30":[52.37,9.73],"31":[52.15,9.95],"32":[52.12,8.67],"33":[52.02,8.53],"34":[51.31,9.48],"35":[50.58,8.68],"36":[50.55,9.68],"37":[51.54,9.93],"38":[52.27,10.52],"39":[52.13,11.63],"40":[51.23,6.78],"41":[51.19,6.44],"42":[51.26,7.15],"44":[51.51,7.47],"45":[51.46,7.01],"46":[51.60,6.90],"47":[51.40,6.70],"48":[51.96,7.63],"49":[52.28,8.05],"50":[50.94,6.96],"51":[50.95,7.10],"52":[50.78,6.08],"53":[50.73,7.10],"54":[49.75,6.64],"55":[49.99,8.25],"56":[50.36,7.59],"57":[50.87,8.02],"58":[51.36,7.47],"59":[51.60,7.90],"60":[50.11,8.68],"61":[50.23,8.62],"63":[50.10,8.90],"64":[49.87,8.65],"65":[50.08,8.24],"66":[49.24,6.99],"67":[49.45,8.00],"68":[49.49,8.47],"69":[49.40,8.69],"70":[48.78,9.18],"71":[48.80,9.10],"72":[48.50,9.10],"73":[48.70,9.60],"74":[49.14,9.22],"75":[48.89,8.70],"76":[49.01,8.40],"77":[48.47,7.94],"78":[47.90,8.60],"79":[47.99,7.84],"80":[48.14,11.58],"81":[48.12,11.62],"82":[48.00,11.30],"83":[47.86,12.12],"84":[48.54,12.15],"85":[48.60,11.60],"86":[48.37,10.90],"87":[47.73,10.31],"88":[47.78,9.61],"89":[48.40,9.99],"90":[49.45,11.08],"91":[49.60,10.90],"92":[49.45,11.86],"93":[49.01,12.10],"94":[48.57,13.43],"95":[50.00,11.60],"96":[49.90,10.90],"97":[49.79,9.95],"98":[50.60,10.70],"99":[50.98,11.03]};
-  const P5 = {"20095":[53.55,10.00],"20457":[53.54,9.99],"22041":[53.57,10.08],"21335":[53.25,10.41],"21614":[53.48,9.70],"21680":[53.60,9.48],"21682":[53.60,9.48],"22846":[53.70,10.01],"25421":[53.66,9.80],"25335":[53.75,9.65],"24103":[54.32,10.13],"23552":[53.87,10.69],"29221":[52.62,10.08],"34117":[51.31,9.48],"34508":[51.29,8.61],"34537":[51.12,9.12],"28195":[53.08,8.80],"60311":[50.11,8.68]};
-  const CITY = {"hamburg":"20095","lüneburg":"21335","buxtehude":"21614","stade":"21682","norderstedt":"22846","pinneberg":"25421","elmshorn":"25335","kiel":"24103","lübeck":"23552","celle":"29221","kassel":"34117","bremen":"28195","frankfurt":"60311"};
-  const geo = (plz, city) => {
-    if (!plz && city) plz = CITY[String(city).trim().toLowerCase()];
-    if (!plz || !/^\d{5}$/.test(plz)) return null;
-    return P5[plz] || P2[plz.slice(0, 2)] || null;
-  };
-  const km = (a, b) => {
-    if (!a || !b) return null;
-    const r = x => x * Math.PI / 180, dLa = r(b[0] - a[0]), dLo = r(b[1] - a[1]);
-    const h = Math.sin(dLa / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dLo / 2) ** 2;
-    return Math.round(12742 * Math.asin(Math.sqrt(h)));
-  };
+  /* Orte & Entfernungen kommen aus app.js (NMA.geoOf, NMA.km, NMA.kontaktOrt) */
+  const geo = NMA.geoOf, km = NMA.km;
   const custPlz = c => (String(c.ort || "").match(/\d{5}/) || [])[0];
   const custCity = c => String(c.ort || "").replace(/\d{5}/, "").trim();
 
@@ -82,16 +68,26 @@
       "Heidi_HH": "Heidi", "Rosi aus Celle": "Rosemarie", "Gisela60": "Gisela", "Seebär Uwe": "Uwe", "Jens_N": "Jens", "Hafenkapitän": "Horst", "Klaus L.": "Klaus",
       "Peter aus Pinneberg": "Peter", "Norbert65": "Norbert", "Dieter K.": "Dieter" };
     Object.entries(T.customers).forEach(([n, c]) => { if (!c.sex) { c.sex = "m"; ch = true; } if (!c.vorname && vn[n]) { c.vorname = vn[n]; ch = true; } });
+    /* angemeldeter Demo-Kunde (Kundenseite) */
+    const u = NMA.user();
+    if (u && u.nick) {
+      const c = T.customers[u.nick] || (T.customers[u.nick] = { nr: 10600, st: "T", coins: NMA.coins(), since: new Date().toLocaleDateString("de-DE") });
+      Object.assign(c, { vorname: u.vorname || c.vorname, age: u.age || c.age, job: u.job || c.job || "", look: u.looking || c.look || "Beziehung", radius: +u.radius || 50,
+        sex: /^eine Frau/.test(u.sex || "") ? "w" : "m", ort: ((u.plz || "") + " " + (u.city || "")).trim() || c.ort });
+      ch = true;
+    }
     if (ch) T.saveAll();
   }
 
   /* ---------- Speicher ---------- */
-  let cfg   = Object.assign({ radius: 50, fallback: true, pause: 1 }, S.get("mvCfg", {}));
+  let cfg   = Object.assign({ radius: 50, fallback: true, pause: 1, wohnort: "kontakt" }, S.get("mvCfg", {}));
+  const kontakt = () => cfg.wohnort !== "fest";
+  const custRef = (nick, c) => ({ nick, plz: custPlz(c), radius: c.radius || 50, city: custCity(c) });
   let tpls  = S.get("mvTpls", null) || [
     { nr: 1, group: "abenteuer-m",  owner: "chef",  name: "Neugierig",       text: "Hallo {vorname}, dein Profil ist mir gerade aufgefallen 😊 Ich wohne gar nicht weit weg und bin für ein kleines Abenteuer immer zu haben. Schreibst du mir?" },
     { nr: 2, group: "beziehung-fm", owner: "chef",  name: "Sonntagsfrage",   text: "Hallo {vorname}, ich bin {profil} aus {ort}. Ich suche jemanden für gemütliche Sonntage und ehrliche Gespräche – vielleicht ja dich?" },
     { nr: 3, group: "beziehung-mf", owner: "chef",  name: "Kaffee",          text: "Hallo {name}, ich habe dein Profil gelesen und musste lächeln. Wie wäre es mit einem virtuellen Kaffee und ein paar Zeilen?" },
-    { nr: 4, group: "tester",       owner: "marco", name: "Willkommen",      text: "Hallo {name}, schön, dass du neu hier bist! Ich bin {profil} und würde mich freuen, dich ein bisschen kennenzulernen." }
+    { nr: 4, group: "tester",       owner: "marco", name: "Willkommen",      text: "Hallo {vorname}, schön, dass du neu hier bist! Ich bin {profil} und würde mich freuen, dich ein bisschen kennenzulernen." }
   ];
   let jobs  = S.get("mvJobs", []);
   let msent = S.get("mvSent", {});           /* Kunde → [{pid, t, job, tpl}] */
@@ -108,7 +104,7 @@
   const canEditTpl = t => T.isAdmin() || t.owner === T.meKey();
 
   /* ---------- Empfänger + Profil-Zuordnung berechnen ---------- */
-  const fill = (text, nick, p, c) => text.replace(/\{vorname\}/g, (c && c.vorname) || nick).replace(/\{name\}/g, nick).replace(/\{profil\}/g, p.name).replace(/\{ort\}/g, p.city || "");
+  const fill = (text, nick, p, c, ort) => text.replace(/\{vorname\}/g, (c && c.vorname) || nick).replace(/\{name\}/g, nick).replace(/\{profil\}/g, p.name).replace(/\{ort\}/g, ort || p.city || "");
   const contacted = () => {              /* Kunde → Set(Profil-IDs), die schon Kontakt hatten */
     const m = {}; const add = (c, p) => (m[c] = m[c] || new Set()).add(p);
     Object.entries(msent).forEach(([c, a]) => a.forEach(x => add(c, x.pid)));
@@ -120,7 +116,7 @@
     const G = grp(job.group), byKey = job.by === "chef" ? "chef" : job.by;
     const pool = T.profiles.filter(p => byKey === "chef" || p.owner === byKey);
     const done = contacted(), now = Date.now(), pauseMs = (+cfg.pause || 0) * DAY;
-    const rows = [], skip = [];
+    const rows = [], skip = [], load = {};
     Object.entries(T.customers).forEach(([nick, c]) => {
       if (!G.who(c)) return;
       if (!G.fixedSt && job.st && c.st !== job.st) return;
@@ -131,25 +127,40 @@
       const cg = geo(custPlz(c), custCity(c));
       if (!cg) { skip.push({ nick, c, why: "PLZ unbekannt" }); return; }
       const f = G.from(c), had = done[nick] || new Set();
-      const cands = pool.filter(p => p.sex === f.sex && (!f.looking || p.looking === f.looking) && !had.has(p.id))
-        .map(p => ({ p, d: km(cg, geo(p.plz, p.city)) })).filter(x => x.d !== null).sort((a, b) => a.d - b.d);
-      if (!cands.length) { skip.push({ nick, c, why: pool.length ? "alle passenden Profile hatten schon Kontakt" : "keine passenden Profile" }); return; }
+      const fit = pool.filter(p => p.sex === f.sex && (!f.looking || p.looking === f.looking) && !had.has(p.id));
+      if (!fit.length) { skip.push({ nick, c, why: pool.length ? "alle passenden Profile hatten schon Kontakt" : "keine passenden Profile" }); return; }
+      if (kontakt()) {
+        /* Profil wohnt für diesen Kunden in seinem Umkreis – gleichmäßig auf die Profile verteilen */
+        const ref = custRef(nick, c);
+        const pick = fit.map(p => ({ p, k: NMA.kontaktOrt(p, ref, true) })).filter(x => x.k)
+          .sort((a, b) => (load[a.p.id] || 0) - (load[b.p.id] || 0) || a.k.km - b.k.km)[0];
+        if (!pick) { skip.push({ nick, c, why: "PLZ unbekannt" }); return; }
+        load[pick.p.id] = (load[pick.p.id] || 0) + 1;
+        rows.push({ nick, c, p: pick.p, d: pick.k.km, ort: pick.k.ort, far: false });
+        return;
+      }
+      const cands = fit.map(p => ({ p, d: km(cg, geo(p.plz, p.city)) })).filter(x => x.d !== null).sort((a, b) => a.d - b.d);
+      if (!cands.length) { skip.push({ nick, c, why: "keine Profile mit bekanntem Ort" }); return; }
       let pick = cands.find(x => x.d <= job.radius);
       if (!pick) {
         if (job.fallback) pick = cands[0];
         else { skip.push({ nick, c, why: `kein freies Profil im Umkreis von ${job.radius} km (nächstes: ${cands[0].d} km)` }); return; }
       }
-      rows.push({ nick, c, p: pick.p, d: pick.d, far: pick.d > job.radius });
+      rows.push({ nick, c, p: pick.p, d: pick.d, ort: pick.p.city, far: pick.d > job.radius });
     });
     rows.sort((a, b) => a.d - b.d);
     return { rows, skip };
   };
   const execute = job => {
     const { rows, skip } = plan(job), t = Date.now();
+    const me = NMA.user().nick, inbox = S.get("custMsgs", []);
     rows.forEach((r, i) => {
+      if (kontakt()) NMA.kontaktOrt(r.p, custRef(r.nick, r.c));      /* Ort jetzt fest für dieses Paar */
+      if (r.nick === me) inbox.push({ to: me, pid: r.p.id, text: fill(job.text, r.nick, r.p, r.c, r.ort), t, read: false });
       (msent[r.nick] = msent[r.nick] || []).push({ pid: r.p.id, t, job: job.nr, tpl: job.tpl || null });
-      T.sent.push({ id: "m" + t + "_" + i, cust: r.nick, pid: r.p.id, text: fill(job.text, r.nick, r.p, r.c), t, by: job.by, tpl: null, mass: job.nr });
+      T.sent.push({ id: "m" + t + "_" + i, cust: r.nick, pid: r.p.id, text: fill(job.text, r.nick, r.p, r.c, r.ort), t, by: job.by, tpl: null, mass: job.nr });
     });
+    S.set("custMsgs", inbox);
     job.status = "gesendet"; job.sentAt = t; job.result = { sent: rows.length, skipped: skip.length, profiles: new Set(rows.map(r => r.p.id)).size };
     save(); T.saveAll(); T.renderQueue();
     return rows.length;
@@ -261,7 +272,7 @@
           <label class="mv-t"><input type="radio" name="mvT" value="" ${!W.tpl ? "checked" : ""}><span><b>Eigenen Text schreiben</b></span></label></div>`
           : `<p class="mv-warn">Für diese Zielgruppe ist noch keine Massenvorlage hinterlegt. Schreib unten einen Text – du kannst ihn gleich als Vorlage speichern.</p>`}
         <div class="field"><label for="mvText">Text</label>
-          <div class="mv-ph"><span class="hint">Platzhalter einfügen:</span><button type="button" data-ph="{vorname}">{vorname} = Vorname des Kunden</button><button type="button" data-ph="{name}">{name} = Nickname des Kunden</button><button type="button" data-ph="{profil}">{profil} = Profilname</button><button type="button" data-ph="{ort}">{ort} = Ort des Profils</button></div>
+          <div class="mv-ph"><span class="hint">Platzhalter einfügen:</span><button type="button" data-ph="{vorname}">{vorname} = Vorname des Kunden</button><button type="button" data-ph="{name}">{name} = Nickname des Kunden</button><button type="button" data-ph="{profil}">{profil} = Profilname</button><button type="button" data-ph="{ort}">{ort} = Wohnort des Profils (für diesen Kunden)</button></div>
           <textarea class="input" id="mvText" rows="5" placeholder="Hallo {name}, …">${esc(W.text)}</textarea><span class="hint" id="mvLen"></span></div>
         <label class="small" style="display:flex;gap:8px;align-items:center" id="mvSaveRow"><input type="checkbox" id="mvSaveTpl" ${W.saveTpl ? "checked" : ""}> Als Massenvorlage speichern <input class="input" id="mvTplName" maxlength="40" placeholder="Kurzname" value="${esc(W.tplName)}" style="max-width:220px;min-height:38px"></label>
         <div class="mv-nav"><button class="btn ghost" data-back>Zurück</button><button class="btn primary" data-next>Weiter</button></div></div>`;
@@ -295,16 +306,15 @@
         ${G.fixedSt ? `<p class="mv-info">Es gehen nur Nachrichten an Testmitglieder (registriert, noch nie gekauft).</p>` : `
         <div class="field"><span class="label">Wer soll die Nachricht bekommen?</span>
           <div class="seg" style="grid-template-columns:repeat(3,1fr)"><label><input type="radio" name="mvSt" value="" ${!W.st ? "checked" : ""}> Alle</label><label><input type="radio" name="mvSt" value="T" ${W.st === "T" ? "checked" : ""}> Nur Testmitglieder</label><label><input type="radio" name="mvSt" value="K" ${W.st === "K" ? "checked" : ""}> Nur zahlende Kunden</label></div></div>`}
-        <div class="form-grid">
+        ${kontakt() ? `<p class="mv-info"><b>Wohnort der Profile:</b> Jedes Profil wohnt für den jeweiligen Kunden in dessen Umkreis (laut seiner Angabe bei der Registrierung) und bleibt dort für ihn. Es schreiben Profile, die den Kunden noch nie angeschrieben haben – gleichmäßig verteilt.</p>` : `<div class="form-grid">
           <div class="field"><label for="mvRad">Umkreis um den Kunden</label><select class="input" id="mvRad">${[25, 50, 75, 100, 200].map(r => `<option value="${r}" ${W.radius === r ? "selected" : ""}>${r} km</option>`).join("")}</select><span class="hint">Das System nimmt das nächstgelegene passende Profil, das diesen Kunden noch nie angeschrieben hat.</span></div>
           <div class="field"><span class="label">Kein freies Profil im Umkreis?</span><label class="small" style="display:flex;gap:8px;align-items:center;min-height:46px"><input type="checkbox" id="mvFb" ${W.fallback ? "checked" : ""}> Trotzdem das nächstgelegene Profil nehmen</label><span class="hint">Sonst wird der Kunde diesmal übersprungen.</span></div>
-        </div>
+        </div>`}
         <p class="mv-info">${T.isAdmin() ? `Es schreiben <b>alle passenden Profile</b> (${T.profiles.length}). Antworten landen beim Mitarbeiter, dem das jeweilige Profil gehört.` : `Es schreiben nur <b>deine eigenen Profile</b> (${mine.length}). Antworten landen in deinem Posteingang.`}
           ${+cfg.pause ? `<br>Regel vom Chef: jeder Kunde bekommt höchstens 1 Massennachricht in ${cfg.pause} Tag${cfg.pause == 1 ? "" : "en"}.` : ""}</p>
         <div class="mv-nav"><button class="btn ghost" data-back>Zurück</button><button class="btn primary" data-next>Vorschau anzeigen</button></div></div>`;
       el.querySelectorAll("input[name=mvSt]").forEach(r => r.addEventListener("change", () => W.st = r.value));
-      $("mvRad").addEventListener("change", e => W.radius = +e.target.value);
-      $("mvFb").addEventListener("change", e => W.fallback = e.target.checked);
+      if ($("mvRad")) { $("mvRad").addEventListener("change", e => W.radius = +e.target.value); $("mvFb").addEventListener("change", e => W.fallback = e.target.checked); }
       el.querySelector("[data-back]").addEventListener("click", () => { W.step = 2; render(); });
       el.querySelector("[data-next]").addEventListener("click", () => { W.step = 4; render(); });
       return;
@@ -329,12 +339,12 @@
   const planHtml = (job, pl) => {
     const G = grp(job.group), first = pl.rows[0], np = new Set(pl.rows.map(r => r.p.id)).size, far = pl.rows.filter(r => r.far).length;
     return `<h2 style="font-size:22px;margin-bottom:4px">${G.icon} ${G.name}</h2>
-      <p class="hint" style="margin:0 0 14px">${G.fixedSt ? "Nur Testmitglieder" : job.st === "T" ? "Nur Testmitglieder" : job.st === "K" ? "Nur zahlende Kunden" : "Alle"} · Umkreis ${job.radius} km${job.fallback ? " (sonst nächstes Profil)" : ""}${job.tpl ? " · Vorlage " + mNo(job.tpl) : " · eigener Text"}</p>
+      <p class="hint" style="margin:0 0 14px">${G.fixedSt ? "Nur Testmitglieder" : job.st === "T" ? "Nur Testmitglieder" : job.st === "K" ? "Nur zahlende Kunden" : "Alle"} · ${kontakt() ? "Wohnort pro Kunde in seinem Umkreis" : `Umkreis ${job.radius} km${job.fallback ? " (sonst nächstes Profil)" : ""}`}${job.tpl ? " · Vorlage " + mNo(job.tpl) : " · eigener Text"}</p>
       <div class="mv-kpis"><div class="card"><small>Empfänger</small><strong>${pl.rows.length}</strong></div><div class="card"><small>Profile beteiligt</small><strong>${np}</strong></div><div class="card"><small>Übersprungen</small><strong>${pl.skip.length}</strong></div></div>
       ${far ? `<p class="mv-warn">${far} Empfänger ${far === 1 ? "bekommt" : "bekommen"} eine Nachricht von einem Profil außerhalb von ${job.radius} km (gelb markiert).</p>` : ""}
-      ${first ? `<div class="mv-prev"><small>Beispiel: „${esc(first.p.name)}“ an ${esc(first.nick)}</small>${esc(fill(job.text, first.nick, first.p, first.c))}</div>` : `<p class="mv-warn">Aktuell gibt es keinen Empfänger für diese Auswahl.</p>`}
-      ${pl.rows.length ? `<table class="mv"><thead><tr><th>Kunde</th><th class="hide-sm">Wohnort</th><th>schreibt an ihn/sie</th><th class="num">Entfernung</th>${T.isAdmin() ? `<th class="hide-sm">Profil gehört</th>` : ""}</tr></thead><tbody>
-        ${pl.rows.slice(0, 100).map(r => `<tr><td>${esc(r.nick)} ${stBadge(r.c)}</td><td class="hide-sm">${esc(r.c.ort || "–")}</td><td>${esc(r.p.name)}<br><small class="muted">${esc(r.p.city || "")}</small></td><td class="num ${r.far ? "far" : ""}">${r.d} km</td>${T.isAdmin() ? `<td class="hide-sm">${esc(T.ownerName(r.p.owner))}</td>` : ""}</tr>`).join("")}
+      ${first ? `<div class="mv-prev"><small>Beispiel: „${esc(first.p.name)}“ an ${esc(first.nick)}</small>${esc(fill(job.text, first.nick, first.p, first.c, first.ort))}</div>` : `<p class="mv-warn">Aktuell gibt es keinen Empfänger für diese Auswahl.</p>`}
+      ${pl.rows.length ? `<table class="mv"><thead><tr><th>Kunde</th><th class="hide-sm">Wohnort</th><th>schreibt an ihn/sie</th><th class="num">${kontakt() ? "wohnt für ihn/sie" : "Entfernung"}</th>${T.isAdmin() ? `<th class="hide-sm">Profil gehört</th>` : ""}</tr></thead><tbody>
+        ${pl.rows.slice(0, 100).map(r => `<tr><td>${esc(r.nick)} ${stBadge(r.c)}</td><td class="hide-sm">${esc(r.c.ort || "–")}</td><td>${esc(r.p.name)}${kontakt() ? "" : `<br><small class="muted">${esc(r.p.city || "")}</small>`}</td><td class="num ${r.far ? "far" : ""}">${kontakt() ? `${esc(r.ort)}<br><small class="muted">${r.d} km</small>` : r.d + " km"}</td>${T.isAdmin() ? `<td class="hide-sm">${esc(T.ownerName(r.p.owner))}</td>` : ""}</tr>`).join("")}
         </tbody></table>${pl.rows.length > 100 ? `<p class="hint">… und ${pl.rows.length - 100} weitere.</p>` : ""}` : ""}
       ${pl.skip.length ? `<details class="mv-skip"><summary>${pl.skip.length} übersprungen – warum?</summary><table class="mv"><tbody>${pl.skip.map(s => `<tr><td>${esc(s.nick)} ${stBadge(s.c)}</td><td>${esc(s.why)}</td></tr>`).join("")}</tbody></table></details>` : ""}`;
   };
@@ -376,7 +386,7 @@
     const list = pendingFor();
     el.innerHTML = `<div class="card pad">${list.length ? list.map(j => { const pl = plan(j);
       return `<div class="mv-job">${jobHead(j)}<p>${esc(j.text)}</p>
-        <div class="hint" style="margin-bottom:8px">${j.st === "T" ? "Nur Testmitglieder · " : j.st === "K" ? "Nur zahlende Kunden · " : ""}Umkreis ${j.radius} km · würde jetzt an <b>${pl.rows.length}</b> gehen (${pl.skip.length} übersprungen)</div>
+        <div class="hint" style="margin-bottom:8px">${j.st === "T" ? "Nur Testmitglieder · " : j.st === "K" ? "Nur zahlende Kunden · " : ""}${kontakt() ? "Wohnort pro Kunde" : `Umkreis ${j.radius} km`} · würde jetzt an <b>${pl.rows.length}</b> gehen (${pl.skip.length} übersprungen)</div>
         <div class="mv-acts"><button class="btn sm" data-pv="${j.id}">Vorschau</button>
         ${T.isAdmin() ? `<button class="btn sm primary" data-ok="${j.id}" ${pl.rows.length ? "" : "disabled"}>Freigeben &amp; senden</button><input class="input" id="note_${j.id}" placeholder="Grund bei Ablehnung (optional)" style="max-width:260px;min-height:38px"><button class="btn sm ghost" data-no="${j.id}">Ablehnen</button>`
           : `<button class="btn sm ghost" data-back="${j.id}">Zurückziehen</button>`}</div></div>`; }).join("")
@@ -419,7 +429,8 @@
         </tbody></table></div>
       <div class="card pad"><h2 style="font-size:22px;margin-bottom:12px">Regeln für alle</h2>
         <div class="field"><label for="mvPause">Pause pro Kunde</label><select class="input" id="mvPause">${[[0, "Keine Pause"], [1, "1 Massennachricht pro Tag"], [2, "höchstens alle 2 Tage"], [3, "höchstens alle 3 Tage"], [7, "höchstens 1× pro Woche"]].map(([v, t]) => `<option value="${v}" ${+cfg.pause === v ? "selected" : ""}>${t}</option>`).join("")}</select><span class="hint">Schützt Kunden vor zu vielen Massennachrichten – egal von welchem Mitarbeiter.</span></div>
-        <div class="field"><label for="mvR">Standard-Umkreis</label><select class="input" id="mvR">${[25, 50, 75, 100, 200].map(r => `<option value="${r}" ${+cfg.radius === r ? "selected" : ""}>${r} km</option>`).join("")}</select></div>
+        <div class="field"><label for="mvW">Wohnort der Profile</label><select class="input" id="mvW"><option value="kontakt" ${kontakt() ? "selected" : ""}>Pro Kunde in seiner Nähe (Kontakt-Ort)</option><option value="fest" ${kontakt() ? "" : "selected"}>Fest – Ort/PLZ aus dem Profil</option></select><span class="hint">Kontakt-Ort: Das Profil wohnt für jeden Kunden in dessen Umkreis und bleibt dort für ihn. Fest: Umkreis-Suche nach PLZ des Profils.</span></div>
+        <div class="field" id="mvRF"><label for="mvR">Standard-Umkreis</label><select class="input" id="mvR">${[25, 50, 75, 100, 200].map(r => `<option value="${r}" ${+cfg.radius === r ? "selected" : ""}>${r} km</option>`).join("")}</select></div>
         <label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mvF" ${cfg.fallback ? "checked" : ""}> Standard: kein Profil im Umkreis → nächstgelegenes nehmen</label>
         <p class="hint" style="margin-top:14px">Profile ohne PLZ werden über den Ort zugeordnet. Für genaue Entfernungen bei jedem Profil die PLZ eintragen (Profile → Bearbeiten).</p></div></div>`;
     el.querySelectorAll("[data-perm]").forEach(s => s.addEventListener("change", () => {
@@ -427,6 +438,7 @@
       NMA.toast(`${st.name}: Massenversand ${PERM[s.value].toLowerCase()}.`);
     }));
     $("mvPause").addEventListener("change", e => { cfg.pause = +e.target.value; save(); NMA.toast("Gespeichert."); });
+    $("mvW").addEventListener("change", e => { cfg.wohnort = e.target.value; save(); NMA.toast(kontakt() ? "Profile wohnen jetzt pro Kunde in seiner Nähe." : "Profile haben jetzt einen festen Ort."); render(); });
     $("mvR").addEventListener("change", e => { cfg.radius = +e.target.value; save(); if (W.step === 1) W.radius = cfg.radius; NMA.toast("Gespeichert."); });
     $("mvF").addEventListener("change", e => { cfg.fallback = e.target.checked; save(); if (W.step === 1) W.fallback = cfg.fallback; NMA.toast("Gespeichert."); });
   };
