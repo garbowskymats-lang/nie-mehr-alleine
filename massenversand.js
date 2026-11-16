@@ -78,15 +78,18 @@
     };
     let ch = false;
     Object.entries(extra).forEach(([n, c]) => { if (!T.customers[n]) { T.customers[n] = c; ch = true; } });
-    Object.values(T.customers).forEach(c => { if (!c.sex) { c.sex = "m"; ch = true; } });
+    const vn = { "Michael Nordlicht": "Michael", "Sonnenschein63": "Werner", "Rolf aus Kassel": "Rolf", "Wanderfreund": "Günter", "Berti_K": "Bertram", "Kalle 58": "Karl",
+      "Heidi_HH": "Heidi", "Rosi aus Celle": "Rosemarie", "Gisela60": "Gisela", "Seebär Uwe": "Uwe", "Jens_N": "Jens", "Hafenkapitän": "Horst", "Klaus L.": "Klaus",
+      "Peter aus Pinneberg": "Peter", "Norbert65": "Norbert", "Dieter K.": "Dieter" };
+    Object.entries(T.customers).forEach(([n, c]) => { if (!c.sex) { c.sex = "m"; ch = true; } if (!c.vorname && vn[n]) { c.vorname = vn[n]; ch = true; } });
     if (ch) T.saveAll();
   }
 
   /* ---------- Speicher ---------- */
   let cfg   = Object.assign({ radius: 50, fallback: true, pause: 1 }, S.get("mvCfg", {}));
   let tpls  = S.get("mvTpls", null) || [
-    { nr: 1, group: "abenteuer-m",  owner: "chef",  name: "Neugierig",       text: "Hallo {name}, dein Profil ist mir gerade aufgefallen 😊 Ich wohne gar nicht weit weg und bin für ein kleines Abenteuer immer zu haben. Schreibst du mir?" },
-    { nr: 2, group: "beziehung-fm", owner: "chef",  name: "Sonntagsfrage",   text: "Hallo {name}, ich bin {profil} aus {ort}. Ich suche jemanden für gemütliche Sonntage und ehrliche Gespräche – vielleicht ja dich?" },
+    { nr: 1, group: "abenteuer-m",  owner: "chef",  name: "Neugierig",       text: "Hallo {vorname}, dein Profil ist mir gerade aufgefallen 😊 Ich wohne gar nicht weit weg und bin für ein kleines Abenteuer immer zu haben. Schreibst du mir?" },
+    { nr: 2, group: "beziehung-fm", owner: "chef",  name: "Sonntagsfrage",   text: "Hallo {vorname}, ich bin {profil} aus {ort}. Ich suche jemanden für gemütliche Sonntage und ehrliche Gespräche – vielleicht ja dich?" },
     { nr: 3, group: "beziehung-mf", owner: "chef",  name: "Kaffee",          text: "Hallo {name}, ich habe dein Profil gelesen und musste lächeln. Wie wäre es mit einem virtuellen Kaffee und ein paar Zeilen?" },
     { nr: 4, group: "tester",       owner: "marco", name: "Willkommen",      text: "Hallo {name}, schön, dass du neu hier bist! Ich bin {profil} und würde mich freuen, dich ein bisschen kennenzulernen." }
   ];
@@ -105,7 +108,7 @@
   const canEditTpl = t => T.isAdmin() || t.owner === T.meKey();
 
   /* ---------- Empfänger + Profil-Zuordnung berechnen ---------- */
-  const fill = (text, nick, p) => text.replace(/\{name\}/g, nick).replace(/\{profil\}/g, p.name).replace(/\{ort\}/g, p.city || "");
+  const fill = (text, nick, p, c) => text.replace(/\{vorname\}/g, (c && c.vorname) || nick).replace(/\{name\}/g, nick).replace(/\{profil\}/g, p.name).replace(/\{ort\}/g, p.city || "");
   const contacted = () => {              /* Kunde → Set(Profil-IDs), die schon Kontakt hatten */
     const m = {}; const add = (c, p) => (m[c] = m[c] || new Set()).add(p);
     Object.entries(msent).forEach(([c, a]) => a.forEach(x => add(c, x.pid)));
@@ -145,7 +148,7 @@
     const { rows, skip } = plan(job), t = Date.now();
     rows.forEach((r, i) => {
       (msent[r.nick] = msent[r.nick] || []).push({ pid: r.p.id, t, job: job.nr, tpl: job.tpl || null });
-      T.sent.push({ id: "m" + t + "_" + i, cust: r.nick, pid: r.p.id, text: fill(job.text, r.nick, r.p), t, by: job.by, tpl: null, mass: job.nr });
+      T.sent.push({ id: "m" + t + "_" + i, cust: r.nick, pid: r.p.id, text: fill(job.text, r.nick, r.p, r.c), t, by: job.by, tpl: null, mass: job.nr });
     });
     job.status = "gesendet"; job.sentAt = t; job.result = { sent: rows.length, skipped: skip.length, profiles: new Set(rows.map(r => r.p.id)).size };
     save(); T.saveAll(); T.renderQueue();
@@ -258,7 +261,7 @@
           <label class="mv-t"><input type="radio" name="mvT" value="" ${!W.tpl ? "checked" : ""}><span><b>Eigenen Text schreiben</b></span></label></div>`
           : `<p class="mv-warn">Für diese Zielgruppe ist noch keine Massenvorlage hinterlegt. Schreib unten einen Text – du kannst ihn gleich als Vorlage speichern.</p>`}
         <div class="field"><label for="mvText">Text</label>
-          <div class="mv-ph"><span class="hint">Platzhalter einfügen:</span><button type="button" data-ph="{name}">{name} = Nickname des Kunden</button><button type="button" data-ph="{profil}">{profil} = Profilname</button><button type="button" data-ph="{ort}">{ort} = Ort des Profils</button></div>
+          <div class="mv-ph"><span class="hint">Platzhalter einfügen:</span><button type="button" data-ph="{vorname}">{vorname} = Vorname des Kunden</button><button type="button" data-ph="{name}">{name} = Nickname des Kunden</button><button type="button" data-ph="{profil}">{profil} = Profilname</button><button type="button" data-ph="{ort}">{ort} = Ort des Profils</button></div>
           <textarea class="input" id="mvText" rows="5" placeholder="Hallo {name}, …">${esc(W.text)}</textarea><span class="hint" id="mvLen"></span></div>
         <label class="small" style="display:flex;gap:8px;align-items:center" id="mvSaveRow"><input type="checkbox" id="mvSaveTpl" ${W.saveTpl ? "checked" : ""}> Als Massenvorlage speichern <input class="input" id="mvTplName" maxlength="40" placeholder="Kurzname" value="${esc(W.tplName)}" style="max-width:220px;min-height:38px"></label>
         <div class="mv-nav"><button class="btn ghost" data-back>Zurück</button><button class="btn primary" data-next>Weiter</button></div></div>`;
@@ -329,7 +332,7 @@
       <p class="hint" style="margin:0 0 14px">${G.fixedSt ? "Nur Testmitglieder" : job.st === "T" ? "Nur Testmitglieder" : job.st === "K" ? "Nur zahlende Kunden" : "Alle"} · Umkreis ${job.radius} km${job.fallback ? " (sonst nächstes Profil)" : ""}${job.tpl ? " · Vorlage " + mNo(job.tpl) : " · eigener Text"}</p>
       <div class="mv-kpis"><div class="card"><small>Empfänger</small><strong>${pl.rows.length}</strong></div><div class="card"><small>Profile beteiligt</small><strong>${np}</strong></div><div class="card"><small>Übersprungen</small><strong>${pl.skip.length}</strong></div></div>
       ${far ? `<p class="mv-warn">${far} Empfänger ${far === 1 ? "bekommt" : "bekommen"} eine Nachricht von einem Profil außerhalb von ${job.radius} km (gelb markiert).</p>` : ""}
-      ${first ? `<div class="mv-prev"><small>Beispiel: „${esc(first.p.name)}“ an ${esc(first.nick)}</small>${esc(fill(job.text, first.nick, first.p))}</div>` : `<p class="mv-warn">Aktuell gibt es keinen Empfänger für diese Auswahl.</p>`}
+      ${first ? `<div class="mv-prev"><small>Beispiel: „${esc(first.p.name)}“ an ${esc(first.nick)}</small>${esc(fill(job.text, first.nick, first.p, first.c))}</div>` : `<p class="mv-warn">Aktuell gibt es keinen Empfänger für diese Auswahl.</p>`}
       ${pl.rows.length ? `<table class="mv"><thead><tr><th>Kunde</th><th class="hide-sm">Wohnort</th><th>schreibt an ihn/sie</th><th class="num">Entfernung</th>${T.isAdmin() ? `<th class="hide-sm">Profil gehört</th>` : ""}</tr></thead><tbody>
         ${pl.rows.slice(0, 100).map(r => `<tr><td>${esc(r.nick)} ${stBadge(r.c)}</td><td class="hide-sm">${esc(r.c.ort || "–")}</td><td>${esc(r.p.name)}<br><small class="muted">${esc(r.p.city || "")}</small></td><td class="num ${r.far ? "far" : ""}">${r.d} km</td>${T.isAdmin() ? `<td class="hide-sm">${esc(T.ownerName(r.p.owner))}</td>` : ""}</tr>`).join("")}
         </tbody></table>${pl.rows.length > 100 ? `<p class="hint">… und ${pl.rows.length - 100} weitere.</p>` : ""}` : ""}
@@ -345,7 +348,7 @@
         <p class="hint" style="margin:0 0 12px">Massenvorlagen haben eigene Nummern (M-…). Dieselbe Massenvorlage geht nie zweimal an denselben Kunden.</p>
         <div class="field"><label for="mtG">Zielgruppe</label><select class="input" id="mtG">${GROUPS.map(g => `<option value="${g.id}" ${(editT ? editT.group : W.group) === g.id ? "selected" : ""}>${g.name}</option>`).join("")}</select><span class="hint" id="mtTip"></span></div>
         <div class="field"><label for="mtN">Kurzname</label><input class="input" id="mtN" maxlength="40" value="${esc(editT ? editT.name : "")}"></div>
-        <div class="field"><label for="mtX">Text</label><textarea class="input" id="mtX" rows="5" placeholder="Hallo {name}, …">${esc(editT ? editT.text : "")}</textarea><span class="hint">Platzhalter: {name} = Kunde · {profil} = Profilname · {ort} = Ort des Profils</span></div>
+        <div class="field"><label for="mtX">Text</label><textarea class="input" id="mtX" rows="5" placeholder="Hallo {name}, …">${esc(editT ? editT.text : "")}</textarea><span class="hint">Platzhalter: {vorname} = Vorname des Kunden · {name} = Nickname · {profil} = Profilname · {ort} = Ort des Profils</span></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary">${editT ? "Speichern" : "Vorlage speichern"}</button>${editT ? `<button type="button" class="btn ghost" id="mtCancel">Abbrechen</button>` : ""}</div></form>
       <div class="card pad"><h2 style="font-size:22px;margin-bottom:12px">${T.isAdmin() ? "Alle Massenvorlagen" : "Massenvorlagen"}</h2>
         ${list.length ? list.map(t => { const uses = Object.values(msent).filter(a => a.some(x => x.tpl === t.nr)).length;

@@ -89,3 +89,24 @@ GEPLANT (Konzept 16.11.2026) – Wohnort der Profile pro Kunde („Kontakt-Ort�
   angeschrieben haben (gleichmäßig verteilt); der Ort wird dabei wie oben im Umkreis des Kunden festgelegt.
 - Ortsdaten: OpenPLZ / OpenGeoDB (PLZ, Ortsname, Koordinaten).
 - AGB/Hinweis muss ausdrücklich sagen, dass Angaben der Profile (auch der Wohnort) erfunden sind und Treffen nicht möglich sind.
+
+Stand 16.11.2026 – Registrierung, Vorname, Support
+- Pflichtangaben bei der Registrierung: Nickname (einmalig), Vorname (nur Buchstaben, mind. 2), E-Mail, Passwort,
+  wer sucht wen, Beziehung/Abenteuer, Geburtsdatum (ab 18), PLZ + Umkreis.
+- Nickname und Vorname kann der Kunde NICHT selbst ändern (Mein Profil zeigt sie gesperrt) – nur der Admin im
+  Mitarbeiterbereich unter „🛟 Support“. Server: Änderungen protokollieren, Nickname-Eindeutigkeit serverseitig prüfen.
+- Support: Kunde schreibt unter „Hilfe & Kontakt“ kostenlos (keine Coins), sieht dort seine Anfragen und Antworten.
+  Admin-Reiter „🛟 Support“: offene/erledigte Anfragen, antworten, Namen ändern. (support.js)
+- Massenversand: neuer Platzhalter {vorname}.
+- Hilfe-FAQ: Hinweis „Profile werden von Moderatoren geführt, Angaben (auch Wohnort) erfunden, Treffen nicht möglich“.
+
+GEPLANT – Profile wachsen mit den Regionen („Region aufbauen“)
+- Profil-Pool: viele Blanko-Profile (Bild + Alter + Rubrik + Grundtext, noch ohne Ort). Bilder nur mit
+  Nutzungsrechten (lizenzierte Fotos mit Model-Release oder KI-generiert) – nie Fotos echter Privatpersonen.
+  KI-Bilder: Kennzeichnungspflichten (EU-KI-Verordnung) vom Anwalt prüfen lassen.
+- Admin sieht neue Registrierungen nach PLZ-Bereich und klickt „Region aufbauen“: PLZ-Bereich, Anzahl, Altersklasse,
+  Rubrik (z. B. 20 × Frauen 50–60 · Abenteuer). Das System nimmt Profile aus dem Pool, gibt ihnen echte Orte im
+  Umkreis (5 km bis Kunden-Umkreis), teilt sie Mitarbeitern zu und schaltet sie stückweise frei (z. B. 5 pro Tag).
+- KI darf Profiltexte als Entwurf vorschlagen (Mitarbeiter prüft). Grundlage: Region, Altersklasse, Rubrik –
+  NICHT das persönliche Profil eines einzelnen Kunden.
+- Zusammen mit „Kontakt-Ort“ (oben): einmal festgelegte Orte bleiben für den jeweiligen Kunden gleich.

@@ -77,7 +77,7 @@ NMA.sendHeart = id => {
 };
 NMA.coins = () => store.get("coins",5);
 NMA.setCoins = n => {store.set("coins",n);document.querySelectorAll("[data-coins]").forEach(e=>e.textContent=n+" Coins")};
-NMA.user = () => store.get("user",{nick:"Michael Nordlicht",age:56,plz:"20095",city:"Hamburg",radius:"50",job:"Elektriker",about:"Ich freue mich auf nette Gespräche und vielleicht mehr.",looking:"Beziehung"});
+NMA.user = () => store.get("user",{nick:"Michael Nordlicht",vorname:"Michael",age:56,plz:"20095",city:"Hamburg",radius:"50",job:"Elektriker",about:"Ich freue mich auf nette Gespräche und vielleicht mehr.",looking:"Beziehung"});
 /* Vergebene Nicknames (Demo). Jeder Nickname darf nur einmal existieren – der Server prüft das endgültig. */
 NMA.takenNicks = () => NMA.profiles.map(p=>p.name).concat(["Blonde Carola","Claudia Herz"]);
 NMA.nickFree = n => !NMA.takenNicks().some(t=>t.toLowerCase()===n.trim().toLowerCase());

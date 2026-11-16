@@ -21,24 +21,48 @@
     <div style="display:grid;gap:20px">
       <section class="card pad">
         <details class="faq"><summary>Was kostet die Nutzung?</summary><p>Anmeldung, Profil, Suche und Mails sind kostenlos. Eine Chatnachricht kostet 1 Coin. Coins kaufst du einmalig unter „Coins aufladen“ – es gibt kein Abo.</p></details>
-        <details class="faq"><summary>Wie bearbeite ich mein Profil?</summary><p>Tippe auf „Ich“ bzw. „Mein Bereich“ und dann auf „Profil bearbeiten“. Dort änderst du Foto, Text und Interessen.</p></details>
+        <details class="faq"><summary>Wie bearbeite ich mein Profil?</summary><p>Tippe auf „Ich“ bzw. „Mein Bereich“ und dann auf „Profil bearbeiten“. Dort änderst du Foto, Text, Interessen und deine Postleitzahl. Nickname und Vorname ändert nur der Support – schreib uns einfach unten.</p></details>
         <details class="faq"><summary>Wie melde oder blockiere ich jemanden?</summary><p>Im Profil unter „Melden / Blockieren“ oder im Chat über die drei Punkte oben rechts. Unser Support prüft jede Meldung vertraulich.</p></details>
-        <details class="faq"><summary>Wie schütze ich mich beim Kennenlernen?</summary><p>Gib keine Bankdaten, Passwörter oder deine Adresse weiter und überweise niemandem Geld. Triff dich beim ersten Mal an einem öffentlichen Ort und sag einer vertrauten Person Bescheid.</p></details>
+        <details class="faq"><summary>Sind die Profile echte Personen? Kann ich mich treffen?</summary><p>Nein. „Nie mehr alleine“ ist ein Unterhaltungs-Chat: Alle Profile werden von Moderatoren geführt, die Angaben in den Profilen (auch der Wohnort) sind erfunden. Treffen sind deshalb nicht möglich.</p></details>
+        <details class="faq"><summary>Wie schütze ich meine Daten?</summary><p>Gib keine Bankdaten, Passwörter oder deine Adresse im Chat weiter und überweise niemandem Geld.</p></details>
         <details class="faq"><summary>Wie lösche ich mein Konto?</summary><p>Unter „Einstellungen“ ganz unten. Die Löschung wird noch einmal abgefragt.</p></details>
       </section>
-      <form class="card pad" id="f">
-        <h2 style="font-size:24px;margin-bottom:14px">Support kontaktieren</h2>
-        <div class="field"><label for="topic">Thema</label><select class="input" id="topic"><option>Allgemeine Frage</option><option>Coins &amp; Zahlung</option><option>Technisches Problem</option><option>Mitglied melden</option><option>Datenschutz</option></select></div>
-        <div class="field"><label for="msg">Deine Nachricht</label><textarea class="input" id="msg" required></textarea></div>
-        <button class="btn primary">Absenden</button>
+      <form class="card pad" id="support">
+        <h2 style="font-size:24px;margin-bottom:6px">Support anschreiben</h2>
+        <p class="hint" style="margin:0 0 14px"><b>Kostenlos</b> – Nachrichten an den Support kosten keine Coins. Die Antwort siehst du hier unter „Meine Anfragen“.</p>
+        <div class="field"><label for="topic">Thema</label><select class="input" id="topic"><option value="frage">Allgemeine Frage</option><option value="name">Nickname oder Vorname ändern</option><option value="coins">Coins &amp; Zahlung</option><option value="technik">Technisches Problem</option><option value="konto">Konto löschen</option><option value="datenschutz">Datenschutz</option></select></div>
+        <div class="field" id="newNameF" hidden><label for="newName">Wie soll es richtig heißen?</label><input class="input" id="newName" maxlength="30" placeholder="z. B. Vorname: Michael"></div>
+        <div class="field"><label for="msg">Deine Nachricht</label><textarea class="input" id="msg" required placeholder="Beschreib kurz dein Anliegen."></textarea></div>
+        <button class="btn primary">Kostenlos absenden</button>
       </form>
+      <section class="card pad"><h2 style="font-size:24px;margin-bottom:10px">Meine Anfragen</h2><div id="tickets"></div></section>
     </div>
   </div>
 </main>
 <script src="app.js"></script>
+<style>
+.tk{padding:14px 0;border-bottom:1px solid var(--line)}.tk:last-child{border-bottom:0}
+.tk .top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.tk small{color:var(--muted)}
+.tk p{margin:6px 0;white-space:pre-wrap}.tk .ans{margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#0d5f5a}
+.tk-st{font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:#2a2112;color:#f6d79f}.tk-st.erledigt{background:#123a2a;color:#9be8bf}
+</style>
 <script>{
-  const f=document.getElementById("f");
-  f.addEventListener("submit",e=>{e.preventDefault();if(!f.checkValidity()){NMA.toast("Bitte schreib kurz dein Anliegen.");return}f.reset();NMA.toast("Danke! Der Support meldet sich per E-Mail (Demo).")});
+  /* Support-Anfragen (Demo: localStorage "support"; Server: Tabelle support_tickets, kostenlos, keine Coins) */
+  const $=id=>document.getElementById(id),f=$("support"),u=NMA.user();
+  const TOP={frage:"Allgemeine Frage",name:"Nickname oder Vorname ändern",coins:"Coins & Zahlung",technik:"Technisches Problem",konto:"Konto löschen",datenschutz:"Datenschutz"};
+  const fmt=t=>new Date(t).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  const showName=()=>{$("newNameF").hidden=$("topic").value!=="name"};
+  if(NMA.param("thema")&&TOP[NMA.param("thema")]){$("topic").value=NMA.param("thema");}
+  $("topic").addEventListener("change",showName);showName();
+  const render=()=>{const mine=NMA.store.get("support",[]).filter(t=>t.nick===u.nick).sort((a,b)=>b.t-a.t);
+    $("tickets").innerHTML=mine.length?mine.map(t=>`<div class="tk"><div class="top"><b>${NMA.esc(TOP[t.topic]||t.topic)}</b><span class="tk-st ${t.status}">${t.status==="erledigt"?"erledigt":"offen"}</span><small>${fmt(t.t)}</small></div><p>${NMA.esc(t.msg)}</p>${(t.replies||[]).map(r=>`<div class="ans"><small style="color:#bfe0dc">Support · ${fmt(r.t)}</small><br>${NMA.esc(r.text)}</div>`).join("")}</div>`).join(""):'<p class="muted">Noch keine Anfragen.</p>'};
+  f.addEventListener("submit",e=>{e.preventDefault();const msg=$("msg").value.trim();
+    if(msg.length<5){NMA.toast("Bitte schreib kurz dein Anliegen.");return}
+    const all=NMA.store.get("support",[]);
+    all.push({id:"t"+Date.now(),nick:u.nick,vorname:u.vorname||"",topic:$("topic").value,wish:$("topic").value==="name"?$("newName").value.trim():"",msg,t:Date.now(),status:"offen",replies:[]});
+    NMA.store.set("support",all);f.reset();showName();render();NMA.toast("Danke! Deine Anfrage ist beim Support angekommen.")});
+  addEventListener("storage",e=>{if(e.key==="nma_support")render()});
+  render();
 }</script>
 </body>
 </html>
