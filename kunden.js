@@ -57,10 +57,12 @@
   const css = document.createElement("style");
   css.textContent = `
   .kd-list td{cursor:pointer}.kd-list tr:hover td{background:#ffffff07}
-  .kd-card{width:min(1100px,100%);max-height:94svh;overflow:auto;padding:22px}
+  .modal .card.kd-card{width:min(1150px,100%);max-width:none;max-height:94svh;overflow:auto;padding:24px 26px}
+  .kd-checks label input{flex:none}
+  .kd-kv b .btn{white-space:nowrap}
   .kd-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px}
   @media(max-width:860px){.kd-grid{grid-template-columns:1fr}}
-  .kd-kv{display:grid;grid-template-columns:minmax(120px,max-content) 1fr;gap:7px 14px;font-size:15px}
+  .kd-kv{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr);gap:7px 14px;font-size:15px}
   .kd-kv span{color:var(--muted)}.kd-kv b{font-weight:600;overflow-wrap:anywhere}
   .kd-box{padding:14px;border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
   .kd-box h4{margin:0 0 10px;font-size:13px;letter-spacing:.02em;color:var(--muted)}
