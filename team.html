@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Team – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="stylesheet" href="style.css">
+<style>
+.tb-tag{padding:4px 10px;border-radius:20px;background:#2a2112;color:#f6d79f;font-size:12px;font-weight:700;margin-left:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{min-height:40px;padding:0 16px;border-radius:30px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600}
+.tabs button.on{background:#0f2a2b;color:var(--accent);border-color:#1f5552}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.kpi{padding:18px 20px}
+.kpi small{display:block;color:var(--muted);font-size:14px}
+.kpi strong{display:block;font:700 clamp(28px,3.4vw,38px)/1.1 var(--serif);margin-top:6px;white-space:nowrap}
+.kpi .delta{font-size:13px;margin-top:4px}
+.up{color:var(--ok)}.down{color:var(--danger)}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.panel h2{font-size:22px;margin-bottom:4px}
+.panel>p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.bars{display:grid;gap:12px}
+.bar{display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) 56px;align-items:center;gap:12px;font-size:14px}
+.bar .track{height:14px;border-radius:8px;background:#10292a;overflow:hidden}
+.bar .fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+.bar b{text-align:right;font-variant-numeric:tabular-nums}
+.hours{display:flex;align-items:flex-end;gap:4px;height:170px;padding-top:10px}
+.hours div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.hours i{display:block;width:100%;border-radius:5px 5px 0 0;background:#1d5c58}
+.hours i.peak{background:var(--accent)}
+.hours span{font-size:11px;color:var(--muted)}
+table.staff{width:100%;border-collapse:collapse;font-size:15px}
+.staff th{text-align:left;color:var(--muted);font-weight:600;font-size:13px;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.staff td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.staff td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.staff tr.off td{opacity:.5}
+.who{display:flex;align-items:center;gap:10px}
+.role{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:#10292a;color:#bdf3ee}
+.role.admin{background:#2a2112;color:#f6d79f}
+.st{white-space:nowrap}
+.st::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#5d7472}
+.st.online::before{background:var(--ok)}.st.pause::before{background:var(--gold)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px}
+.toolbar .search{min-width:240px}
+.form-modal .card{width:min(520px,100%)}
+@media(max-width:700px){
+  .staff thead{display:none}
+  .staff tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .staff td{border:0;padding:0;display:flex;flex-direction:column;font-size:14px}
+  .staff td::before{content:attr(data-l);color:var(--muted);font-size:12px}
+  .staff td.num{text-align:left}
+  .staff td:first-child{grid-column:1/-1}.staff td:first-child::before{display:none}
+  .staff td:last-child{grid-column:1/-1;flex-direction:row;gap:8px}.staff td:last-child::before{display:none}
+  .bar{grid-template-columns:minmax(0,96px) minmax(0,1fr) 46px}
+  #me,.tb-tag{display:none}
+  .staff .role{align-self:flex-start}
+}
+</style>
+</head>
+<body data-page="team">
+<header class="topbar">
+  <a class="brand" href="team.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span><span class="tb-tag">Team</span></a>
+  <div class="top-right"><span class="muted small" id="me">Angemeldet als Admin</span><a class="btn sm ghost" href="mitarbeiter-login.html">Abmelden</a></div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div><h1>Mitarbeiterbereich</h1><p>Statistik und Verwaltung des Moderatoren-Teams.</p></div>
+    <div class="tabs" role="tablist"><button class="on" data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab">Mitarbeiter</button></div>
+  </div>
+
+  <!-- ================= STATISTIK ================= -->
+  <section id="stats">
+    <div class="toolbar">
+      <div class="tabs" id="range"><button class="on" data-r="1">Heute</button><button data-r="7">7 Tage</button><button data-r="30">30 Tage</button></div>
+      <span class="demo">Beispieldaten – echte Zahlen liefert später der Server.</span>
+    </div>
+    <div class="kpis">
+      <div class="card kpi"><small>Beantwortete Nachrichten</small><strong id="kMsg">–</strong><div class="delta" id="dMsg"></div></div>
+      <div class="card kpi"><small>Ø Antwortzeit</small><strong id="kTime">–</strong><div class="delta" id="dTime"></div></div>
+      <div class="card kpi"><small>Mitarbeiter online</small><strong id="kOn">–</strong><div class="delta muted" id="dOn"></div></div>
+      <div class="card kpi"><small>Wartende Nachrichten</small><strong id="kWait">–</strong><div class="delta muted">älteste: <span id="kOld">–</span></div></div>
+    </div>
+    <div class="two">
+      <div class="card pad panel"><h2>Nachrichten pro Mitarbeiter</h2><p id="barsSub">Beantwortete Nachrichten im gewählten Zeitraum</p><div class="bars" id="bars"></div></div>
+      <div class="card pad panel"><h2>Antwortzeit pro Mitarbeiter</h2><p>Durchschnitt in Minuten – kürzer ist besser</p><div class="bars" id="rt"></div></div>
+    </div>
+    <div class="card pad panel" style="margin-top:20px"><h2>Eingehende Nachrichten nach Uhrzeit</h2><p>Wann am meisten los ist – hilft bei der Schichtplanung</p><div class="hours" id="hours"></div></div>
+  </section>
+
+  <!-- ================= MITARBEITER ================= -->
+  <section id="staff" hidden>
+    <div class="toolbar">
+      <label class="search"><span aria-hidden="true">⌕</span><input type="search" id="q" placeholder="Mitarbeiter suchen" aria-label="Mitarbeiter suchen"></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><select class="input" id="fRole" style="width:auto" aria-label="Rolle filtern"><option value="">Alle Rollen</option><option>Admin</option><option>Moderator</option></select><button class="btn primary" id="add">+ Mitarbeiter anlegen</button></div>
+    </div>
+    <div class="card pad" style="padding-top:8px">
+      <table class="staff">
+        <thead><tr><th>Name</th><th>Rolle</th><th>Status</th><th>Letzter Login</th><th class="num">Nachrichten (7 T.)</th><th class="num">Ø Antwort</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="hint" style="margin-top:12px"><b>Admin</b> darf Mitarbeiter verwalten und alle Statistiken sehen. <b>Moderator</b> sieht nur seinen eigenen Posteingang und seine Zahlen.</p>
+  </section>
+</main>
+
+<script src="app.js"></script>
+<script>{
+  const $=id=>document.getElementById(id);
+  const KEY="staff";
+  const seed=[
+    {id:1,name:"Sandra K.",user:"sandra",role:"Admin",status:"online",last:"Heute, 08:02",msg:[64,402,1690],rt:[3.1,3.4,3.6],active:true,g:"linear-gradient(145deg,#c79a54,#4b3517)"},
+    {id:2,name:"Marco B.",user:"marco",role:"Moderator",status:"online",last:"Heute, 12:15",msg:[81,515,2120],rt:[2.6,2.9,3.0],active:true,g:"linear-gradient(145deg,#5b7aa0,#1c2a3c)"},
+    {id:3,name:"Julia W.",user:"julia",role:"Moderator",status:"pause",last:"Heute, 10:40",msg:[47,388,1610],rt:[4.2,3.9,4.1],active:true,g:"linear-gradient(145deg,#b0566f,#3b1825)"},
+    {id:4,name:"Tim R.",user:"tim",role:"Moderator",status:"online",last:"Heute, 14:01",msg:[29,301,1302],rt:[5.8,5.1,4.9],active:true,g:"linear-gradient(145deg,#4f8f87,#173a37)"},
+    {id:5,name:"Nicole H.",user:"nicole",role:"Moderator",status:"offline",last:"Gestern, 22:47",msg:[0,276,1188],rt:[0,3.7,3.8],active:true,g:"linear-gradient(145deg,#8a6aa8,#2c2240)"},
+    {id:6,name:"Dennis P.",user:"dennis",role:"Moderator",status:"offline",last:"03.11.2026",msg:[0,0,410],rt:[0,0,6.2],active:false,g:"linear-gradient(145deg,#7b8a5a,#283019)"}
+  ];
+  let staff=NMA.store.get(KEY,null)||seed;
+  const persist=()=>NMA.store.set(KEY,staff);
+  let range=1;const ri=()=>range===1?0:range===7?1:2;
+  const fmtMin=m=>m?`${m.toFixed(1).replace(".",",")} Min.`:"–";
+  const nf=n=>n.toLocaleString("de-DE");
+
+  /* ---------- Statistik ---------- */
+  const renderStats=()=>{
+    const i=ri(),act=staff.filter(s=>s.active);
+    const total=act.reduce((a,s)=>a+s.msg[i],0);
+    const withRt=act.filter(s=>s.rt[i]);
+    const avg=withRt.length?withRt.reduce((a,s)=>a+s.rt[i]*s.msg[i],0)/Math.max(1,withRt.reduce((a,s)=>a+s.msg[i],0)):0;
+    const prev={0:[198,3.6],1:[1730,3.8],2:[7900,4.0]}[i];
+    $("kMsg").textContent=nf(total);
+    const dm=Math.round((total-prev[0])/prev[0]*100);
+    $("dMsg").innerHTML=`<span class="${dm>=0?"up":"down"}">${dm>=0?"▲":"▼"} ${Math.abs(dm)} %</span> <span class="muted">zum Vorzeitraum</span>`;
+    $("kTime").textContent=fmtMin(avg);
+    const dt=avg-prev[1];
+    $("dTime").innerHTML=`<span class="${dt<=0?"up":"down"}">${dt<=0?"▼":"▲"} ${Math.abs(dt).toFixed(1).replace(".",",")} Min.</span> <span class="muted">zum Vorzeitraum</span>`;
+    const on=act.filter(s=>s.status==="online").length,pause=act.filter(s=>s.status==="pause").length;
+    $("kOn").textContent=`${on} von ${act.length}`;$("dOn").textContent=pause?`${pause} in Pause`:"niemand in Pause";
+    $("kWait").textContent="12";$("kOld").textContent="4 Min.";
+    $("barsSub").textContent=`Beantwortete Nachrichten – ${range===1?"heute":"letzte "+range+" Tage"}`;
+    const sorted=[...act].sort((a,b)=>b.msg[i]-a.msg[i]),max=Math.max(1,...sorted.map(s=>s.msg[i]));
+    $("bars").innerHTML=sorted.map(s=>`<div class="bar"><span>${NMA.esc(s.name)}</span><span class="track"><span class="fill" style="display:block;width:${s.msg[i]/max*100}%"></span></span><b>${nf(s.msg[i])}</b></div>`).join("");
+    const rs=act.filter(s=>s.rt[i]).sort((a,b)=>a.rt[i]-b.rt[i]),rmax=Math.max(1,...rs.map(s=>s.rt[i]));
+    $("rt").innerHTML=rs.length?rs.map(s=>`<div class="bar"><span>${NMA.esc(s.name)}</span><span class="track"><span class="fill" style="display:block;width:${s.rt[i]/rmax*100}%;background:${s.rt[i]>5?"linear-gradient(90deg,#9a5a30,#e3b26a)":""}"></span></span><b>${s.rt[i].toFixed(1).replace(".",",")}</b></div>`).join(""):'<p class="muted">Keine Daten.</p>';
+    const h=[2,1,1,0,0,0,1,2,4,6,7,8,9,9,8,8,10,12,15,19,22,24,18,9].map(v=>v*(range===1?1:range));
+    const hm=Math.max(...h);
+    $("hours").innerHTML=h.map((v,k)=>`<div title="${k}–${k+1} Uhr: ${nf(v)} Nachrichten"><i class="${v>=hm*.8?"peak":""}" style="height:${v/hm*100}%"></i><span>${k%3===0?k:""}</span></div>`).join("");
+  };
+
+  /* ---------- Mitarbeiter ---------- */
+  const stLabel={online:"Online",pause:"Pause",offline:"Offline"};
+  const renderStaff=()=>{
+    const q=$("q").value.trim().toLowerCase(),r=$("fRole").value;
+    const list=staff.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.user.includes(q))&&(!r||s.role===r));
+    $("rows").innerHTML=list.length?list.map(s=>`<tr class="${s.active?"":"off"}">
+      <td data-l="Name"><span class="who"><span class="avatar" style="--g:${s.g};width:38px;height:38px;font-size:14px">${NMA.esc(s.name[0])}</span><span><b>${NMA.esc(s.name)}</b><br><span class="muted small">@${NMA.esc(s.user)}${s.active?"":" · deaktiviert"}</span></span></span></td>
+      <td data-l="Rolle"><span class="role ${s.role==="Admin"?"admin":""}">${s.role}</span></td>
+      <td data-l="Status"><span class="st ${s.status}">${s.active?stLabel[s.status]:"Gesperrt"}</span></td>
+      <td data-l="Letzter Login">${s.last}</td>
+      <td data-l="Nachrichten (7 T.)" class="num">${nf(s.msg[1])}</td>
+      <td data-l="Ø Antwort" class="num">${fmtMin(s.rt[1])}</td>
+      <td><button class="btn sm" data-edit="${s.id}">Bearbeiten</button><button class="btn sm ghost" data-toggle="${s.id}">${s.active?"Sperren":"Freischalten"}</button></td></tr>`).join(""):'<tr><td colspan="7" class="empty">Keine Mitarbeiter gefunden.</td></tr>';
+  };
+
+  const form=(s)=>{
+    const isNew=!s; s=s||{name:"",user:"",role:"Moderator",status:"offline"};
+    const m=document.createElement("div");m.className="modal form-modal";
+    m.innerHTML=`<form class="card" novalidate><h2>${isNew?"Mitarbeiter anlegen":"Mitarbeiter bearbeiten"}</h2>
+      <div class="form-grid" style="margin-top:14px">
+        <div class="field"><label for="fn">Name</label><input class="input" id="fn" required value="${NMA.esc(s.name)}"></div>
+        <div class="field"><label for="fu">Benutzername</label><input class="input" id="fu" required pattern="[a-z0-9._-]{3,}" value="${NMA.esc(s.user)}"><span class="hint">Kleinbuchstaben, mind. 3 Zeichen</span></div>
+        <div class="field"><label for="fr">Rolle</label><select class="input" id="fr"><option ${s.role==="Moderator"?"selected":""}>Moderator</option><option ${s.role==="Admin"?"selected":""}>Admin</option></select></div>
+        <div class="field"><label for="fe">E-Mail</label><input class="input" id="fe" type="email" value="${NMA.esc(s.mail||"")}" placeholder="für das Einladungs-Passwort"></div>
+      </div>
+      ${isNew?'<p class="hint">Der neue Mitarbeiter bekommt per E-Mail einen Link, um sein Passwort selbst festzulegen.</p>':""}
+      <div class="row"><button type="button" class="btn ghost" data-x>Abbrechen</button><button class="btn primary">${isNew?"Anlegen":"Speichern"}</button></div></form>`;
+    document.body.appendChild(m);
+    const f=m.querySelector("form");m.querySelector("#fn").focus();
+    m.addEventListener("click",e=>{if(e.target===m||e.target.hasAttribute("data-x"))m.remove()});
+    f.addEventListener("submit",e=>{e.preventDefault();
+      const name=m.querySelector("#fn").value.trim(),user=m.querySelector("#fu").value.trim().toLowerCase();
+      if(!name||!/^[a-z0-9._-]{3,}$/.test(user)){NMA.toast("Bitte Name und gültigen Benutzernamen eingeben.");return}
+      if(staff.some(x=>x.user===user&&x.id!==s.id)){NMA.toast(`@${user} ist schon vergeben.`);return}
+      const data={name,user,role:m.querySelector("#fr").value,mail:m.querySelector("#fe").value.trim()};
+      if(isNew){staff.push(Object.assign({id:Date.now(),status:"offline",last:"noch nie",msg:[0,0,0],rt:[0,0,0],active:true,g:"linear-gradient(145deg,#2f6f69,#123234)"},data));NMA.toast(`${name} wurde angelegt (Demo).`)}
+      else{Object.assign(s,data);NMA.toast("Gespeichert.")}
+      persist();m.remove();renderStaff();renderStats()});
+  };
+
+  $("rows").addEventListener("click",e=>{
+    const ed=e.target.closest("[data-edit]"),tg=e.target.closest("[data-toggle]");
+    if(ed)form(staff.find(s=>s.id==ed.dataset.edit));
+    if(tg){const s=staff.find(x=>x.id==tg.dataset.toggle);
+      if(s.role==="Admin"&&s.active&&staff.filter(x=>x.role==="Admin"&&x.active).length===1){NMA.toast("Der letzte Admin kann nicht gesperrt werden.");return}
+      NMA.modal({title:s.active?`${s.name} sperren?`:`${s.name} freischalten?`,text:s.active?"Der Zugang wird sofort gesperrt. Statistiken bleiben erhalten.":"Der Zugang wird wieder freigegeben.",cancel:"Abbrechen",ok:s.active?"Sperren":"Freischalten",
+        onOk:()=>{s.active=!s.active;if(!s.active)s.status="offline";persist();renderStaff();renderStats()}})}
+  });
+  $("add").addEventListener("click",()=>form());
+  $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
+  document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
+    $("stats").hidden=b.dataset.tab!=="stats";$("staff").hidden=b.dataset.tab!=="staff";}));
+  $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
+    $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
+  renderStats();renderStaff();
+}</script>
+</body>
+</html>

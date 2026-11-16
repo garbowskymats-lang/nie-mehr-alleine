@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mitarbeiter-Login – Nie mehr alleine</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="team-login">
+<main class="auth" style="grid-template-columns:1fr">
+  <div class="auth-side">
+    <a class="brand" href="index.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span></a>
+    <form class="card auth-card" data-next="team.html" novalidate>
+      <h1>Mitarbeiter-Login</h1>
+      <p>Nur für das Team. Melde dich mit deinem Benutzernamen an.</p>
+      <div class="field"><label for="u">Benutzername</label><input class="input" id="u" autocomplete="username" required></div>
+      <div class="field"><label for="p">Passwort</label><input class="input" id="p" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary wide" type="submit">Anmelden</button>
+      <p class="demo" style="margin-top:16px">Demo: Beliebige Eingaben funktionieren. Später prüft der Server Benutzername, Passwort und Rolle.</p>
+    </form>
+  </div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
