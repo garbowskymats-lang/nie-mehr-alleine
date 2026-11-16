@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Übersicht – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member" data-page="uebersicht">
+<main class="page">
+  <p class="notice">Unterhaltungs-Chat mit moderierten Profilen: Die Profile werden von Moderatoren geführt.</p>
+  <section class="hello">
+    <div class="card welcome">
+      <p class="kicker" id="greetSmall">Willkommen zurück</p>
+      <h1 id="greet">Schön, dass du da bist!</h1>
+      <p class="muted" id="greetText" style="margin:0">Du hast neue Nachrichten. Schau rein oder entdecke, wer gerade online ist.</p>
+      <div class="actions"><a class="btn primary" href="suche.html">Menschen entdecken</a><a class="btn" href="chat.html">Zum Chat</a></div>
+    </div>
+    <div class="stats">
+      <a class="card stat" href="chat.html"><strong id="sChat">2</strong><span>Ungelesene Chats</span></a>
+      <a class="card stat" href="postfach.html"><strong id="sMail">1</strong><span>Neue Mails</span></a>
+      <a class="card stat" href="mein-profil.html"><strong>7</strong><span>Profilbesucher heute</span></a>
+      <a class="card stat" href="suche.html"><strong id="sLiked">0</strong><span>Gemerkte Profile</span></a>
+    </div>
+  </section>
+
+  <div class="section-title"><h2>Letzte Unterhaltungen</h2><a class="link" href="chat.html">Alle ansehen</a></div>
+  <div class="card list" id="recent"></div>
+
+  <div class="section-title"><h2>Gerade online in deiner Nähe</h2><a class="link" href="suche.html">Zur Suche</a></div>
+  <div class="people" id="online"></div>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const u=NMA.user();
+  if(NMA.param("neu")){document.getElementById("greetSmall").textContent="Willkommen";document.getElementById("greet").textContent=`Hallo ${u.nick}, dein Profil ist bereit!`;document.getElementById("greetText").innerHTML='Du hast 5 Coins zum Start geschenkt bekommen. Ergänze jetzt ein Foto – Profile mit Foto bekommen viel mehr Nachrichten.'}
+  else document.getElementById("greet").textContent=`Schön, dass du da bist, ${u.nick}!`;
+  document.getElementById("sLiked").textContent=NMA.store.get("liked",[]).length;
+  document.getElementById("sChat").textContent=Object.values(NMA.unread).reduce((a,b)=>a+b,0);
+  document.getElementById("sMail").textContent=NMA.mails.filter(m=>m.unread).length;
+  document.getElementById("recent").innerHTML=Object.keys(NMA.chats).map(id=>{const p=NMA.get(id),msgs=NMA.chats[id].filter(m=>m.x),last=msgs[msgs.length-1];const n=NMA.unread[id]||0;
+    return `<a class="list-row" href="chat.html?mit=${id}">${NMA.avatar(p)}<span class="grow"><strong>${p.name}, ${p.age}</strong><span class="muted" style="display:block">${last.t==="me"?"Du: ":""}${NMA.esc(last.x)}</span></span><span class="time">${last.h}</span>${n?`<span class="unread-n">${n}</span>`:""}</a>`}).join("");
+  document.getElementById("online").innerHTML=NMA.profiles.filter(p=>p.online&&p.sex==="w").slice(0,4).map(p=>`<article class="card person"><a href="profil.html?id=${p.id}">${NMA.photo(p)}</a><div class="body"><div class="title"><h3>${p.name}, ${p.age}</h3><span class="small muted">${p.km} km</span></div><p>${p.city}</p><div class="acts"><a class="btn sm" href="profil.html?id=${p.id}">Profil</a><a class="btn sm primary" href="chat.html?mit=${p.id}">Chatten</a></div></div></article>`).join("");
+}</script>
+</body>
+</html>

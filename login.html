@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anmelden – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="login">
+<main class="auth">
+  <div class="auth-photo"><p>Schön, dass du wieder da bist.</p></div>
+  <div class="auth-side">
+    <a class="brand" href="index.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span></a>
+    <form class="card auth-card" data-next="uebersicht.html" novalidate>
+      <h1>Anmelden</h1>
+      <p>Melde dich mit deinem Nickname oder deiner E-Mail-Adresse an.</p>
+      <div class="field"><label for="nick">Nickname oder E-Mail</label><input class="input" id="nick" autocomplete="username" required></div>
+      <div class="field"><label for="pw">Passwort</label><input class="input" id="pw" type="password" autocomplete="current-password" required></div>
+      <label class="check" style="margin-bottom:18px"><input type="checkbox" checked> Angemeldet bleiben</label>
+      <button class="btn primary wide" type="submit">Anmelden</button>
+      <p class="auth-alt"><a href="passwort.html">Passwort vergessen?</a></p>
+      <p class="auth-alt">Noch kein Mitglied? <a href="register.html">Kostenlos registrieren</a></p>
+      <p class="demo">Demo: Beliebige Eingaben funktionieren, es wird nichts gespeichert.</p>
+    </form>
+  </div>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+</body>
+</html>

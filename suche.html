@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Suche – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member" data-page="suche">
+<main class="page">
+  <div class="page-head">
+    <div><h1>Menschen entdecken</h1><p><b id="count">0</b> Profile passen zu deiner Suche.</p></div>
+    <button class="btn filter-btn" id="filterBtn" aria-expanded="false" aria-controls="filters">Filter anzeigen</button>
+  </div>
+
+  <p class="notice">Unterhaltungs-Chat: Alle Profile werden von Moderatoren geführt.</p>
+  <form class="card filters" id="filters">
+    <div class="field"><label>Ich suche</label><select class="input" id="fSex"><option value="w">Frauen</option><option value="m">Männer</option><option value="">Alle</option></select></div>
+    <div class="field"><label>Alter</label><div class="range"><input class="input" id="fMin" type="number" min="18" max="99" value="40" aria-label="Alter von"><span>–</span><input class="input" id="fMax" type="number" min="18" max="99" value="65" aria-label="Alter bis"></div></div>
+    <div class="field"><label for="fKm">Entfernung</label><select class="input" id="fKm"><option value="20">bis 20 km</option><option value="50" selected>bis 50 km</option><option value="100">bis 100 km</option><option value="9999">über 100 km</option></select></div>
+    <div class="field"><label for="fLook">Sucht</label><select class="input" id="fLook"><option value="">Beides</option><option>Beziehung</option><option>Abenteuer</option></select></div>
+    <div class="field"><label for="fSort">Sortieren</label><select class="input" id="fSort"><option value="online">Online zuerst</option><option value="km">Nächste zuerst</option><option value="age">Jüngste zuerst</option></select></div>
+    <label class="check"><input type="checkbox" id="fOnline"> Nur gerade online</label>
+    <button class="btn primary" type="submit">Anzeigen</button>
+  </form>
+
+  <div class="people" id="grid"></div>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const $=id=>document.getElementById(id);
+  const liked=new Set(NMA.store.get("liked",[]));
+  const render=()=>{
+    const sex=$("fSex").value,min=+$("fMin").value||18,max=+$("fMax").value||99,km=+$("fKm").value,on=$("fOnline").checked,sort=$("fSort").value,look=$("fLook").value;
+    let list=NMA.profiles.filter(p=>(!sex||p.sex===sex)&&p.age>=min&&p.age<=max&&p.km<=km&&(!on||p.online)&&(!look||p.looking===look));
+    list.sort(sort==="km"?(a,b)=>a.km-b.km:sort==="age"?(a,b)=>a.age-b.age:(a,b)=>(b.online-a.online)||a.km-b.km);
+    $("count").textContent=list.length;
+    $("grid").innerHTML=list.length?list.map(p=>`<article class="card person"><a href="profil.html?id=${p.id}" aria-label="Profil von ${p.name}">${NMA.photo(p)}</a><div class="body"><div class="title"><h3>${p.name}, ${p.age}</h3><span class="small muted">${p.km} km</span></div><p>${NMA.esc(p.about.split(".")[0])}.</p><div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div><div class="acts"><button class="btn sm like ${liked.has(p.id)?"on":""}" data-like="${p.id}" aria-pressed="${liked.has(p.id)}">${liked.has(p.id)?"♥ Gemerkt":"♡ Merken"}</button><a class="btn sm primary" href="chat.html?mit=${p.id}">Chatten</a></div></div></article>`).join(""):'<div class="card empty" style="grid-column:1/-1">Keine Profile gefunden. Erweitere Alter oder Entfernung.</div>';
+  };
+  $("filters").addEventListener("submit",e=>{e.preventDefault();render();if(innerWidth<600){$("filters").classList.remove("open");$("filterBtn").textContent="Filter anzeigen"}});
+  ["fSex","fKm","fSort","fOnline","fLook"].forEach(id=>$(id).addEventListener("change",render));
+  $("filterBtn").addEventListener("click",()=>{const o=$("filters").classList.toggle("open");$("filterBtn").setAttribute("aria-expanded",o);$("filterBtn").textContent=o?"Filter schließen":"Filter anzeigen"});
+  $("grid").addEventListener("click",e=>{const b=e.target.closest("[data-like]");if(!b)return;const id=b.dataset.like;
+    if(liked.has(id)){liked.delete(id)}else{liked.add(id);NMA.toast(`${NMA.get(id).name} wurde gemerkt.`)}
+    NMA.store.set("liked",[...liked]);render()});
+  render();
+}</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coins aufladen – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member" data-page="coins">
+<main class="page">
+  <div class="page-head"><div><h1>Coins aufladen</h1><p>Du hast aktuell <b style="color:var(--gold)" id="have">5</b> Coins. Eine Chatnachricht kostet 1 Coin, Mails sind kostenlos.</p></div></div>
+  <p class="notice">Unterhaltungs-Chat mit moderierten Profilen: Die Profile werden von Moderatoren geführt. Mit dem Kauf von Coins bezahlst du für diese Unterhaltung.</p>
+  <div class="shop">
+    <div>
+      <h2 style="font-size:24px;margin-bottom:14px">1. Paket wählen</h2>
+      <div class="packs" id="packs" role="radiogroup" aria-label="Coin-Pakete"></div>
+      <h2 style="font-size:24px;margin:30px 0 14px">2. Zahlungsart wählen</h2>
+      <div class="pay" id="pay"></div>
+      <p class="demo" style="margin-top:20px">Beispielpreise. Pakete, Preise und Zahlungsarten legt der Betreiber fest; die Zahlung selbst läuft über den Zahlungsanbieter.</p>
+    </div>
+    <aside class="card pad summary">
+      <h2 style="font-size:24px;margin-bottom:10px">Deine Auswahl</h2>
+      <div class="line"><span>Paket</span><b id="sPack">–</b></div>
+      <div class="line"><span>Preis pro Coin</span><span id="sPer">–</span></div>
+      <div class="line"><span>Zahlungsart</span><span id="sPay">–</span></div>
+      <div class="line total"><span>Gesamt</span><span id="sTotal">–</span></div>
+      <button class="btn gold wide" id="buy" style="margin-top:14px">Zahlungspflichtig bestellen</button>
+      <p class="hint" style="margin-top:12px">Einmalzahlung, kein Abo. Die Coins sind sofort nach der Zahlung verfügbar.</p>
+    </aside>
+  </div>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const $=id=>document.getElementById(id);
+  const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+  const methods=["Kreditkarte","PayPal","Sofortüberweisung","Lastschrift","Vorkasse"];
+  let pick=2,method=0;
+  $("have").textContent=NMA.coins();
+  $("packs").innerHTML=NMA.packs.map((p,i)=>`<button class="pack" role="radio" data-i="${i}">${p.flag?`<span class="flag">${p.flag}</span>`:""}<strong>${p.coins} Coins</strong><span class="price">${eur(p.price)}</span><small>${eur(p.price/p.coins)} pro Coin</small></button>`).join("");
+  $("pay").innerHTML=methods.map((m,i)=>`<label><input type="radio" name="pay" value="${i}" ${i===0?"checked":""}> ${m}</label>`).join("");
+  const upd=()=>{document.querySelectorAll(".pack").forEach((b,i)=>{b.classList.toggle("on",i===pick);b.setAttribute("aria-checked",i===pick)});
+    const p=NMA.packs[pick];$("sPack").textContent=p.coins+" Coins";$("sPer").textContent=eur(p.price/p.coins);$("sPay").textContent=methods[method];$("sTotal").textContent=eur(p.price)};
+  $("packs").addEventListener("click",e=>{const b=e.target.closest(".pack");if(b){pick=+b.dataset.i;upd()}});
+  $("pay").addEventListener("change",e=>{method=+e.target.value;upd()});
+  $("buy").addEventListener("click",()=>{const p=NMA.packs[pick];
+    NMA.modal({title:"Weiter zum Zahlungsanbieter",text:`Hier würdest du jetzt zur Zahlung von ${eur(p.price)} per ${methods[method]} weitergeleitet. In dieser Demo werden die ${p.coins} Coins direkt gutgeschrieben.`,cancel:"Abbrechen",ok:"Demo: Gutschreiben",
+      onOk:()=>{NMA.setCoins(NMA.coins()+p.coins);$("have").textContent=NMA.coins();NMA.toast(`${p.coins} Coins gutgeschrieben (Demo).`)}})});
+  upd();
+}</script>
+</body>
+</html>

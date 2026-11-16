@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hilfe – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member" data-page="hilfe">
+<main class="page">
+  <div class="page-head"><div><h1>Hilfe &amp; Kontakt</h1><p>Antworten auf häufige Fragen – und ein direkter Draht zum Support.</p></div></div>
+  <div class="area">
+    <nav class="card subnav" aria-label="Mein Bereich"><a href="mein-profil.html">Profil bearbeiten</a><a href="coins.html">Coins aufladen</a><a href="einstellungen.html">Einstellungen</a><a class="active" href="hilfe.html">Hilfe &amp; Kontakt</a><a href="#" data-install>App installieren</a><a href="index.html">Abmelden</a></nav>
+    <div style="display:grid;gap:20px">
+      <section class="card pad">
+        <details class="faq"><summary>Was kostet die Nutzung?</summary><p>Anmeldung, Profil, Suche und Mails sind kostenlos. Eine Chatnachricht kostet 1 Coin. Coins kaufst du einmalig unter „Coins aufladen“ – es gibt kein Abo.</p></details>
+        <details class="faq"><summary>Wie bearbeite ich mein Profil?</summary><p>Tippe auf „Ich“ bzw. „Mein Bereich“ und dann auf „Profil bearbeiten“. Dort änderst du Foto, Text und Interessen.</p></details>
+        <details class="faq"><summary>Wie melde oder blockiere ich jemanden?</summary><p>Im Profil unter „Melden / Blockieren“ oder im Chat über die drei Punkte oben rechts. Unser Support prüft jede Meldung vertraulich.</p></details>
+        <details class="faq"><summary>Wie schütze ich mich beim Kennenlernen?</summary><p>Gib keine Bankdaten, Passwörter oder deine Adresse weiter und überweise niemandem Geld. Triff dich beim ersten Mal an einem öffentlichen Ort und sag einer vertrauten Person Bescheid.</p></details>
+        <details class="faq"><summary>Wie lösche ich mein Konto?</summary><p>Unter „Einstellungen“ ganz unten. Die Löschung wird noch einmal abgefragt.</p></details>
+      </section>
+      <form class="card pad" id="f">
+        <h2 style="font-size:24px;margin-bottom:14px">Support kontaktieren</h2>
+        <div class="field"><label for="topic">Thema</label><select class="input" id="topic"><option>Allgemeine Frage</option><option>Coins &amp; Zahlung</option><option>Technisches Problem</option><option>Mitglied melden</option><option>Datenschutz</option></select></div>
+        <div class="field"><label for="msg">Deine Nachricht</label><textarea class="input" id="msg" required></textarea></div>
+        <button class="btn primary">Absenden</button>
+      </form>
+    </div>
+  </div>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const f=document.getElementById("f");
+  f.addEventListener("submit",e=>{e.preventDefault();if(!f.checkValidity()){NMA.toast("Bitte schreib kurz dein Anliegen.");return}f.reset();NMA.toast("Danke! Der Support meldet sich per E-Mail (Demo).")});
+}</script>
+</body>
+</html>

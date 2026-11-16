@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Profil – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member" data-page="profil">
+<main class="page">
+  <p style="margin:0 0 18px"><a class="link" href="suche.html">← Zurück zur Suche</a></p>
+  <section class="profile" id="prof"></section>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const p=NMA.get(NMA.param("id"));
+  document.title=`${p.name}, ${p.age} – Nie mehr alleine`;
+  document.getElementById("prof").innerHTML=`${NMA.photo(p)}
+  <div class="card pad">
+    <p class="kicker">${p.online?'<span class="dot"></span>Gerade online':`Zuletzt online ${p.last}`}</p>
+    <h1>${p.name}, ${p.age}</h1>
+    <p class="muted" style="margin:8px 0 0">${p.city} · ${p.km} km entfernt</p>
+    <div class="facts"><div class="fact"><small>Sucht</small>${p.looking}</div><div class="fact"><small>Beruf</small>${p.job}</div><div class="fact"><small>Familienstand</small>${p.status}</div></div>
+    <h2 style="font-size:24px;margin-bottom:8px">Über mich</h2>
+    <p style="margin:0 0 16px;color:#cfe3e1">${NMA.esc(p.about)}</p>
+    <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+    <p class="notice" style="margin:22px 0 0">Moderiertes Profil – wird von einem Moderator geführt.</p>
+    <div class="acts"><a class="btn primary" href="chat.html?mit=${p.id}">Chat starten</a><a class="btn" href="postfach.html?an=${p.id}">Mail schreiben</a><button class="btn ghost" id="report">Melden / Blockieren</button></div>
+  </div>`;
+  document.getElementById("report").addEventListener("click",()=>NMA.modal({title:`${p.name} melden oder blockieren?`,text:"Blockierte Mitglieder können dir nicht mehr schreiben und dein Profil nicht mehr sehen. Meldungen prüft unser Support vertraulich.",cancel:"Abbrechen",ok:"Blockieren",onOk:()=>NMA.toast(`${p.name} wurde blockiert (Demo).`)}));
+}</script>
+</body>
+</html>

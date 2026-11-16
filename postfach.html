@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Postfach – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member full" data-page="postfach">
+<main class="messenger" id="shell">
+  <aside class="side">
+    <div class="side-head">
+      <h1>Postfach</h1>
+      <button class="btn primary wide" id="newBtn">Neue Mail schreiben</button>
+    </div>
+    <div class="chips"><button class="chip on" data-f="in">Eingang</button><button class="chip" data-f="out">Gesendet</button></div>
+    <div class="convs" id="list"></div>
+  </aside>
+  <section class="pane">
+    <header class="pane-head"><button class="icon back" id="back" aria-label="Zurück zur Liste">←</button><span class="who"><strong>Mails sind kostenlos</strong></span></header>
+    <div class="mail-view" id="view"><div class="no-chat"><p>Wähle links eine Mail aus.</p></div></div>
+  </section>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const $=id=>document.getElementById(id);
+  const sent=NMA.store.get("sent",[]);
+  let box="in";
+  const sys={name:"Team",age:"",g:"linear-gradient(145deg,#e3b26a,#8a5d24)",online:false};
+  const who=m=>m.from==="system"?sys:NMA.get(m.from);
+  const renderList=()=>{
+    const items=box==="in"?NMA.mails:sent;
+    $("list").innerHTML=items.length?items.map((m,i)=>{const p=box==="in"?who(m):NMA.get(m.to);
+      return `<button class="conv ${m.unread?"unread":""}" data-i="${i}">${NMA.avatar(p,"lg",false)}<span class="grow"><span class="top"><strong>${box==="out"?"An ":""}${p.name}</strong><span class="time">${m.date}</span></span><span class="prev">${NMA.esc(m.subj)}</span></span>${m.unread?'<span class="unread-n">neu</span>':""}</button>`}).join(""):'<p class="empty">Noch keine Mails.</p>';
+  };
+  const show=i=>{
+    const items=box==="in"?NMA.mails:sent,m=items[i];m.unread=false;
+    const p=box==="in"?who(m):NMA.get(m.to);
+    $("view").innerHTML=`<p class="kicker">${box==="in"?"Von":"An"} ${p.name}${p.age?", "+p.age:""} · ${m.date}</p><h2>${NMA.esc(m.subj)}</h2><div class="text">${NMA.esc(m.text)}</div>
+      ${box==="in"&&m.from!=="system"?`<form class="mail-reply" id="rep"><div class="field"><label for="rt">Antworten</label><textarea class="input" id="rt" required placeholder="Deine Antwort an ${p.name} …"></textarea></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary">Antwort senden</button><a class="btn" href="chat.html?mit=${m.from}">Lieber chatten</a></div></form>`:""}`;
+    $("shell").classList.add("open");document.body.classList.add("chat-open");renderList();
+    const r=$("rep");if(r)r.addEventListener("submit",e=>{e.preventDefault();const t=$("rt").value.trim();if(!t)return;
+      sent.unshift({to:m.from,subj:"Re: "+m.subj,text:t,date:"Gerade eben"});NMA.store.set("sent",sent);NMA.toast(`Antwort an ${p.name} gesendet (Demo).`);$("rt").value=""});
+  };
+  const compose=to=>{
+    const opts=NMA.profiles.map(p=>`<option value="${p.id}" ${p.id===to?"selected":""}>${p.name}, ${p.age} – ${p.city}</option>`).join("");
+    $("view").innerHTML=`<h2>Neue Mail</h2><form class="mail-reply" id="cf"><div class="field"><label for="cto">An</label><select class="input" id="cto">${opts}</select></div><div class="field"><label for="cs">Betreff</label><input class="input" id="cs" required></div><div class="field"><label for="ct">Nachricht</label><textarea class="input" id="ct" required></textarea></div><button class="btn primary">Mail senden</button></form>`;
+    $("shell").classList.add("open");document.body.classList.add("chat-open");
+    $("cf").addEventListener("submit",e=>{e.preventDefault();if(!$("cf").checkValidity()){NMA.toast("Bitte Betreff und Nachricht ausfüllen.");return}
+      const p=NMA.get($("cto").value);sent.unshift({to:p.id,subj:$("cs").value.trim(),text:$("ct").value.trim(),date:"Gerade eben"});NMA.store.set("sent",sent);
+      NMA.toast(`Mail an ${p.name} gesendet (Demo).`);box="out";document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.dataset.f==="out"));renderList();show(0)});
+  };
+  $("list").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)show(+b.dataset.i)});
+  document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));c.classList.add("on");box=c.dataset.f;renderList()}));
+  $("newBtn").addEventListener("click",()=>compose());
+  $("back").addEventListener("click",()=>{$("shell").classList.remove("open");document.body.classList.remove("chat-open")});
+  renderList();
+  const an=NMA.param("an");
+  if(an)compose(an);else if(innerWidth>860)show(0);
+}</script>
+</body>
+</html>

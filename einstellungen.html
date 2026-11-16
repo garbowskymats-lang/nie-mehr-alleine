@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Einstellungen – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member" data-page="einstellungen">
+<main class="page">
+  <div class="page-head"><div><h1>Einstellungen</h1><p>Benachrichtigungen, Privatsphäre und Konto.</p></div></div>
+  <div class="area">
+    <nav class="card subnav" aria-label="Mein Bereich"><a href="mein-profil.html">Profil bearbeiten</a><a href="coins.html">Coins aufladen</a><a class="active" href="einstellungen.html">Einstellungen</a><a href="hilfe.html">Hilfe &amp; Kontakt</a><a href="#" data-install>App installieren</a><a href="index.html">Abmelden</a></nav>
+    <div style="display:grid;gap:20px">
+      <section class="card pad">
+        <h2 style="font-size:24px;margin-bottom:6px">Benachrichtigungen</h2>
+        <div class="setting"><div><b>Neue Chatnachrichten aufs Handy</b><p>Wie bei WhatsApp: Du bekommst eine Mitteilung, auch wenn die Seite geschlossen ist.</p></div><label class="switch"><input type="checkbox" checked aria-label="Handy-Benachrichtigungen"><span></span></label></div>
+        <div class="setting"><div><b>E-Mail bei neuen Nachrichten</b><p>Eine kurze Info, wenn du offline bist.</p></div><label class="switch"><input type="checkbox" checked aria-label="E-Mail-Benachrichtigung"><span></span></label></div>
+        <div class="setting"><div><b>Ton im Chat</b><p>Kurzer Hinweiston, wenn eine Nachricht eintrifft.</p></div><label class="switch"><input type="checkbox" aria-label="Ton im Chat"><span></span></label></div>
+      </section>
+      <section class="card pad">
+        <h2 style="font-size:24px;margin-bottom:6px">Privatsphäre</h2>
+        <div class="setting"><div><b>Online-Status anzeigen</b><p>Andere sehen, wann du online bist.</p></div><label class="switch"><input type="checkbox" checked aria-label="Online-Status anzeigen"><span></span></label></div>
+        <div class="setting"><div><b>Profil in der Suche zeigen</b><p>Ausschalten, wenn du eine Pause machen möchtest.</p></div><label class="switch"><input type="checkbox" checked aria-label="In der Suche zeigen"><span></span></label></div>
+        <div class="setting"><div><b>Wer darf mir Bilder schicken?</b><p>Bilder lassen sich getrennt von Texten erlauben.</p></div><select class="input" style="width:auto" aria-label="Bilder erlauben von"><option>Alle Mitglieder</option><option>Nur Kontakte</option><option>Niemand</option></select></div>
+        <button class="btn primary" data-save style="margin-top:16px">Speichern</button>
+      </section>
+      <section class="card pad">
+        <h2 style="font-size:24px;margin-bottom:6px">Konto</h2>
+        <div class="setting"><div><b>Passwort ändern</b><p>Wir schicken dir einen Link per E-Mail.</p></div><button class="btn sm" id="pw">Link senden</button></div>
+        <div class="setting"><div><b>E-Mail-Adresse</b><p>michael@beispiel.de</p></div><button class="btn sm" data-save>Ändern</button></div>
+      </section>
+      <section class="card pad danger-zone">
+        <h2 style="font-size:24px;margin-bottom:6px">Konto löschen</h2>
+        <p class="muted">Profil, Fotos und Nachrichten werden endgültig gelöscht. Nicht verbrauchte Coins verfallen.</p>
+        <button class="btn danger" id="del">Konto löschen</button>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  document.getElementById("pw").addEventListener("click",()=>NMA.toast("Link zum Ändern des Passworts gesendet (Demo)."));
+  document.getElementById("del").addEventListener("click",()=>NMA.modal({title:"Konto wirklich löschen?",text:"Das kann nicht rückgängig gemacht werden. Profil, Fotos, Nachrichten und restliche Coins gehen verloren.",cancel:"Behalten",ok:"Endgültig löschen",onOk:()=>NMA.toast("In der echten Version wäre das Konto jetzt gelöscht.")}));
+}</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Passwort vergessen – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="passwort">
+<main class="auth">
+  <div class="auth-photo"><p>Kein Problem – das passiert jedem mal.</p></div>
+  <div class="auth-side">
+    <a class="brand" href="index.html"><i aria-hidden="true">♥</i><span>Nie mehr <b>alleine</b></span></a>
+    <form class="card auth-card" id="f" novalidate>
+      <h1>Passwort vergessen?</h1>
+      <p>Gib deine E-Mail-Adresse ein. Wir schicken dir einen Link, mit dem du ein neues Passwort festlegen kannst.</p>
+      <div class="field"><label for="mail">E-Mail-Adresse</label><input class="input" id="mail" type="email" autocomplete="email" required></div>
+      <button class="btn primary wide" type="submit">Link anfordern</button>
+      <p class="hint good" id="done" hidden style="margin-top:14px">Wenn die Adresse bei uns registriert ist, bekommst du gleich eine E-Mail. Schau auch im Spam-Ordner nach.</p>
+      <p class="auth-alt"><a href="login.html">Zurück zur Anmeldung</a></p>
+    </form>
+  </div>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const f=document.getElementById("f");
+  f.addEventListener("submit",e=>{e.preventDefault();if(!f.checkValidity()){NMA.toast("Bitte gib eine gültige E-Mail-Adresse ein.");return}document.getElementById("done").hidden=false});
+}</script>
+</body>
+</html>

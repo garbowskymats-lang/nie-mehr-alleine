@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chat – Nie mehr alleine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="member full" data-page="chat">
+<main class="messenger" id="shell">
+  <aside class="side">
+    <div class="side-head">
+      <h1>Chat</h1>
+      <label class="search"><span aria-hidden="true">⌕</span><input type="search" id="q" placeholder="Unterhaltungen durchsuchen" aria-label="Unterhaltungen durchsuchen"></label>
+    </div>
+    <div class="chips" role="tablist"><button class="chip on" data-f="all">Alle</button><button class="chip" data-f="unread">Ungelesen</button><button class="chip" data-f="online">Online</button></div>
+    <div class="convs" id="convs"></div>
+  </aside>
+
+  <section class="pane" id="pane" style="position:relative">
+    <div class="no-chat" id="none"><div><h2 style="font-size:28px;margin-bottom:8px">Wähle eine Unterhaltung</h2><p>oder <a class="link" href="suche.html">entdecke neue Menschen</a>.</p></div></div>
+    <header class="pane-head" id="head" hidden>
+      <button class="icon back" id="back" aria-label="Zurück zur Liste">←</button>
+      <a class="who" id="who" href="#"></a>
+      <a class="icon" id="info" href="#" aria-label="Profil ansehen" title="Profil ansehen">ⓘ</a>
+      <button class="icon" id="more" aria-label="Melden oder blockieren" title="Melden oder blockieren">⋯</button>
+    </header>
+    <div class="cost" id="cost" hidden></div>
+    <div class="msgs" id="msgs" hidden aria-live="polite"></div>
+    <form class="composer" id="comp" hidden>
+      <button type="button" class="icon" id="emojiBtn" aria-label="Emoji einfügen" aria-expanded="false">☺</button>
+      <button type="button" class="icon" id="imgBtn" aria-label="Bild senden">＋</button>
+      <input type="file" id="img" accept="image/*" hidden>
+      <input class="input" id="txt" placeholder="Nachricht schreiben …" autocomplete="off" aria-label="Nachricht">
+      <button class="send" aria-label="Senden">➤</button>
+    </form>
+    <div class="emoji-pop" id="emojis" hidden></div>
+  </section>
+</main>
+<script src="app.js"></script>
+<script src="edit.js" defer></script>
+<script>{
+  const $=id=>document.getElementById(id);
+  const shell=$("shell");
+  let current=null, filter="all";
+  const chats=NMA.chats, unread=NMA.unread;
+  const now=()=>new Date().toTimeString().slice(0,5);
+  const lastOf=id=>{const m=(chats[id]||[]).filter(x=>x.x||x.img);return m[m.length-1]};
+
+  const renderList=()=>{
+    const q=$("q").value.trim().toLowerCase();
+    const ids=Object.keys(chats).filter(id=>{const p=NMA.get(id);
+      return (!q||p.name.toLowerCase().includes(q))&&(filter!=="unread"||unread[id])&&(filter!=="online"||p.online)});
+    $("convs").innerHTML=ids.length?ids.map(id=>{const p=NMA.get(id),l=lastOf(id),n=unread[id]||0;
+      const prev=l?(l.t==="me"?"Du: ":"")+(l.img?"📷 Bild":l.x):"Noch keine Nachrichten";
+      return `<button class="conv ${id===current?"on":""} ${n?"unread":""}" data-id="${id}">${NMA.avatar(p,"lg")}<span class="grow"><span class="top"><strong>${p.name}, ${p.age}</strong><span class="time">${l?l.h:""}</span></span><span class="prev">${NMA.esc(prev)}</span></span>${n?`<span class="unread-n">${n}</span>`:""}</button>`}).join(""):'<p class="empty">Keine Unterhaltungen gefunden.</p>';
+  };
+  const bubble=m=>m.d?`<div class="day">${m.d}</div>`:`<div class="bubble ${m.t}">${m.img?`<img src="${m.img}" alt="Gesendetes Bild">`:NMA.esc(m.x)}<time>${m.h}${m.t==="me"?" ✓✓":""}</time></div>`;
+  const renderMsgs=()=>{$("msgs").innerHTML=chats[current].map(bubble).join("");$("msgs").scrollTop=$("msgs").scrollHeight};
+  const renderCost=()=>{const c=NMA.coins();$("cost").hidden=false;
+    $("cost").innerHTML=c>0?`Eine Chatnachricht kostet ${NMA.costPerChat} Coin · Du hast noch <b>${c}</b> Coins`:`Du hast keine Coins mehr. <a class="link" href="coins.html">Jetzt Coins aufladen</a>`};
+
+  const open=id=>{
+    current=id; if(!chats[id])chats[id]=[];
+    delete unread[id];
+    const p=NMA.get(id);
+    $("none").hidden=true;["head","msgs","comp"].forEach(x=>$(x).hidden=false);
+    $("who").href=$("info").href=`profil.html?id=${id}`;
+    $("who").innerHTML=`${NMA.avatar(p)}<span><strong>${p.name}, ${p.age}</strong><small>${p.online?'<span class="dot"></span>Online':"Zuletzt online "+p.last}</small></span>`;
+    shell.classList.add("open");document.body.classList.add("chat-open");
+    renderMsgs();renderCost();renderList();
+    try{history.replaceState(null,"","?mit="+id)}catch(e){}
+    if(innerWidth>860)$("txt").focus();
+  };
+  const needCoins=()=>NMA.modal({title:"Keine Coins mehr",text:"Um weiter zu chatten, lade bitte dein Guthaben auf. Mails im Postfach bleiben kostenlos.",cancel:"Später",ok:"Coins aufladen",onOk:()=>location.href="coins.html"});
+  const pay=()=>{const c=NMA.coins();if(c<NMA.costPerChat){needCoins();return false}NMA.setCoins(c-NMA.costPerChat);renderCost();return true};
+  const fakeReply=id=>{
+    const t=document.createElement("div");t.className="typing";t.innerHTML="<i></i><i></i><i></i>";
+    setTimeout(()=>{if(current!==id)return;$("msgs").appendChild(t);$("msgs").scrollTop=$("msgs").scrollHeight},600);
+    setTimeout(()=>{t.remove();const answers=["Das klingt schön 😊 Erzähl mir mehr!","Oh, wie spannend! Und was machst du sonst gern?","Da muss ich schmunzeln 😄","Ich freue mich, dass du schreibst!"];
+      chats[id].push({t:"them",x:answers[Math.floor(Math.random()*answers.length)],h:now()});
+      if(current===id)renderMsgs();else unread[id]=(unread[id]||0)+1;renderList()},2200);
+  };
+  const send=m=>{if(!pay())return;chats[current].push(Object.assign({t:"me",h:now()},m));renderMsgs();renderList();fakeReply(current)};
+
+  $("comp").addEventListener("submit",e=>{e.preventDefault();const v=$("txt").value.trim();if(!v)return;$("txt").value="";$("emojis").hidden=true;send({x:v})});
+  $("convs").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(b)open(b.dataset.id)});
+  $("q").addEventListener("input",renderList);
+  document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));c.classList.add("on");filter=c.dataset.f;renderList()}));
+  $("back").addEventListener("click",()=>{shell.classList.remove("open");document.body.classList.remove("chat-open");current=null;renderList()});
+  $("more").addEventListener("click",()=>{const p=NMA.get(current);NMA.modal({title:`${p.name} blockieren?`,text:"Blockierte Mitglieder können dir nicht mehr schreiben. Wenn dich jemand belästigt, melde es bitte zusätzlich dem Support.",cancel:"Abbrechen",ok:"Blockieren",onOk:()=>NMA.toast(`${p.name} wurde blockiert (Demo).`)})});
+  const em=["😊","😄","😉","😍","🥰","😘","❤️","💕","👍","🙏","😂","🤗","🌹","☕","🍷","🌞","🌙","🎶","😎","🙈","🤔","😢","👋","✨"];
+  $("emojis").innerHTML=em.map(x=>`<button type="button">${x}</button>`).join("");
+  $("emojiBtn").addEventListener("click",()=>{const h=!$("emojis").hidden;$("emojis").hidden=h;$("emojiBtn").setAttribute("aria-expanded",!h)});
+  $("emojis").addEventListener("click",e=>{if(e.target.tagName==="BUTTON"){$("txt").value+=e.target.textContent;$("txt").focus()}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")$("emojis").hidden=true});
+  $("imgBtn").addEventListener("click",()=>$("img").click());
+  $("img").addEventListener("change",()=>{const f=$("img").files[0];$("img").value="";if(!f)return;
+    if(!f.type.startsWith("image/")){NMA.toast("Bitte wähle ein Bild aus.");return}
+    if(f.size>8e6){NMA.toast("Das Bild darf höchstens 8 MB groß sein.");return}
+    send({img:URL.createObjectURL(f)})});
+
+  const start=NMA.param("mit");
+  if(start)open(start);else if(innerWidth>860)open(Object.keys(chats)[0]);else renderList();
+}</script>
+</body>
+</html>
