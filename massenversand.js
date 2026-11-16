@@ -79,7 +79,10 @@
     if (u && u.nick) {
       const c = T.customers[u.nick] || (T.customers[u.nick] = { nr: 10600, st: "T", coins: NMA.coins(), since: new Date().toLocaleDateString("de-DE") });
       Object.assign(c, { vorname: u.vorname || c.vorname, age: u.age || c.age, job: u.job || c.job || "", look: u.looking || c.look || "Beziehung", radius: +u.radius || 50,
+        mail: u.mail || c.mail, birth: u.birth || c.birth, reg: u.registered || c.reg, lastLogin: u.lastLogin || c.lastLogin, coins: NMA.coins(),
+        buchungen: NMA.store.get("buchungen", c.buchungen || []),
         sex: /^eine Frau/.test(u.sex || "") ? "w" : "m", land: u.land || "DE", ort: ((u.plz || "") + " " + (u.city || "")).trim() || c.ort });
+      if (c.buchungen.length) { c.st = "K"; c.firstPay = c.firstPay || c.buchungen[0].t; }
       ch = true;
     }
     if (ch) T.saveAll();
@@ -126,6 +129,8 @@
     Object.entries(T.customers).forEach(([nick, c]) => {
       if (!G.who(c)) return;
       if (!G.fixedSt && job.st && c.st !== job.st) return;
+      if (c.noMass) { skip.push({ nick, c, why: "möchte keine Massennachrichten (Kundenkarte)" }); return; }
+      if (c.gesperrt) { skip.push({ nick, c, why: "Konto gesperrt" }); return; }
       const hist = msent[nick] || [];
       const last = hist.reduce((a, x) => Math.max(a, x.t), 0);
       if (pauseMs && last && now - last < pauseMs) { skip.push({ nick, c, why: `hatte am ${fmt(last)} schon eine Massennachricht (Pause ${cfg.pause} Tag${cfg.pause == 1 ? "" : "e"})` }); return; }

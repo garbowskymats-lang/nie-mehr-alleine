@@ -148,7 +148,7 @@ if(!document.body.classList.contains("full")) document.body.appendChild(foot);
 /* Demo-Formulare: kein Absenden an einen Server */
 document.querySelectorAll("form[data-next]").forEach(f=>f.addEventListener("submit",e=>{
   e.preventDefault();
-  if(f.checkValidity()) location.href=f.dataset.next;
+  if(f.checkValidity()){ if(document.body.dataset.page==="login"){const u=NMA.user();u.lastLogin=Date.now();NMA.store.set("user",u);} location.href=f.dataset.next; }
   else NMA.toast("Bitte fülle alle Felder aus.");
 }));
 document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();NMA.toast("Gespeichert (Demo – noch ohne Server)")}));

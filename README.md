@@ -141,3 +141,15 @@ Stand 16.11.2026 – Deutschland, Österreich, Schweiz
   Land und PLZ-Bereich des Kunden. Profile haben ein Feld Land (für den Modus „fester Ort“).
 - SERVER: Koordinaten je PLZ-Bereich aus echten Daten (OpenPLZ deckt DE, AT, CH ab); in der Demo sind die Werte
   Näherungen (DE-3er-Bereiche nur eine Auswahl, sonst 2 Ziffern).
+
+Stand 16.11.2026 – Kundenkarte (kunden.js, Reiter „👤 Kunden“, nur Admin)
+- Liste aller Kunden (Suche nach Nickname, Kunden-Nr., E-Mail, Name; Filter Kunde/Tester). Klick öffnet die Kundenkarte,
+  ebenso der Knopf „Kundenkarte öffnen“ im Chat rechts.
+- Karte: Nickname, Vorname, Geburtsdatum + Alter (automatisch), Geschlecht/sucht, Wohnort, Land, PLZ-Bereich, E-Mail,
+  Registriert am, Kunde seit (erste Zahlung), Name laut Zahlungsanbieter, letzter Login, letzte erhaltene Nachricht
+  (wann, von welchem Profil), Support-Anfragen, interne Notiz (nur Chef), Team-Notiz, Coins mit Korrektur (+/- mit
+  Pflicht-Grund, protokolliert), Häkchen Newsletter / keine Massennachrichten (Massenversand überspringt ihn) /
+  Konto gesperrt, alle Buchungen mit Datum, Buchungs-Nr., Zahlungsart, Coins, Betrag und Umsatz gesamt.
+- PASSWORT wird bewusst NICHT angezeigt: Server speichert nur einen Hash (bcrypt/argon2). Admin kann einen Link zum
+  Zurücksetzen senden. (Klartext-Passwörter wären ein Datenschutzverstoß, Art. 32 DSGVO.)
+- SERVER: Kundendaten nur für Admins ausliefern; Buchungen aus dem Zahlungsanbieter; jede Änderung protokollieren.

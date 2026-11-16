@@ -51,7 +51,7 @@
   $("pay").addEventListener("change",e=>{method=+e.target.value;upd()});
   $("buy").addEventListener("click",()=>{const p=NMA.packs[pick];
     NMA.modal({title:"Weiter zum Zahlungsanbieter",text:`Hier würdest du jetzt zur Zahlung von ${eur(p.price)} per ${methods[method]} weitergeleitet. In dieser Demo werden die ${p.coins} Coins direkt gutgeschrieben.`,cancel:"Abbrechen",ok:"Demo: Gutschreiben",
-      onOk:()=>{NMA.setCoins(NMA.coins()+p.coins);$("have").textContent=NMA.coins();NMA.toast(`${p.coins} Coins gutgeschrieben (Demo).`)}})});
+      onOk:()=>{NMA.setCoins(NMA.coins()+p.coins);const bu=NMA.store.get("buchungen",[]);bu.push({t:Date.now(),coins:p.coins,eur:p.price,art:methods[method],nr:"B-"+Date.now().toString().slice(-6)});NMA.store.set("buchungen",bu);$("have").textContent=NMA.coins();NMA.toast(`${p.coins} Coins gutgeschrieben (Demo).`)}})});
   upd();
 }</script>
 </body>

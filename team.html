@@ -157,7 +157,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <main class="page">
   <div class="page-head">
     <div><h1 id="pTitle">Mitarbeiterbereich</h1><p id="pSub">Statistik und Verwaltung des Moderatoren-Teams.</p></div>
-    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="mass" role="tab" id="tabMass" hidden>📣 Massenversand <span class="badge" id="mvBadge" hidden>0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="support" role="tab" data-admin>🛟 Support <span class="badge" id="supBadge" hidden>0</span></button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
+    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="mass" role="tab" id="tabMass" hidden>📣 Massenversand <span class="badge" id="mvBadge" hidden>0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="kunden" role="tab" data-admin>👤 Kunden</button><button data-tab="support" role="tab" data-admin>🛟 Support <span class="badge" id="supBadge" hidden>0</span></button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
   </div>
 
   <!-- ================= STATISTIK ================= -->
@@ -264,6 +264,8 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     </div>
     <p class="hint" style="margin-top:12px"><b>Admin</b> darf Mitarbeiter verwalten, alle Statistiken und – mit Zusatzcode – die Verläufe sehen. <b>Moderator</b> sieht nur seinen eigenen Posteingang und seine Zahlen.</p>
   </section>
+  <!-- ================= KUNDEN (nur Admin, kunden.js) ================= -->
+  <section id="kunden" hidden></section>
   <!-- ================= SUPPORT (nur Admin, support.js) ================= -->
   <section id="support" hidden></section>
   <!-- ================= VERLÄUFE (nur Admin) ================= -->
@@ -424,7 +426,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
-    ["inbox","profiles","templates","mass","stats","staff","support","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
+    ["inbox","profiles","templates","mass","stats","staff","kunden","support","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
   $("eCoin").addEventListener("change",e=>{const v=+e.target.value;if(v>0){ecfg.coin=v;NMA.store.set("earnCfg",ecfg);renderStats();NMA.toast("Gespeichert.")}});
   $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
     $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
@@ -553,6 +555,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     const c=cust(x.cust),p=prof(x.pid)||{};
     const got=(tplSent[x.cust]||[]).map(s=>tplNo(s.nr)).join(", ")||"keine";
     $("infoPane").innerHTML=`<h4>KUNDE</h4><div class="kv"><span>Nickname</span><b>${NMA.esc(x.cust)}</b><span>Vorname</span>${NMA.esc(c.vorname||"–")}<span>Kunden-Nr.</span>#${c.nr}<span>Status</span><span style="color:var(--ink)">${stBadge(c)} ${c.st==="K"?"Kunde (hat bezahlt)":"Tester"}</span><span>Coins</span><b style="color:var(--gold)">${c.coins}</b><span>Alter</span>${c.age||"–"}<span>Wohnort</span>${NMA.esc(c.ort||"–")}${c.ort?` <small class="muted">(${c.land||"DE"})</small>`:""}<span>PLZ-Bereich</span>${NMA.esc(NMA.region(c.land||"DE",(String(c.ort||"").match(/\d{4,5}/)||[])[0])||"–")}<span>Beruf</span>${NMA.esc(c.job||"–")}<span>Sucht</span>${c.look||"–"}<span>Dabei seit</span>${c.since||"–"}<span>Vorlagen erhalten</span>${got}</div>
+      ${isAdmin()?`<button class="btn sm" data-kcard="${NMA.esc(x.cust)}" style="margin:10px 0 4px">👤 Kundenkarte öffnen</button>`:""}
       <h4>NOTIZEN ZUM KUNDEN <small style="font-weight:400">(für alle Mitarbeiter)</small></h4><textarea class="input" id="note" placeholder="z. B. Hobbys, Familie, worüber zuletzt gesprochen wurde">${NMA.esc(notes[x.cust]||"")}</textarea>
       <h4>PROFIL IN DIESEM GESPRÄCH</h4><div class="kv"><span>Name</span><b>${NMA.esc(p.name||"")}</b><span>Rubrik</span>${p.sex==="m"?"Mann":"Frau"} · ${p.looking||""}<span>Alter</span>${p.age||"–"}${(()=>{const ko=NMA.wohnortModus()==="kontakt"&&NMA.kontaktOrt(p,{nick:x.cust,plz:(String(c.ort||"").match(/\d{4,5}/)||[])[0],radius:c.radius||50,city:String(c.ort||"").replace(/\d{4,5}/,"").trim(),land:c.land||"DE"});return ko?`<span>Wohnt für ihn</span><b style="color:var(--accent)">${NMA.esc(ko.ort)} (${ko.km} km)</b>`:`<span>Ort</span>${NMA.esc(p.city||"–")}`})()}<span>Beruf</span>${NMA.esc(p.job||"–")}<span>Gehört</span>${NMA.esc(ownerName(p.owner))}</div>
       <p class="small muted" style="margin:8px 0 0">${NMA.esc(p.about||"")}</p>`;
@@ -718,17 +721,18 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(!a){setLock(false);const vis=document.querySelector("[data-tab].on");if(vis&&vis.hidden)document.querySelector('[data-tab="inbox"]').click()}
     $("tabProf").textContent=a?"Profile":"Meine Profile";
     hideConv();renderQueue();renderStats();renderProfiles();renderTpls();resetTplForm();
-    window.MV&&MV.render();window.SUP&&SUP.render();
+    window.MV&&MV.render();window.SUP&&SUP.render();window.KD&&KD.render();
   };
   $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+ownerName(me)+" (Moderator)")});
 
   /* Schnittstelle für massenversand.js */
   window.TEAM={get me(){return me},isAdmin,meKey,ownerName,owners,get staff(){return staff},persistStaff:()=>{persist();renderStaff()},
-    profiles,customers,cust,get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff};
+    profiles,customers,cust,get notes(){return notes},get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff};
 
   renderStats();renderStaff();applyRole();
 }</script>
 <script src="massenversand.js"></script>
 <script src="support.js"></script>
+<script src="kunden.js"></script>
 </body>
 </html>
