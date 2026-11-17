@@ -201,15 +201,16 @@ NMA.fabrikConfig = NMA.fabrikConfig || { url: "" };   /* z. B. "https://api.tipp
       <div class="card pad"><h2 style="font-size:22px;margin-bottom:8px">So geht's</h2><ol class="fb-steps">
         <li><b>Erstellen</b> – z. B. 100 Profile. Sie sind noch nicht sichtbar.</li>
         <li><b>⬇ Prompts herunterladen</b> – die Textdatei enthält je 10 Personen pro Block. Einen Block nach dem anderen in ChatGPT einfügen.</li>
-        <li><b>Bilder speichern</b> – genau unter dem Ordner und Dateinamen, den ChatGPT unter jedes Bild schreibt.</li>
-        <li><b>📂 Bilder einlesen</b> – den Ordner „Profilbilder“ auswählen. Jedes Bild landet automatisch bei der richtigen Person.</li>
+        <li><b>Bilder herunterladen</b> – einfach der Reihe nach, so wie ChatGPT sie macht. Umbenennen ist nicht nötig.</li>
+        <li><b>📥 Bilder der Reihe nach einlesen</b> – Personen-Nummern des Blocks eingeben, alle Bilder auswählen. Die Fabrik verteilt sie in der Download-Reihenfolge auf die Personen und zeigt sie dir zur Kontrolle nebeneinander.</li>
         <li><b>✅ Freischalten</b> – fertige Profile gehen live und werden auf die Mitarbeiter verteilt.</li></ol>
         <p class="hint" style="margin:10px 0 0">🤖 <b>Vollautomatisch:</b> Sobald der Server angebunden ist, erzeugt die Bild-KI die Bilder selbst – Schritt 2 bis 4 entfallen.</p></div></div>
       <div class="toolbar" style="flex-wrap:wrap;gap:8px">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select class="input" id="fbF" style="width:auto" aria-label="Filter"><option value="">Alle (${F.items.length})</option>${Object.entries(ST).map(([k, [l]]) => `<option value="${k}" ${filt === k ? "selected" : ""}>${l} (${cnt(k)})</option>`).join("")}</select></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <button class="btn sm" id="fbDl" type="button">⬇ Prompts herunterladen</button>
-          <label class="btn sm" for="fbIn" style="cursor:pointer">📂 Bilder einlesen</label><input type="file" id="fbIn" accept="image/*" multiple webkitdirectory hidden>
+          <button class="btn sm primary" id="fbSeq" type="button">📥 Bilder der Reihe nach einlesen</button>
+          <label class="btn sm" for="fbIn" style="cursor:pointer">📂 Ordner einlesen</label><input type="file" id="fbIn" accept="image/*" multiple webkitdirectory hidden>
           <label class="btn sm ghost" for="fbIn2" style="cursor:pointer">Einzelne Bilder</label><input type="file" id="fbIn2" accept="image/*" multiple hidden>
           <button class="btn sm" id="fbAuto" type="button">🤖 Bilder automatisch erzeugen</button>
           <select class="input" id="fbOwn" style="width:auto" aria-label="Verteilen an"><option value="_gleich">Gleichmäßig verteilen</option>${owners().map(o => `<option value="${o.user}" ${cfg.owner === o.user ? "selected" : ""}>an ${esc(o.name)}</option>`).join("")}</select>
@@ -217,7 +218,7 @@ NMA.fabrikConfig = NMA.fabrikConfig || { url: "" };   /* z. B. "https://api.tipp
       <div class="card pad" style="padding-top:8px">${items.length ? `<table class="staff fb-list"><thead><tr><th>Nr.</th><th>Person</th><th>Nickname</th><th>Ordner</th><th class="num">Bilder</th><th>Status</th><th></th></tr></thead><tbody>
         ${items.slice().reverse().slice(0, shown).map(it => { const s = stateOf(it); return `<tr><td>${pad(it.num)}</td><td>${it.sx === "w" ? "Frau" : "Mann"}, ${it.age} · ${it.looking}</td><td><b>${esc(it.nick)}</b><br><span class="small muted">${esc(it.vor)}</span></td>
           <td class="small muted">${esc(it.folder)}</td><td class="num">${s === "live" ? it.shots.length : imgCount(it)}/${it.shots.length}</td><td><span class="fb-st" style="color:${ST[s][1]}">${ST[s][0]}</span></td>
-          <td><div class="acts"><button class="btn sm" data-fbv="${it.num}" type="button">Ansehen</button>${s === "fertig" ? `<button class="btn sm primary" data-fbp="${it.num}" type="button">Freischalten</button>` : ""}</div></td></tr>`; }).join("")}
+          <td><div class="acts"><button class="btn sm" data-fbv="${it.num}" type="button">Ansehen</button>${imgCount(it) && it.st !== "live" ? `<button class="btn sm ghost" data-fbr="${it.num}" type="button">Kontrolle</button>` : ""}${s === "fertig" ? `<button class="btn sm primary" data-fbp="${it.num}" type="button">Freischalten</button>` : ""}</div></td></tr>`; }).join("")}
         </tbody></table>${items.length > shown ? `<p style="text-align:center"><button class="btn sm ghost" id="fbMore" type="button">Weitere ${Math.min(50, items.length - shown)} anzeigen</button></p>` : ""}`
         : `<p class="muted" style="margin:16px 0">Noch keine Profile in der Fabrik. Oben Anzahl eingeben und „Profile erstellen“ klicken.</p>`}</div>`;
   };
@@ -265,6 +266,54 @@ NMA.fabrikConfig = NMA.fabrikConfig || { url: "" };   /* z. B. "https://api.tipp
     try { S.set("fabrikImg", im); } catch (e) { NMA.toast("Browser-Speicher voll – bitte erst fertige Profile freischalten, dann den Rest einlesen."); return; }
     render();
     NMA.modal({ title: `${ok.length} Bilder zugeordnet`, text: (bad.length ? `<b>${bad.length} nicht zugeordnet:</b><div class="fb-pre" style="margin-top:8px">${bad.map(esc).join("\n")}</div>` : "Alle Bilder wurden der richtigen Person zugeordnet.") + `<br>Vollständig und bereit: <b>${F.items.filter(i => stateOf(i) === "fertig").length}</b> Profile.`, ok: "OK" });
+  };
+
+  /* Der Reihe nach einlesen: Bilder ohne Umbenennen, Reihenfolge = Download-Reihenfolge */
+  const seqDialog = () => {
+    const open = F.items.filter(i => i.st !== "live" && imgCount(i) < i.shots.length).sort((a, b) => a.num - b.num);
+    if (!open.length) { NMA.toast("Alle Profile haben schon ihre Bilder."); return; }
+    const from = open[0].num, to = (open[Math.min(9, open.length - 1)] || open[0]).num;
+    const m = document.createElement("div"); m.className = "modal form-modal";
+    m.innerHTML = `<form class="card" style="max-width:560px;width:100%"><h2>📥 Bilder der Reihe nach einlesen</h2>
+      <p class="muted" style="margin:6px 0 14px">Für einen Block aus der Prompt-Datei: alle Bilder aus diesem ChatGPT-Chat herunterladen, <b>ohne Umbenennen</b>, dann hier alle auf einmal auswählen. Die Fabrik verteilt sie in der Reihenfolge, in der du sie heruntergeladen hast.</p>
+      <div class="fb-row"><div class="field"><label for="sqF">Von Person</label><input class="input" id="sqF" type="number" value="${from}"></div><div class="field"><label for="sqT">Bis Person</label><input class="input" id="sqT" type="number" value="${to}"></div></div>
+      <p class="small muted" id="sqInfo" style="margin:10px 0 0"></p>
+      <div class="row"><button type="button" class="btn ghost" data-x>Abbrechen</button><label class="btn primary" for="sqIn" style="cursor:pointer">Bilder auswählen</label><input type="file" id="sqIn" accept="image/*" multiple hidden></div></form>`;
+    document.body.appendChild(m);
+    const range = () => { const a = +m.querySelector("#sqF").value, b = +m.querySelector("#sqT").value; return F.items.filter(i => i.num >= Math.min(a, b) && i.num <= Math.max(a, b) && i.st !== "live").sort((x, y) => x.num - y.num); };
+    const slots = () => { const im = IMG(), out = []; range().forEach(it => it.shots.forEach(sh => { if (!im[pad(it.num) + "/" + sh.file]) out.push({ it, sh }); })); return out; };
+    const info = () => { const r = range(); m.querySelector("#sqInfo").textContent = r.length ? `${r.length} Personen, es fehlen noch ${slots().length} Bilder.` : "Keine offenen Personen in diesem Bereich."; };
+    info(); m.querySelector("#sqF").addEventListener("input", info); m.querySelector("#sqT").addEventListener("input", info);
+    m.addEventListener("click", e => { if (e.target === m || e.target.hasAttribute("data-x")) m.remove(); });
+    m.querySelector("#sqIn").addEventListener("change", async e => {
+      const files = [...e.target.files].filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name)).sort((a, b) => (a.lastModified - b.lastModified) || a.name.localeCompare(b.name, "de", { numeric: true }));
+      const sl = slots(); if (!files.length || !sl.length) return;
+      const go = async () => {
+        m.remove(); NMA.toast(`${Math.min(files.length, sl.length)} Bilder werden zugeordnet …`);
+        const im = IMG(), touched = [];
+        for (let i = 0; i < Math.min(files.length, sl.length); i++) { const src = await shrink(files[i]); if (!src) continue; im[pad(sl[i].it.num) + "/" + sl[i].sh.file] = src; if (!touched.includes(sl[i].it)) touched.push(sl[i].it); }
+        try { S.set("fabrikImg", im); } catch (er) { NMA.toast("Browser-Speicher voll – bitte erst fertige Profile freischalten."); return; }
+        render(); review(touched);
+      };
+      if (files.length !== sl.length) NMA.modal({ title: "Anzahl passt nicht", text: `Du hast <b>${files.length}</b> Bilder ausgewählt, erwartet werden <b>${sl.length}</b>.<br><br>Meist hat ChatGPT ein Bild übersprungen oder abgelehnt – dann rutschen alle folgenden Bilder eine Person weiter. Prüfe danach die Kontrollansicht genau.`, cancel: "Abbrechen", ok: "Trotzdem zuordnen", onOk: go });
+      else go();
+    });
+  };
+  /* Kontrolle: alle Bilder einer Person nebeneinander – ist es dieselbe Person? */
+  const review = list => {
+    const im = IMG(), m = document.createElement("div"); m.className = "modal form-modal";
+    const row = it => `<div class="card pad" style="margin-bottom:10px;max-width:none;width:100%" data-rv="${it.num}"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+        <b>${pad(it.num)} · ${esc(it.nick)} <span class="muted small">${it.sx === "w" ? "Frau" : "Mann"}, ${it.age} · ${esc(it.look.hair)}</span></b>
+        <button type="button" class="btn sm danger" data-rx="${it.num}">Passt nicht – Bilder entfernen</button></div>
+        <div class="fb-thumbs">${it.shots.map(sh => { const u = im[pad(it.num) + "/" + sh.file]; return `<figure>${u ? `<img src="${u}" alt="">` : `<div class="ph"></div>`}<figcaption>${sh.file}${sh.free ? " 🔒" : ""}</figcaption></figure>`; }).join("")}</div></div>`;
+    m.innerHTML = `<div class="card" style="max-width:860px;width:100%;max-height:92svh;overflow:auto"><h2>Kontrolle: Ist es jeweils dieselbe Person?</h2>
+      <p class="muted" style="margin:6px 0 14px">Schau pro Zeile, ob alle Bilder dieselbe Person zeigen und zu Alter und Geschlecht passen. Wenn nicht: „Passt nicht“ – dann diese Bilder einzeln neu erstellen und noch einmal einlesen.</p>
+      ${list.map(row).join("")}<div class="row"><button type="button" class="btn primary" data-x>Alles in Ordnung</button></div></div>`;
+    document.body.appendChild(m);
+    m.addEventListener("click", e => {
+      if (e.target === m || e.target.hasAttribute("data-x")) m.remove();
+      const x = e.target.closest("[data-rx]"); if (x) { const it = F.items.find(i => i.num === +x.dataset.rx), im2 = IMG(); it.shots.forEach(sh => delete im2[pad(it.num) + "/" + sh.file]); S.set("fabrikImg", im2); x.closest("[data-rv]").remove(); render(); NMA.toast(`Bilder von ${pad(it.num)} entfernt.`); }
+    });
   };
 
   /* Freischalten → echtes Profil + Fotos */
@@ -342,13 +391,15 @@ NMA.fabrikConfig = NMA.fabrikConfig || { url: "" };   /* z. B. "https://api.tipp
     const b = e.target.closest("button"); if (!b) return;
     if (b.id === "fbDl") download();
     if (b.id === "fbAuto") auto();
+    if (b.id === "fbSeq") seqDialog();
     if (b.id === "fbMore") { shown += 50; render(); }
     if (b.id === "fbPubAll") { const l = F.items.filter(i => stateOf(i) === "fertig"); if (!l.length) { NMA.toast("Noch keine vollständigen Profile – erst Bilder einlesen."); return; }
       NMA.modal({ title: `${l.length} Profile freischalten?`, text: `Sie erscheinen sofort in der Suche und werden ${$("fbOwn").value === "_gleich" ? "gleichmäßig auf die Mitarbeiter verteilt" : "an " + esc(T.ownerName($("fbOwn").value)) + " vergeben"}.`, cancel: "Abbrechen", ok: "Freischalten", onOk: () => publishMany(l) }); }
     if (b.dataset.fbv) view(+b.dataset.fbv);
+    if (b.dataset.fbr) review([F.items.find(i => i.num === +b.dataset.fbr)]);
     if (b.dataset.fbp) publishMany([F.items.find(i => i.num === +b.dataset.fbp)]);
   });
 
-  window.FAB = { render, make: n => { cfg.n = n; create(); }, items: () => F.items, parse };
+  window.FAB = { render, make: n => { const el = $("fbN"); if (el) el.value = n; create(); }, items: () => F.items, parse };
   render();
 })();
