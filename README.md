@@ -249,3 +249,9 @@ Stand 17.11.2026 – Verwaltung im Team-Portal (admin.js)
   Mitarbeiter mit Dauer (Portal protokolliert An- und Abmelden).
 - Reiter Kunden: „⬇ Kundenliste (Excel)“ / „⬇ Testerliste (Excel)“ – CSV mit ; für Excel, gefiltert nach gewähltem Eingang.
 - Im Team-Portal gibt es keinen Link mehr zur Kundenseite.
+
+Stand 17.11.2026 – Team-App
+- Das Team-Portal lässt sich als eigene App installieren (team.webmanifest, Symbol ✦ „Team“ ohne Seitennamen,
+  sw-team.js). Knopf „📲 Team-App installieren“ auf der Portal-Anmeldung und „📲 App installieren“ oben im Team-Bereich;
+  auf iPhone/iPad Anleitung über Safari → Teilen → Zum Home-Bildschirm. Die App startet im Team-Bereich (Anmeldung nötig).
+- Auf der gemeinsamen Testseite haben Kunden- und Team-App getrennte Service-Worker-Bereiche (/ und /team).

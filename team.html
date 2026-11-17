@@ -6,7 +6,13 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-<link rel="icon" href="assets/icon-192.png">
+<link rel="manifest" href="team.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/team-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Team">
+<link rel="icon" href="assets/team-192.png">
 <link rel="stylesheet" href="style.css">
 <style>
 .tb-tag{padding:4px 10px;border-radius:20px;background:#2a2112;color:#f6d79f;font-size:12px;font-weight:700;margin-left:10px}
@@ -152,7 +158,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <body data-page="team">
 <header class="topbar">
   <a class="brand" href="team.html"><i aria-hidden="true">✦</i><span>Team-<b>Portal</b></span></a>
-  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><a class="btn sm ghost" href="portal.html" id="teamLogout">Abmelden</a></div>
+  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><button class="btn sm" id="teamApp" hidden>📲 App installieren</button><a class="btn sm ghost" href="portal.html" id="teamLogout">Abmelden</a></div>
 </header>
 
 <main class="page">
@@ -786,6 +792,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(s){const v=s.role==="Admin"?"admin":s.user;
       if(![...$("viewAs").options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=`${s.name} (${s.role})`;$("viewAs").appendChild(o)}
       $("viewAs").value=v;me=v;applyRole()}}
+  {const b=$("teamApp"),upd=()=>{b.hidden=!NMA.install.can()||NMA.install.standalone()};b.addEventListener("click",async()=>{if(await NMA.install.run())NMA.toast("Team-App wird installiert.");upd()});addEventListener("nma:installable",upd);upd();}
   $("teamLogout").addEventListener("click",()=>{const tu=NMA.store.get("teamUser",null),lg=NMA.store.get("staffLog",[]),o=lg.slice().reverse().find(l=>l.user===tu&&!l.out);if(o){o.out=Date.now();NMA.store.set("staffLog",lg)}NMA.store.set("teamUser",null)});
 }</script>
 <script src="massenversand.js"></script>

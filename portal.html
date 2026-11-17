@@ -6,6 +6,13 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="team.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/team-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Team">
+<link rel="icon" href="assets/team-192.png">
 <link rel="stylesheet" href="style.css">
 <style>
 .pt{min-height:100svh;display:grid;place-items:center;padding:24px}
@@ -33,6 +40,11 @@
     <div class="field"><label for="p">Passwort</label><input class="input" id="p" type="password" autocomplete="current-password" required></div>
     <button class="btn primary" style="width:100%">Anmelden</button>
     <p class="hint" style="margin:14px 0 0">Demo: Benutzer sandra (Chef), marco, julia, tim oder nicole – Passwort beliebig.</p>
+    <div id="appBox" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line)" hidden>
+      <b>📲 Team-App</b>
+      <p class="hint" style="margin:4px 0 10px" id="appTxt">Installiere das Team-Portal als App – dann öffnest du es mit einem Tipp vom Startbildschirm.</p>
+      <button type="button" class="btn" id="appBtn" hidden>Team-App installieren</button>
+    </div>
   </form>
 </main>
 <script src="app.js"></script>
@@ -45,6 +57,15 @@
     if(!s){NMA.toast("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");return}
     const lg=NMA.store.get("staffLog",[]);lg.push({user,in:Date.now(),out:null});NMA.store.set("staffLog",lg.slice(-500));
     NMA.store.set("teamUser",user);location.href="team.html"});
+  /* Team-App installieren */
+  {const box=document.getElementById("appBox"),btn=document.getElementById("appBtn"),txt=document.getElementById("appTxt");
+    const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+    const show=()=>{if(NMA.install.standalone()){box.hidden=true;return}box.hidden=false;
+      if(NMA.install.can()){btn.hidden=false;txt.textContent="Installiere das Team-Portal als App – dann öffnest du es mit einem Tipp vom Startbildschirm."}
+      else if(ios){btn.hidden=true;txt.innerHTML="iPhone/iPad: in <b>Safari</b> unten auf <b>Teilen</b> → <b>Zum Home-Bildschirm</b> → <b>Hinzufügen</b>."}
+      else{btn.hidden=true;txt.innerHTML="Android/PC: im Browser-Menü <b>⋮</b> → <b>App installieren</b> (Chrome oder Edge)."}};
+    btn.addEventListener("click",async()=>{if(await NMA.install.run())NMA.toast("Team-App wird installiert.");show()});
+    addEventListener("nma:installable",show);show();}
   if(NMA.store.get("teamUser",null))NMA.toast("Du bist abgemeldet.");
   NMA.store.set("teamUser",null);
 }</script>
