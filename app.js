@@ -394,3 +394,40 @@ NMA.chatBadge = () => {
   }
   NMA.chatBadge();
 }
+
+/* ---------------- FAVORITEN ----------------
+   Kunde markiert Profile mit ☆. Benachrichtigungen können auf „nur Favoriten“ gestellt werden.
+   SERVER: Favoriten pro Kunde speichern; beim Push prüfen: Modus „favoriten“ → nur wenn Profil in den Favoriten. */
+NMA.favs = () => NMA.store.get("favs", []);
+NMA.isFav = id => NMA.favs().includes(id);
+NMA.toggleFav = id => { const f = NMA.favs(), on = !f.includes(id); NMA.store.set("favs", on ? [...f, id] : f.filter(x => x !== id)); const p = NMA.get && NMA.get(id); NMA.toast(on ? `☆ ${p ? p.name : "Profil"} ist jetzt ein Favorit.` : "Aus den Favoriten entfernt."); return on; };
+NMA.pushMode = () => NMA.store.get("pushMode", "alle");      /* "alle" | "favoriten" | "aus" */
+
+/* ---------------- FRAGE NACH DEM ANMELDEN: Benachrichtigungen ----------------
+   Erscheint einmal nach Registrierung oder Anmeldung (im Mitgliederbereich). */
+{
+  const pg = (document.body && document.body.dataset.page) || "";
+  if (NMA.store.get("pushAsk", false) && /^(uebersicht|suche|chat|postfach|mein-profil)$/.test(pg)) setTimeout(() => {
+    NMA.store.set("pushAsk", false);
+    const m = document.createElement("div"); m.className = "modal";
+    m.innerHTML = `<div class="card" role="dialog" aria-modal="true" aria-labelledby="pqT" style="max-width:460px">
+      <h2 id="pqT">Benachrichtigungen erhalten?</h2>
+      <p class="muted">Wir sagen dir Bescheid, sobald jemand dir schreibt – wie bei WhatsApp, auch wenn die App geschlossen ist.</p>
+      <div style="display:grid;gap:10px;margin:16px 0 6px">
+        <button class="btn primary" data-pm="alle">🔔 Bei allen neuen Nachrichten</button>
+        <button class="btn" data-pm="favoriten">☆ Nur bei meinen Favoriten</button>
+        <button class="btn ghost" data-pm="aus">Jetzt nicht</button>
+      </div>
+      <p class="hint" style="margin:8px 0 0">Favoriten markierst du mit ☆ im Profil oder im Chat. Ändern kannst du das jederzeit unter Einstellungen.</p></div>`;
+    document.body.appendChild(m);
+    m.querySelectorAll("[data-pm]").forEach(b => b.addEventListener("click", async () => {
+      const mode = b.dataset.pm; NMA.store.set("pushMode", mode); NMA.store.set("pushModeSet", true); m.remove();
+      if (mode === "aus") { NMA.toast("Okay – du kannst Benachrichtigungen jederzeit in den Einstellungen einschalten."); return; }
+      if (!NMA.push) { NMA.toast("Gespeichert."); return; }
+      const c = NMA.push.check();
+      if (!c.ok) { NMA.toast(c.ios ? "Auf dem iPhone geht das erst in der installierten App – siehe „App installieren“." : "Gespeichert. Benachrichtigungen funktionieren auf der echten Seite bzw. in der App."); return; }
+      try { await NMA.push.enable(NMA.store.get("pushPreview", false), mode); NMA.toast(mode === "alle" ? "🔔 Du wirst bei neuen Nachrichten benachrichtigt." : "☆ Du wirst nur bei Nachrichten deiner Favoriten benachrichtigt."); }
+      catch (err) { NMA.toast(err.message); }
+    }));
+  }, 700);
+}

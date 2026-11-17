@@ -82,7 +82,7 @@
     if(!f.checkValidity()){const bad=f.querySelector(":invalid");bad&&bad.focus();
       NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="vorname"?"Bitte gib deinen Vornamen ein (mindestens 2 Buchstaben).":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?`Bitte gib deine Postleitzahl ein (${NMA.LAND[landEl.value].len} Ziffern für ${NMA.LAND[landEl.value].name}).`:"Bitte fülle alle Pflichtfelder aus.");return}
     NMA.store.set("user",{registered:Date.now(),lastLogin:Date.now(),mail:$("mail").value.trim(),nick:nick.value.trim(),vorname:vn.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,sex:$("sex").value,job:$("job").value.trim(),land:landEl.value,plz:$("plz").value,radius:$("radius").value,city:"",about:""});
-    NMA.store.set("buchungen",[]);NMA.setCoins(5); location.href="uebersicht.html?neu=1";
+    NMA.store.set("buchungen",[]);NMA.store.set("favs",[]);NMA.store.set("pushAsk",true);NMA.store.set("pushModeSet",false);NMA.setCoins(5); location.href="uebersicht.html?neu=1";
   });
 }</script>
 </body>

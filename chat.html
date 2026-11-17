@@ -20,7 +20,7 @@
       <h1>Chat</h1>
       <label class="search"><span aria-hidden="true">⌕</span><input type="search" id="q" placeholder="Unterhaltungen durchsuchen" aria-label="Unterhaltungen durchsuchen"></label>
     </div>
-    <div class="chips" role="tablist"><button class="chip on" data-f="all">Alle</button><button class="chip" data-f="unread">Ungelesen</button><button class="chip" data-f="online">Online</button></div>
+    <div class="chips" role="tablist"><button class="chip on" data-f="all">Alle</button><button class="chip" data-f="unread">Ungelesen</button><button class="chip" data-f="online">Online</button><button class="chip" data-f="fav">☆ Favoriten</button></div>
     <div class="convs" id="convs"></div>
   </aside>
 
@@ -29,6 +29,7 @@
     <header class="pane-head" id="head" hidden>
       <button class="icon back" id="back" aria-label="Zurück zur Liste">←</button>
       <a class="who" id="who" href="#"></a>
+      <button class="icon" id="fav" aria-label="Als Favorit markieren" title="Favorit" style="font-size:20px;color:var(--gold)">☆</button>
       <a class="icon" id="info" href="#" aria-label="Profil ansehen" title="Profil ansehen">ⓘ</a>
       <button class="icon" id="more" aria-label="Melden oder blockieren" title="Melden oder blockieren">⋯</button>
     </header>
@@ -45,6 +46,7 @@
   </section>
 </main>
 <script src="app.js"></script>
+<script src="push.js"></script>
 <script>{
   const $=id=>document.getElementById(id);
   const shell=$("shell");
@@ -56,10 +58,10 @@
   const renderList=()=>{
     const q=$("q").value.trim().toLowerCase();
     const ids=Object.keys(chats).filter(id=>{const p=NMA.get(id);
-      return (!q||p.name.toLowerCase().includes(q))&&(filter!=="unread"||unread[id])&&(filter!=="online"||p.online)});
+      return (!q||p.name.toLowerCase().includes(q))&&(filter!=="unread"||unread[id])&&(filter!=="online"||p.online)&&(filter!=="fav"||NMA.isFav(id))});
     $("convs").innerHTML=ids.length?ids.map(id=>{const p=NMA.get(id),l=lastOf(id),n=unread[id]||0;
       const prev=l?(l.t==="me"?"Du: ":"")+(l.img?"📷 Bild":l.x):"Noch keine Nachrichten";
-      return `<button class="conv ${id===current?"on":""} ${n?"unread":""}" data-id="${id}">${NMA.avatar(p,"lg")}<span class="grow"><span class="top"><strong>${p.name}, ${p.age}</strong><span class="time">${l?l.h:""}</span></span><span class="prev">${NMA.esc(prev)}</span></span>${n?`<span class="unread-n">${n}</span>`:""}</button>`}).join(""):'<p class="empty">Keine Unterhaltungen gefunden.</p>';
+      return `<button class="conv ${id===current?"on":""} ${n?"unread":""}" data-id="${id}">${NMA.avatar(p,"lg")}<span class="grow"><span class="top"><strong>${NMA.isFav(id)?'<span style="color:var(--gold)" title="Favorit">★</span> ':""}${p.name}, ${p.age}</strong><span class="time">${l?l.h:""}</span></span><span class="prev">${NMA.esc(prev)}</span></span>${n?`<span class="unread-n">${n}</span>`:""}</button>`}).join(""):'<p class="empty">Keine Unterhaltungen gefunden.</p>';
   };
   const bubble=m=>m.d?`<div class="day">${m.d}</div>`:`<div class="bubble ${m.t}">${m.img?`<img src="${m.img}" alt="Gesendetes Bild">`:NMA.esc(m.x)}<time>${m.h}${m.t==="me"?" ✓✓":""}</time></div>`;
   const renderMsgs=()=>{$("msgs").innerHTML=chats[current].map(bubble).join("");$("msgs").scrollTop=$("msgs").scrollHeight};
@@ -72,6 +74,7 @@
     const p=NMA.get(id);
     $("none").hidden=true;["head","msgs","comp"].forEach(x=>$(x).hidden=false);
     $("who").href=$("info").href=`profil.html?id=${id}`;
+    $("fav").textContent=NMA.isFav(id)?"★":"☆";$("fav").setAttribute("aria-pressed",NMA.isFav(id));
     $("who").innerHTML=`${NMA.avatar(p)}<span><strong>${p.name}, ${p.age}</strong><small>${p.online?'<span class="dot"></span>Online':"Zuletzt online "+p.last}</small></span>`;
     shell.classList.add("open");document.body.classList.add("chat-open");
     renderMsgs();renderCost();renderList();
@@ -95,6 +98,7 @@
       const q=NMA.store.get("inboxQ",[]);q.push({id:"c"+t,cust:me,pid:current,text:m.x,t});NMA.store.set("inboxQ",q.slice(-300))}
     if(Date.now()-NMA.store.get("teamAlive",0)>10000)fakeReply(current)};
   /* Live: neue Nachricht ist angekommen */
+  $("fav").addEventListener("click",()=>{if(!current)return;const on=NMA.toggleFav(current);$("fav").textContent=on?"★":"☆";$("fav").setAttribute("aria-pressed",on);renderList()});
   addEventListener("nma:msg",e=>{if(e.detail.pid===current){renderMsgs();NMA.markRead(current)}renderList()});
 
   $("comp").addEventListener("submit",e=>{e.preventDefault();const v=$("txt").value.trim();if(!v)return;$("txt").value="";$("emojis").hidden=true;send({x:v})});

@@ -182,3 +182,10 @@ Stand 16.11.2026 – Live-Nachrichten (wie WhatsApp)
 - SERVER: WebSocket (oder Server-Sent Events). In app.js NMA.liveConfig.url = "wss://…/live" eintragen; der Server
   schickt pro Nachricht {type:"msg", id, pid, text, t}; Mitarbeiterbereich bekommt Kundennachrichten ebenso live.
   Ist der Kunde nicht online → Push-Benachrichtigung (siehe Push).
+
+Stand 17.11.2026 – Favoriten & Frage nach Benachrichtigungen
+- Nach Registrierung bzw. erster Anmeldung fragt die App einmal: „Bei allen neuen Nachrichten“ / „Nur bei meinen
+  Favoriten“ / „Jetzt nicht“. Danach fragt das Handy nach der Erlaubnis. Ändern unter Einstellungen → „Benachrichtigen bei“.
+- Favoriten: ☆ im Profil und im Chat-Kopf, Filter „☆ Favoriten“ in der Chatliste, ★ vor dem Namen.
+- SERVER: Favoriten pro Kunde speichern; push/subscribe bekommt mode ("alle"|"favoriten"); bei „favoriten“ nur pushen,
+  wenn das schreibende Profil in den Favoriten ist (siehe server/push-beispiel.js).

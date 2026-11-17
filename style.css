@@ -378,3 +378,4 @@ details.faq p{margin:0 4px 18px;color:#cfe3e1}
 @keyframes igb{to{transform:translate(-50%,-8px)}}
 @media(prefers-reduced-motion:reduce){.ig-arrow{animation:none}}
 @media(max-width:600px){.install-sheet{align-items:end}.install-sheet .card{margin-bottom:56px}}
+.btn.on:not(.like){border-color:var(--gold);color:var(--gold)}

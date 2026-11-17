@@ -16,13 +16,14 @@ app.use(express.json());
 
 /* kundeId kommt in echt aus der Anmeldung (Session/Cookie) */
 const kundeVon = req => req.session?.kundeId || "demo";
-const subs = new Map();            /* kundeId → [{ subscription, preview }] */
+const subs = new Map();            /* kundeId → [{ subscription, preview, mode }] */
+const favoritenVon = kundeId => new Set();   /* in echt: Favoriten des Kunden aus der Datenbank */
 
 app.post("/api/push/subscribe", (req, res) => {
-  const { subscription, preview } = req.body || {};
+  const { subscription, preview, mode } = req.body || {};
   if (!subscription?.endpoint) return res.status(400).end();
   const id = kundeVon(req), list = (subs.get(id) || []).filter(s => s.subscription.endpoint !== subscription.endpoint);
-  list.push({ subscription, preview: !!preview });
+  list.push({ subscription, preview: !!preview, mode: mode === "favoriten" ? "favoriten" : "alle" });
   subs.set(id, list);
   res.status(201).json({ ok: true });
 });
@@ -36,7 +37,8 @@ app.post("/api/push/unsubscribe", (req, res) => {
 /* Aufrufen, sobald ein Profil (Moderator oder Massenversand) einem Kunden schreibt.
    Tipp: nicht bei jeder Nachricht pushen, wenn der Kunde gerade im Chat online ist. */
 async function neueNachrichtPush(kundeId, { profilName, profilId, text }) {
-  const list = subs.get(kundeId) || [];
+  const favs = favoritenVon(kundeId);
+  const list = (subs.get(kundeId) || []).filter(s => s.mode !== "favoriten" || favs.has(profilId));
   await Promise.all(list.map(async s => {
     const payload = s.preview
       ? { title: `Neue Nachricht von ${profilName}`, body: text.slice(0, 120), url: `chat.html?mit=${profilId}`, tag: "chat-" + profilId }

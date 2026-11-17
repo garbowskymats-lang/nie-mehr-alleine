@@ -10,7 +10,8 @@
    1. VAPID-Schlüssel erzeugen:  npx web-push generate-vapid-keys
    2. Öffentlichen Schlüssel unten bei vapidPublicKey eintragen (privater bleibt auf dem Server!)
    3. Endpunkte bauen (Beispiel: server/push-beispiel.js):
-        POST /api/push/subscribe    { subscription, preview }  → beim Kunden speichern
+        POST /api/push/subscribe    { subscription, preview, mode }  → beim Kunden speichern
+                                    (mode: "alle" | "favoriten")
         POST /api/push/unsubscribe  { endpoint }               → löschen
    4. Bei jeder neuen Nachricht an einen Kunden: Push an alle seine Geräte senden.
    Solange vapidPublicKey leer ist, läuft der DEMO-Modus: Die Erlaubnis wird echt abgefragt,
@@ -47,14 +48,15 @@ NMA.push = (() => {
     try { const r = await reg(); return !!(await r.pushManager.getSubscription()); } catch (e) { return false; }
   };
 
-  const enable = async (preview) => {
+  const enable = async (preview, mode) => {
+    mode = mode || NMA.pushMode();
     const c = check(); if (!c.ok) throw new Error(c.why);
     const perm = await Notification.requestPermission();
     if (perm !== "granted") throw new Error("Du hast Benachrichtigungen nicht erlaubt. Du kannst das jederzeit wieder einschalten.");
     const r = await reg(); await navigator.serviceWorker.ready;
     if (!cfg.vapidPublicKey) { NMA.store.set("pushDemo", true); return "demo"; }
     const sub = (await r.pushManager.getSubscription()) || await r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(cfg.vapidPublicKey) });
-    const res = await fetch(cfg.subscribeUrl, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ subscription: sub, preview: !!preview }) });
+    const res = await fetch(cfg.subscribeUrl, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ subscription: sub, preview: !!preview, mode }) });
     if (!res.ok) throw new Error("Der Server hat die Anmeldung nicht angenommen. Bitte später noch einmal versuchen.");
     return "ok";
   };
