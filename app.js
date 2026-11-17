@@ -84,11 +84,11 @@ NMA.notice = "Unterhaltungs-Chat mit moderierten Profilen: Die Profile werden vo
 /* ---------------- Hilfsfunktionen ---------------- */
 NMA.esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 NMA.avatar = (p,cls="",on=true) => {
-  const bg = p.photo ? `background-image:url('${p.photo}');background-position:22% 25%;background-size:260%` : `--g:${p.g}`;
+  const bg = p.photo ? `background-image:url('${p.photo}');background-position:${p.ppos||"22% 25%"};background-size:${p.psize||"260%"}` : `--g:${p.g}`;
   return `<span class="avatar ${cls}" style="${bg}">${p.photo?"":p.name[0]}${on&&p.online?'<i class="on"></i>':""}</span>`;
 };
 NMA.photo = p => {
-  const bg = p.photo ? `background-image:linear-gradient(transparent 55%,#071012cc),url('${p.photo}');background-position:24% 30%` : `--g:${p.g}`;
+  const bg = p.photo ? `background-image:linear-gradient(transparent 55%,#071012cc),url('${p.photo}');background-position:${p.ppos||"24% 30%"}` : `--g:${p.g}`;
   const st = p.online ? '<span class="status"><span class="dot"></span>Online</span>' : `<span class="status"><span class="dot off"></span>Zuletzt online ${p.last||""}</span>`;
   return `<div class="photo" style="${bg}">${p.photo?"":`<span class="ini">${p.name[0]}</span>`}${st}</div>`;
 };

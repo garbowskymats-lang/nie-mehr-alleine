@@ -261,3 +261,13 @@ Stand 17.11.2026 – Team-App
 - Dadurch lassen sich Kunden-App und Team-App auf derselben Adresse **beide** installieren (Edge/Chrome: Installieren-Symbol in der Adressleiste, getrennte Apps in der Taskleiste).
 - Alte Adressen `portal.html` und `team.html` leiten automatisch weiter.
 - Neues Startbild `assets/hero-paar.jpg`: KI-generiertes älteres Paar, keine echten Personen. Es erscheint auf der Startseite, bei der Anmeldung und bei der Registrierung. Am PC steht das Paar links, Text und Anmeldung rechts. Am Handy ist das Bild oben, der Text darunter.
+
+## Stand 17.11.2026 – 🏭 Profil-Fabrik (Team-Portal, nur Chef)
+- Neuer Reiter „🏭 Profil-Fabrik“ (`fabrik.js`). „Ich brauche 100 neue Profile“: Anzahl, Frauenanteil, Abenteueranteil, Altersgruppen und maximale Bilderzahl einstellen, dann „Profile erstellen“.
+- Jede Person bekommt eine feste Nummer und einen festen Ordner, z. B. `Frauen/Abenteuer/Frau_57_0042`. Aus Bausteinen werden zusammengestellt, passend zu Geschlecht, Alter und Kategorie: Vorname, Nickname (einmalig), Beruf (ab 66 Rentner/in), Größe, Familienstand, Interessen, Profiltext, Aussehen und 1–8 Bild-Szenen. Abenteuer-Profile bekommen zusätzlich „_freigabe“-Bilder (FSK16).
+- „⬇ Prompts herunterladen“: Textdatei für ChatGPT mit je 10 Personen pro Block. ChatGPT schreibt unter jedes Bild Ordner und Dateinamen.
+- „📂 Bilder einlesen“: Ordner „Profilbilder“ auswählen. Jedes Bild wird über Ordner- und Dateinamen der richtigen Person zugeordnet (Nummer, Geschlecht und Alter müssen stimmen, sonst Meldung). Flache Namen wie `Frau_57_0042_03_freigabe.jpg` gehen auch.
+- „✅ Freischalten“: vollständige Profile gehen live. Bild 01 wird Profilbild, die übrigen Bilder kommen in die Fotos (`_freigabe` nur nach Fotofreigabe). Die Profile werden gleichmäßig auf die Moderatoren verteilt oder an einen bestimmten vergeben.
+- Pro Person „Ansehen“: Bilder, Profiltext (änderbar), Prompt zum Kopieren, „Neu würfeln“ (solange noch keine Bilder da sind), Löschen.
+- **SERVER / Vollautomatik:** `NMA.fabrikConfig.url` setzen. Dann schickt „🤖 Bilder automatisch erzeugen“ die Szenen an den Server, der eine Bild-KI aufruft und die Bild-URLs zurückgibt. Beispiel: `server/profil-fabrik-beispiel.js` (API-Schlüssel nur auf dem Server, Tageslimit, Admin-Prüfung). Später können die Profiltexte statt aus Bausteinen auch von einer Text-KI geschrieben werden.
+- Demo-Grenze: Der Browser-Speicher reicht nur für einige Dutzend verkleinerte Bilder. Deshalb fertige Profile freischalten, bevor der nächste Schwung eingelesen wird. Auf dem Server gibt es diese Grenze nicht.

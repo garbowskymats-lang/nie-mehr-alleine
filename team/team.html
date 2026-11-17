@@ -164,7 +164,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <main class="page">
   <div class="page-head">
     <div><h1 id="pTitle">Mitarbeiterbereich</h1><p id="pSub">Statistik und Verwaltung des Moderatoren-Teams.</p></div>
-    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="mass" role="tab" id="tabMass" hidden>📣 Massenversand <span class="badge" id="mvBadge" hidden>0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="pinnwand" role="tab">📌 Pinnwand <span class="badge" id="pinBadge" hidden>0</span></button><button data-tab="monitor" role="tab" data-admin>📡 Monitor</button><button data-tab="kunden" role="tab" data-admin>👤 Kunden</button><button data-tab="support" role="tab" data-admin>🛟 Support <span class="badge" id="supBadge" hidden>0</span></button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
+    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="mass" role="tab" id="tabMass" hidden>📣 Massenversand <span class="badge" id="mvBadge" hidden>0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="pinnwand" role="tab">📌 Pinnwand <span class="badge" id="pinBadge" hidden>0</span></button><button data-tab="monitor" role="tab" data-admin>📡 Monitor</button><button data-tab="kunden" role="tab" data-admin>👤 Kunden</button><button data-tab="fabrik" role="tab" data-admin>🏭 Profil-Fabrik</button><button data-tab="support" role="tab" data-admin>🛟 Support <span class="badge" id="supBadge" hidden>0</span></button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
   </div>
 
   <!-- ================= STATISTIK ================= -->
@@ -278,6 +278,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   <section id="monitor" hidden></section>
   <!-- ================= KUNDEN (nur Admin, kunden.js) ================= -->
   <section id="kunden" hidden></section>
+  <section id="fabrik" hidden></section>
   <!-- ================= SUPPORT (nur Admin, support.js) ================= -->
   <section id="support" hidden></section>
   <!-- ================= VERLÄUFE (nur Admin) ================= -->
@@ -441,7 +442,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
-    ["inbox","profiles","templates","mass","stats","staff","pinnwand","monitor","kunden","support","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
+    ["inbox","profiles","templates","mass","stats","staff","pinnwand","monitor","kunden","fabrik","support","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
   $("eCoin").addEventListener("change",e=>{const v=+e.target.value;if(v>0){ecfg.coin=v;NMA.store.set("earnCfg",ecfg);renderStats();NMA.toast("Gespeichert.")}});
   $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
     $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
@@ -782,7 +783,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 
   /* Schnittstelle für massenversand.js */
   window.TEAM={renderLogs,logs,get me(){return me},isAdmin,meKey,ownerName,owners,get staff(){return staff},persistStaff:()=>{persist();renderStaff()},
-    profiles,customers,cust,get notes(){return notes},get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff};
+    profiles,customers,cust,get notes(){return notes},get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff,renderProfiles};
 
   renderStats();renderStaff();applyRole();
 
@@ -801,5 +802,6 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <script src="archiv.js"></script>
 <script src="feiertage.js"></script>
 <script src="admin.js"></script>
+<script src="fabrik.js"></script>
 </body>
 </html>
