@@ -404,7 +404,7 @@ NMA.toggleFav = id => { const f = NMA.favs(), on = !f.includes(id); NMA.store.se
 NMA.pushMode = () => NMA.store.get("pushMode", "alle");      /* "alle" | "favoriten" | "aus" */
 
 /* ---------------- FRAGE NACH DEM ANMELDEN: Benachrichtigungen ----------------
-   Erscheint einmal nach Registrierung oder Anmeldung (im Mitgliederbereich). */
+   Erscheint genau EINMAL direkt nach der Registrierung. „Nein“ = keine Benachrichtigungen (änderbar in den Einstellungen). */
 {
   const pg = (document.body && document.body.dataset.page) || "";
   if (NMA.store.get("pushAsk", false) && /^(uebersicht|suche|chat|postfach|mein-profil)$/.test(pg)) setTimeout(() => {
@@ -416,13 +416,13 @@ NMA.pushMode = () => NMA.store.get("pushMode", "alle");      /* "alle" | "favori
       <div style="display:grid;gap:10px;margin:16px 0 6px">
         <button class="btn primary" data-pm="alle">🔔 Bei allen neuen Nachrichten</button>
         <button class="btn" data-pm="favoriten">☆ Nur bei meinen Favoriten</button>
-        <button class="btn ghost" data-pm="aus">Jetzt nicht</button>
+        <button class="btn ghost" data-pm="aus">Nein, keine Benachrichtigungen</button>
       </div>
       <p class="hint" style="margin:8px 0 0">Favoriten markierst du mit ☆ im Profil oder im Chat. Ändern kannst du das jederzeit unter Einstellungen.</p></div>`;
     document.body.appendChild(m);
     m.querySelectorAll("[data-pm]").forEach(b => b.addEventListener("click", async () => {
       const mode = b.dataset.pm; NMA.store.set("pushMode", mode); NMA.store.set("pushModeSet", true); m.remove();
-      if (mode === "aus") { NMA.toast("Okay – du kannst Benachrichtigungen jederzeit in den Einstellungen einschalten."); return; }
+      if (mode === "aus") { if (NMA.push) NMA.push.disable(); NMA.toast("Okay, du bekommst keine Benachrichtigungen. Ändern kannst du das in den Einstellungen."); return; }
       if (!NMA.push) { NMA.toast("Gespeichert."); return; }
       const c = NMA.push.check();
       if (!c.ok) { NMA.toast(c.ios ? "Auf dem iPhone geht das erst in der installierten App – siehe „App installieren“." : "Gespeichert. Benachrichtigungen funktionieren auf der echten Seite bzw. in der App."); return; }

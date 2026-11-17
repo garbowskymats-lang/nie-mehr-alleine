@@ -46,7 +46,7 @@
       const s=staff.find(x=>x.user===user&&x.active!==false);
       if(!s){NMA.toast("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");return}
       NMA.store.set("teamUser",user);location.href="team.html";return}
-    const u=NMA.user();u.lastLogin=Date.now();NMA.store.set("user",u);if(!NMA.store.get("pushModeSet",false))NMA.store.set("pushAsk",true);location.href="uebersicht.html"});
+    const u=NMA.user();u.lastLogin=Date.now();NMA.store.set("user",u);location.href="uebersicht.html"});
 }</script>
 </body>
 </html>
