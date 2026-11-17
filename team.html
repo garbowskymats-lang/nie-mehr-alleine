@@ -561,7 +561,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   const renderInfo=x=>{
     const c=cust(x.cust),p=prof(x.pid)||{};
     const got=(tplSent[x.cust]||[]).map(s=>tplNo(s.nr)).join(", ")||"keine";
-    $("infoPane").innerHTML=`<h4>KUNDE</h4><div class="kv"><span>Nickname</span><b>${NMA.esc(x.cust)}</b><span>Vorname</span>${NMA.esc(c.vorname||"–")}<span>Kunden-Nr.</span>#${c.nr}<span>Status</span><span style="color:var(--ink)">${stBadge(c)} ${c.st==="K"?"Kunde (hat bezahlt)":"Tester"}</span><span>Coins</span><b style="color:var(--gold)">${c.coins}</b><span>Alter</span>${c.age||"–"}<span>Wohnort</span>${NMA.esc(c.ort||"–")}${c.ort?` <small class="muted">(${c.land||"DE"})</small>`:""}<span>PLZ-Bereich</span>${NMA.esc(NMA.region(c.land||"DE",(String(c.ort||"").match(/\d{4,5}/)||[])[0])||"–")}<span>Beruf</span>${NMA.esc(c.job||"–")}<span>Sucht</span>${c.look||"–"}<span>Dabei seit</span>${c.since||"–"}<span>Vorlagen erhalten</span>${got}</div>
+    $("infoPane").innerHTML=`<h4>KUNDE</h4><div class="kv"><span>Nickname</span><b>${NMA.esc(x.cust)}</b><span>Vorname</span>${NMA.esc(c.vorname||"–")}<span>Kunden-Nr.</span>#${c.nr}<span>Status</span><span style="color:var(--ink)">${stBadge(c)} ${c.st==="K"?"Kunde (hat bezahlt)":"Tester"}</span><span>Coins</span><b style="color:var(--gold)">${c.coins}</b><span>Alter</span>${c.age||"–"}<span>Wohnort</span>${NMA.esc(c.ort||"–")}${c.ort?` <small class="muted">(${c.land||"DE"})</small>`:""}<span>PLZ-Bereich</span>${NMA.esc(NMA.region(c.land||"DE",(String(c.ort||"").match(/\d{4,5}/)||[])[0])||"–")}${window.FEIERTAGE&&FEIERTAGE.info(c.land)?`<span>Feiertag</span><b style="color:var(--gold)">${NMA.esc(FEIERTAGE.info(c.land))}</b>`:""}<span>Beruf</span>${NMA.esc(c.job||"–")}<span>Sucht</span>${c.look||"–"}<span>Dabei seit</span>${c.since||"–"}<span>Vorlagen erhalten</span>${got}</div>
       ${isAdmin()?`<button class="btn sm" data-kcard="${NMA.esc(x.cust)}" style="margin:10px 0 4px">👤 Kundenkarte öffnen</button>`:""}
       <h4>NOTIZEN ZUM KUNDEN <small style="font-weight:400">(für alle Mitarbeiter)</small></h4><textarea class="input" id="note" placeholder="z. B. Hobbys, Familie, worüber zuletzt gesprochen wurde">${NMA.esc(notes[x.cust]||"")}</textarea>
       <h4>PROFIL IN DIESEM GESPRÄCH</h4><div class="kv"><span>Name</span><b>${NMA.esc(p.name||"")}</b><span>Rubrik</span>${p.sex==="m"?"Mann":"Frau"} · ${p.looking||""}<span>Alter</span>${p.age||"–"}${(()=>{const ko=NMA.wohnortModus()==="kontakt"&&NMA.kontaktOrt(p,{nick:x.cust,plz:(String(c.ort||"").match(/\d{4,5}/)||[])[0],radius:c.radius||50,city:String(c.ort||"").replace(/\d{4,5}/,"").trim(),land:c.land||"DE"});return ko?`<span>Wohnt für ihn</span><b style="color:var(--accent)">${NMA.esc(ko.ort)} (${ko.km} km)</b>`:`<span>Ort</span>${NMA.esc(p.city||"–")}`})()}<span>Beruf</span>${NMA.esc(p.job||"–")}<span>Gehört</span>${NMA.esc(ownerName(p.owner))}</div>
@@ -603,7 +603,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(!can)$("ownerLock").innerHTML=`🔒 Dieses Profil gehört <b>${NMA.esc(ownerName(p.owner))}</b>. Nur er/sie kann damit schreiben.${isAdmin()?` <button class="btn sm" id="takeOver">Profil zu mir verschieben</button>`:""}`;
     if(!can&&isAdmin())$("takeOver").addEventListener("click",()=>moveProfile(p,"chef",()=>openQ(id)));
     $("sendBtn").textContent=x.kind==="heart"?"Anschreiben":"Antworten";
-    renderTplPick();renderQueue();renderInfo(x);$("reply").value="";$("charHint").textContent="0 Zeichen";
+    renderTplPick();renderQueue();renderInfo(x);window.FEIERTAGE&&FEIERTAGE.check(x.cust,c.land||"DE");$("reply").value="";$("charHint").textContent="0 Zeichen";
     if(can&&innerWidth>700)$("reply").focus();
   };
   const hideConv=()=>{cur=null;$("ibxConv").hidden=true;$("ibxEmpty").hidden=false;$("infoPane").innerHTML='<p class="empty">Infos zu Kunde und Profil erscheinen hier.</p>'};
@@ -789,5 +789,6 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 <script src="support.js"></script>
 <script src="kunden.js"></script>
 <script src="archiv.js"></script>
+<script src="feiertage.js"></script>
 </body>
 </html>

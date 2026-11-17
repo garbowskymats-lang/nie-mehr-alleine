@@ -230,3 +230,9 @@ Stand 17.11.2026 – Mehrere Domains (Eingänge) + eigenes Team-Portal
 - SERVER: ein Backend für alle Eingänge; Eingang aus dem Host-Header beim Registrieren; Team-API nur für das Portal
   (eigene Domain, CORS/Host prüfen); Kunden-API liefert nie Mitarbeiter-Daten; Domains in Mitarbeiter-Antworten weglassen
   (nur der Chef bekommt „Eingang“).
+
+Stand 17.11.2026 – Feiertage DE/AT/CH (feiertage.js, nur Team-Portal)
+- Leiste oben im Team-Portal: Feiertage heute und morgen pro Land (regionale Feiertage gekennzeichnet).
+- Öffnet ein Mitarbeiter ein Gespräch mit einem Kunden aus einem Land mit Feiertag: Pop-up „Heute Feiertag in Österreich: …“
+  (einmal pro Gespräch und Tag), zusätzlich Zeile „Feiertag“ im Chat rechts. Bewegliche Feiertage über das Osterdatum,
+  gilt für alle Jahre. Test: team.html?datum=2026-10-26
