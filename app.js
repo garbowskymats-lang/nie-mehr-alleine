@@ -194,12 +194,12 @@ document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",e
       `Tippe auf ${dots} <b>Menü</b>.`, `Wähle <b>Installieren</b> bzw. <b>Zum Startbildschirm hinzufügen</b>.`, `Bestätige mit <b>Hinzufügen</b>.`] };
     if (isAndroid) return { t: "Auf dem Android-Handy installieren", s: [
       `Tippe oben rechts auf ${dots} <b>Menü</b>.`, `Wähle <b>App installieren</b> bzw. <b>Zum Startbildschirm hinzufügen</b>.`, `Bestätige mit <b>Installieren</b>.`],
-      n: "Auf der fertigen Seite öffnet der Knopf diesen Dialog automatisch." };
+      n: "In Chrome und Edge öffnet der Knopf den Installieren-Dialog direkt – diese Anleitung kommt nur, wenn der Browser das nicht anbietet." };
     if (isFirefox) return { t: "Am PC installieren", s: [
       `Firefox kann Web-Apps am PC nicht installieren.`, `Öffne die Seite in <b>Chrome</b> oder <b>Edge</b>.`, `Klicke dort rechts in der Adressleiste auf ${inst} und dann auf <b>Installieren</b>.`] };
     return { t: "Am PC installieren", s: [
       `Klicke rechts in der Adressleiste auf ${inst} <b>App installieren</b>.`, `Falls das Symbol fehlt: Menü ${dots} → <b>Streamen, speichern und teilen</b> → <b>Seite als App installieren</b>.`, `Bestätige mit <b>Installieren</b>.`],
-      n: "Auf der fertigen Seite öffnet der Knopf diesen Dialog automatisch." };
+      n: "In Chrome und Edge öffnet der Knopf den Installieren-Dialog direkt – diese Anleitung kommt nur, wenn der Browser das nicht anbietet." };
   };
 
   const guide = () => {
