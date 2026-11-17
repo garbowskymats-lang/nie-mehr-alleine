@@ -367,7 +367,7 @@ NMA.fabrikConfig = NMA.fabrikConfig || { url: "" };   /* z. B. "https://api.tipp
   /* Vollautomatik über den Server */
   const auto = async () => {
     const list = F.items.filter(i => stateOf(i) === "wartet" || stateOf(i) === "teil");
-    if (!NMA.fabrikConfig.url) { NMA.modal({ title: "🤖 Vollautomatik noch nicht angeschlossen", text: `Damit die Bilder ohne ChatGPT-Handarbeit entstehen, braucht der <b>Server</b> einen Zugang zu einer Bild-KI (z. B. OpenAI-Bild-API, kostet pro Bild ein paar Cent). Das richtet der Server-Kollege ein – ein fertiges Beispiel liegt in <code>server/profil-fabrik-beispiel.js</code>.<br><br>Danach erzeugt dieser Knopf die Bilder für alle ${list.length} wartenden Profile selbst, ordnet sie zu, und du musst nur noch freischalten.<br><br>Bis dahin: <b>⬇ Prompts herunterladen</b> → ChatGPT → <b>📂 Bilder einlesen</b>.`, ok: "Verstanden" }); return; }
+    if (!NMA.fabrikConfig.url) { NMA.modal({ title: "🤖 Vollautomatik noch nicht angeschlossen", text: `Damit die Bilder ohne ChatGPT-Handarbeit entstehen, braucht der <b>Server</b> einen Zugang zu einer Bild-KI (z. B. OpenAI-Bild-API, kostet pro Bild ein paar Cent). Das richtet der Server-Kollege ein – ein fertiges Beispiel liegt in <code>server/profil-fabrik-beispiel.js</code>.<br><br>Danach erzeugt dieser Knopf die Bilder für alle ${list.length} wartenden Profile selbst, ordnet sie zu, und du musst nur noch freischalten.<br><br>Bis dahin: <b>⬇ Prompts herunterladen</b> → ChatGPT → <b>📥 Bilder der Reihe nach einlesen</b>.`, ok: "Verstanden" }); return; }
     if (!list.length) { NMA.toast("Keine Profile ohne Bilder."); return; }
     NMA.toast(`Bilder für ${list.length} Profile werden angefordert …`); let done = 0, fail = 0; const im = IMG();
     for (const it of list) {
