@@ -30,6 +30,7 @@
     <header class="pane-head" id="head" hidden>
       <button class="icon back" id="back" aria-label="Zurück zur Liste">←</button>
       <a class="who" id="who" href="#"></a>
+      <button class="icon" id="fotoBtn" aria-label="Fotos und Fotofreigabe" title="Fotos & Freigabe" style="font-size:18px">📷</button>
       <button class="icon" id="fav" aria-label="Als Favorit markieren" title="Favorit" style="font-size:20px;color:var(--gold)">☆</button>
       <a class="icon" id="info" href="#" aria-label="Profil ansehen" title="Profil ansehen">ⓘ</a>
       <button class="icon" id="more" aria-label="Melden oder blockieren" title="Melden oder blockieren">⋯</button>
@@ -47,6 +48,7 @@
   </section>
 </main>
 <script src="app.js"></script>
+<script src="photos.js"></script>
 <script src="push.js"></script>
 <script src="lock.js"></script>
 <script>{
@@ -100,6 +102,21 @@
       const q=NMA.store.get("inboxQ",[]);q.push({id:"c"+t,cust:me,pid:current,text:m.x,t});NMA.store.set("inboxQ",q.slice(-300))}
     if(Date.now()-NMA.store.get("teamAlive",0)>10000)fakeReply(current)};
   /* Live: neue Nachricht ist angekommen */
+  /* Fotos: Freigabe anfragen (kostenlos) und eigene Fotos für dieses Profil freigeben */
+  $("fotoBtn").addEventListener("click",()=>{if(!current)return;const p=NMA.get(current),me="c:"+NMA.user().nick,pk="p:"+current;
+    const m=document.createElement("div");m.className="modal";
+    const draw=()=>{const mine=FOTO.list(me),a=FOTO.access(me,pk);
+      m.innerHTML=`<div class="card" role="dialog" aria-modal="true" style="max-width:560px;max-height:92svh;overflow:auto"><h2>Fotos von ${NMA.esc(p.name)}</h2><div id="fgal"></div>
+        <h3 style="margin:22px 0 6px;font-size:18px">Meine Fotos für ${NMA.esc(p.name)}</h3>
+        ${mine.length?`<label class="small" style="display:flex;gap:8px;align-items:center;min-height:40px"><input type="checkbox" id="fMine" ${a.photos?"checked":""}> Meine privaten Fotos freigeben</label>
+          ${mine.some(x=>x.fsk)?`<label class="small" style="display:flex;gap:8px;align-items:center;min-height:40px"><input type="checkbox" id="fMineFsk" ${a.fsk?"checked":""} ${a.photos?"":"disabled"}> Auch meine FSK-18-Fotos freigeben</label>`:""}`
+          :`<p class="muted small" style="margin:0">Du hast noch keine Fotos. <a class="link" href="mein-profil.html">Fotos hochladen</a></p>`}
+        <div class="row"><button class="btn primary" data-x>Fertig</button></div></div>`;
+      FOTO.gallery(m.querySelector("#fgal"),pk,me,{requests:true});
+      const fm=m.querySelector("#fMine"),ff=m.querySelector("#fMineFsk");
+      fm&&fm.addEventListener("change",()=>{FOTO.setAccess(me,pk,{photos:fm.checked?Date.now():0});NMA.toast(fm.checked?`📷 ${p.name} darf jetzt deine privaten Fotos sehen.`:"Freigabe zurückgenommen.");draw()});
+      ff&&ff.addEventListener("change",()=>{FOTO.setAccess(me,pk,{fsk:ff.checked?Date.now():0});NMA.toast(ff.checked?`🔞 ${p.name} darf deine FSK-18-Fotos sehen.`:"FSK-18-Freigabe zurückgenommen.");draw()});};
+    draw();document.body.appendChild(m);m.addEventListener("click",e=>{if(e.target===m||e.target.hasAttribute("data-x"))m.remove()})});
   $("fav").addEventListener("click",()=>{if(!current)return;const on=NMA.toggleFav(current);$("fav").textContent=on?"★":"☆";$("fav").setAttribute("aria-pressed",on);renderList()});
   addEventListener("nma:msg",e=>{if(e.detail.pid===current){renderMsgs();NMA.markRead(current)}renderList()});
 

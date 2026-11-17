@@ -176,6 +176,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
             <label><input type="radio" name="rub" value="" checked> Alle</label><label><input type="radio" name="rub" value="Beziehung"> Beziehung</label><label><input type="radio" name="rub" value="Abenteuer"> Abenteuer</label>
           </div>
         </div>
+        <div id="fotoReqs"></div>
         <div id="queue"></div>
       </aside>
       <div class="card ibx-chat">
@@ -296,6 +297,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
 </main>
 
 <script src="app.js"></script>
+<script src="photos.js"></script>
 <script>{
   const $=id=>document.getElementById(id);
   const KEY="staff";
@@ -567,9 +569,28 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
       ${isAdmin()?`<button class="btn sm" data-kcard="${NMA.esc(x.cust)}" style="margin:10px 0 4px">👤 Kundenkarte öffnen</button>`:""}
       <h4>NOTIZEN ZUM KUNDEN <small style="font-weight:400">(für alle Mitarbeiter)</small></h4><textarea class="input" id="note" placeholder="z. B. Hobbys, Familie, worüber zuletzt gesprochen wurde">${NMA.esc(notes[x.cust]||"")}</textarea>
       <h4>PROFIL IN DIESEM GESPRÄCH</h4><div class="kv"><span>Name</span><b>${NMA.esc(p.name||"")}</b><span>Rubrik</span>${p.sex==="m"?"Mann":"Frau"} · ${p.looking||""}<span>Alter</span>${p.age||"–"}${(()=>{const ko=NMA.wohnortModus()==="kontakt"&&NMA.kontaktOrt(p,{nick:x.cust,plz:(String(c.ort||"").match(/\d{4,5}/)||[])[0],radius:c.radius||50,city:String(c.ort||"").replace(/\d{4,5}/,"").trim(),land:c.land||"DE"});return ko?`<span>Wohnt für ihn</span><b style="color:var(--accent)">${NMA.esc(ko.ort)} (${ko.km} km)</b>`:`<span>Ort</span>${NMA.esc(p.city||"–")}`})()}<span>Beruf</span>${NMA.esc(p.job||"–")}<span>Gehört</span>${NMA.esc(ownerName(p.owner))}</div>
-      <p class="small muted" style="margin:8px 0 0">${NMA.esc(p.about||"")}</p>`;
+      <p class="small muted" style="margin:8px 0 0">${NMA.esc(p.about||"")}</p>
+      <h4>FOTOS</h4><div id="fotoInfo"></div>`;
+    renderFotoInfo(x);
     $("note").addEventListener("input",e=>{notes[x.cust]=e.target.value;saveAll()});
   };
+  /* ---------- Fotos: Anfragen + Freigaben (photos.js) ---------- */
+  const renderFotoReqs=()=>{const box=$("fotoReqs");if(!box||!window.FOTO)return;
+    const open=FOTO.reqs().filter(r=>r.status==="offen"&&r.owner.startsWith("p:")&&(()=>{const p=prof(r.owner.slice(2));return p&&(isAdmin()||mine(p))})()).sort((a,b)=>a.t-b.t);
+    box.innerHTML=open.length?`<div class="card" style="padding:10px 12px;margin-bottom:10px"><b style="font-size:14px">📷 Foto-Anfragen (${open.length})</b>${open.map(r=>{const p=prof(r.owner.slice(2));return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line);font-size:14px"><span style="flex:1;min-width:160px"><b>${NMA.esc(r.viewer.slice(2))}</b> bittet <b>${NMA.esc(p.name)}</b> um ${r.type==="fsk"?"🔞 FSK-18-Freigabe":"📷 Fotofreigabe"}</span><button class="btn sm primary" data-fr-ok="${r.id}">Freigeben</button><button class="btn sm ghost" data-fr-no="${r.id}">Ablehnen</button></div>`}).join("")}</div>`:"";
+    box.querySelectorAll("[data-fr-ok]").forEach(b=>b.addEventListener("click",()=>{FOTO.decide(b.dataset.frOk,true);NMA.toast("Freigegeben – der Kunde bekommt Bescheid.");renderFotoReqs();if(cur){const x=items.find(i=>i.id===cur);x&&renderFotoInfo(x)}}));
+    box.querySelectorAll("[data-fr-no]").forEach(b=>b.addEventListener("click",()=>{FOTO.decide(b.dataset.frNo,false);renderFotoReqs()}))};
+  const renderFotoInfo=x=>{const box=$("fotoInfo");if(!box||!window.FOTO)return;const p=prof(x.pid);if(!p)return;
+    const pk="p:"+p.id,ck="c:"+x.cust,a=FOTO.access(pk,ck),can=isAdmin()||mine(p);
+    box.innerHTML=`<p class="small" style="margin:0 0 6px">Fotos von <b>${NMA.esc(p.name)}</b> für diesen Kunden:</p>
+      <label class="small" style="display:flex;gap:8px;align-items:center;min-height:32px"><input type="checkbox" id="frP" ${a.photos?"checked":""} ${can?"":"disabled"}> Private Fotos freigegeben</label>
+      <label class="small" style="display:flex;gap:8px;align-items:center;min-height:32px"><input type="checkbox" id="frF" ${a.fsk?"checked":""} ${can&&a.photos?"":"disabled"}> FSK-18-Fotos freigegeben</label>
+      <p class="small" style="margin:10px 0 6px">Fotos des Kunden (so sieht ${NMA.esc(p.name)} sie):</p><div id="frCust"></div>`;
+    FOTO.gallery($("frCust"),ck,pk,{empty:"Der Kunde hat keine weiteren Fotos."});
+    const sP=$("frP"),sF=$("frF");
+    sP.addEventListener("change",()=>{FOTO.setAccess(pk,ck,{photos:sP.checked?Date.now():0});renderFotoInfo(x)});
+    sF.addEventListener("change",()=>{FOTO.setAccess(pk,ck,{fsk:sF.checked?Date.now():0});renderFotoInfo(x)})};
+  addEventListener("storage",e=>{if(e.key==="nma_fotoReq")renderFotoReqs();if((e.key==="nma_fotoAccess"||e.key==="nma_fotos")&&cur){const x=items.find(i=>i.id===cur);x&&renderFotoInfo(x)}});
   const openQ=id=>{
     const x=items.find(q=>q.id===id);if(!x)return;cur=id;insertedTpl=null;
     const p=prof(x.pid),c=cust(x.cust);
@@ -639,7 +660,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     $("pGroups").innerHTML=groups.map(([sx,lk,title])=>{const g=list.filter(p=>p.sex===sx&&p.looking===lk);
       return `<section class="pgroup"><h3>${title} <span class="muted small">${g.length}</span></h3>${g.length?`<div class="pcards">${g.map(p=>{const open=items.filter(i=>i.pid===p.id).length;
         return `<article class="card pcard">${NMA.avatar(p,"lg",false)}<div class="grow"><b>${NMA.esc(p.name)}, ${p.age}</b><small>${NMA.esc(p.city||"")}${p.job?" · "+NMA.esc(p.job):""}</small><small>${open?`<span style="color:var(--accent)">${open} offen</span> · `:""}${isAdmin()?"gehört "+NMA.esc(ownerName(p.owner)):"dein Profil"}</small></div>
-        <div class="pacts"><button class="btn sm" data-pedit="${p.id}">Bearbeiten</button>${isAdmin()?`<select class="input sm-sel" data-pmove="${p.id}" aria-label="Profil verschieben">${owners().map(x=>`<option value="${x.user}" ${x.user===p.owner?"selected":""}>→ ${NMA.esc(x.name)}</option>`).join("")}</select>`:""}</div></article>`}).join("")}</div>`:'<p class="muted small" style="margin:6px 0 0">Noch keine Profile.</p>'}</section>`}).join("");
+        <div class="pacts"><button class="btn sm" data-pedit="${p.id}">Bearbeiten</button>${isAdmin()||mine(p)?`<button class="btn sm" data-pfoto="${p.id}">📷 Fotos</button>`:""}${isAdmin()?`<select class="input sm-sel" data-pmove="${p.id}" aria-label="Profil verschieben">${owners().map(x=>`<option value="${x.user}" ${x.user===p.owner?"selected":""}>→ ${NMA.esc(x.name)}</option>`).join("")}</select>`:""}</div></article>`}).join("")}</div>`:'<p class="muted small" style="margin:6px 0 0">Noch keine Profile.</p>'}</section>`}).join("");
   };
   const moveProfile=(p,to,done)=>{
     if(!isAdmin())return;
@@ -687,7 +708,10 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   };
   $("pAdd").addEventListener("click",()=>profileForm());
   $("pq").addEventListener("input",renderProfiles);$("pOwner").addEventListener("change",e=>{pOwnerSel=e.target.value;renderProfiles()});
-  $("pGroups").addEventListener("click",e=>{const b=e.target.closest("[data-pedit]");if(b)profileForm(prof(b.dataset.pedit))});
+  $("pGroups").addEventListener("click",e=>{const b=e.target.closest("[data-pedit]");if(b)profileForm(prof(b.dataset.pedit));
+    const f=e.target.closest("[data-pfoto]");if(f&&window.FOTO){const p=prof(f.dataset.pfoto),m=document.createElement("div");m.className="modal form-modal";
+      m.innerHTML=`<div class="card" style="max-width:620px;width:100%;max-height:92svh;overflow:auto"><h2>Fotos von ${NMA.esc(p.name)}</h2><p class="muted small" style="margin:0 0 12px">Hauptfoto bleibt das Profilbild. Hier legst du fest, welche Fotos alle sehen, welche nur nach Freigabe und welche FSK 18 sind.</p><div id="pfm"></div><div class="row"><button class="btn primary" data-x>Fertig</button></div></div>`;
+      document.body.appendChild(m);FOTO.manager(m.querySelector("#pfm"),"p:"+p.id);m.addEventListener("click",ev=>{if(ev.target===m||ev.target.hasAttribute("data-x"))m.remove()})}});
   $("pGroups").addEventListener("change",e=>{const s=e.target.closest("[data-pmove]");if(s){const p=prof(s.dataset.pmove);if(s.value!==p.owner)moveProfile(p,s.value)}});
 
   /* ---------- Vorlagen ---------- */
@@ -729,7 +753,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
   addEventListener("storage",e=>{if(e.key==="nma_hearts")pullHearts();if(e.key==="nma_inboxQ")pullInbox()});
   setInterval(()=>{pullHearts();pullInbox();renderQueue()},20000);
   setInterval(()=>NMA.store.set("teamAlive",Date.now()),4000);NMA.store.set("teamAlive",Date.now());
-  pullHearts();pullInbox();
+  pullHearts();pullInbox();renderFotoReqs();setInterval(renderFotoReqs,20000);
 
   /* ---------- Rollenansicht anwenden ---------- */
   const applyRole=()=>{
@@ -746,7 +770,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     $("pSub").textContent=a?"Nachrichten, Profile, Vorlagen, Statistik und Team.":"Deine Nachrichten, Profile, Vorlagen und Zahlen.";
     if(!a){setLock(false);const vis=document.querySelector("[data-tab].on");if(vis&&vis.hidden)document.querySelector('[data-tab="inbox"]').click()}
     $("tabProf").textContent=a?"Profile":"Meine Profile";
-    hideConv();renderQueue();renderStats();renderProfiles();renderTpls();resetTplForm();
+    hideConv();renderQueue();renderStats();renderProfiles();renderTpls();resetTplForm();typeof renderFotoReqs==='function'&&renderFotoReqs();
     window.MV&&MV.render();window.SUP&&SUP.render();window.KD&&KD.render();
   };
   $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+ownerName(me)+" (Moderator)")});

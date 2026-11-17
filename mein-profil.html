@@ -25,6 +25,7 @@
         <div><b>Profilfoto</b><p class="hint" style="margin:4px 0 10px">JPG oder PNG, höchstens 8 MB. Fotos werden vor der Freischaltung geprüft.</p>
           <label class="btn sm" for="file">Foto auswählen</label><input type="file" id="file" accept="image/*" hidden></div>
       </div>
+      <div class="field full" style="margin-top:6px"><b>Weitere Fotos</b><p class="hint" style="margin:4px 0 10px">Lege für jedes Foto fest, ob es alle sehen oder nur Profile, denen du es im Chat freigibst (📷). FSK-18-Fotos bitte ankreuzen – sie sind nur gepixelt zu sehen, bis du sie extra freigibst.</p><div id="myFotos"></div></div>
       <div class="form-grid">
         <div class="field"><label for="nick">Nickname</label><input class="input" id="nick" readonly aria-readonly="true" style="opacity:.75"></div>
         <div class="field"><label for="vorname">Vorname</label><input class="input" id="vorname" readonly aria-readonly="true" style="opacity:.75"></div>
@@ -44,8 +45,10 @@
   </div>
 </main>
 <script src="app.js"></script>
+<script src="photos.js"></script>
 <script src="push.js"></script>
 <script src="lock.js"></script>
+<script>if(window.FOTO)FOTO.manager(document.getElementById("myFotos"),"c:"+NMA.user().nick);</script>
 <script>{
   const $=id=>document.getElementById(id),u=NMA.user();
   $("nick").value=u.nick;$("vorname").value=u.vorname||"";$("city").value=u.city||"";$("about").value=u.about||"";$("looking").value=u.looking==="Abenteuer"?"Abenteuer":"Beziehung";$("job").value=u.job||"";$("plz").value=u.plz||"";$("radius").value=u.radius||"50";

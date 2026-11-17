@@ -204,3 +204,14 @@ Stand 17.11.2026 – App-Sperre (lock.js)
 - Fingerabdruck geht nur über https (echte Seite/Cloudflare), nicht in der Claude-Vorschau.
 - SERVER: Passkey registrieren und Signatur beim Entsperren prüfen (z. B. @simplewebauthn/server), Sitzung serverseitig
   beenden, PIN nur als Hash (argon2/bcrypt), Fehlversuche serverseitig zählen.
+
+Stand 17.11.2026 – Fotos & Fotofreigabe (photos.js)
+- Kunden (Mein Profil → „Weitere Fotos“) und Profile (Mitarbeiterbereich → Profile → „📷 Fotos“) haben mehrere Fotos.
+  Pro Foto: „Für alle sichtbar“ oder „Nur nach Freigabe“, dazu Häkchen „FSK 18“. Neue Uploads sind erst „Nur nach Freigabe“.
+- Profilseite zeigt die Galerie: freie Fotos sichtbar, private als 🔒, FSK-18 gepixelt. Kunde fragt kostenlos
+  „📷 Fotofreigabe“ an, danach getrennt „🔞 FSK-18-Freigabe“. Mitarbeiter sehen die Anfragen oben im Posteingang
+  (nur für eigene Profile, Chef alle) und geben frei; Kunde bekommt eine Chat-Nachricht. Im Chat rechts: Freigaben
+  an/aus und die Fotos des Kunden (so, wie er sie dem Profil freigegeben hat).
+- Kunde gibt im Chat über 📷 seine eigenen privaten bzw. FSK-18-Fotos für dieses Profil frei.
+- SERVER: FSK-18-Bilder bis zur Freigabe nur als gepixelte Datei ausliefern (CSS-Unschärfe ist kein Schutz),
+  FSK-18-Freigabe nur für altersgeprüfte Kunden (AVS), jedes Foto vor Freischaltung prüfen, Freigaben in der Datenbank.
