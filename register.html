@@ -56,6 +56,7 @@
   </div>
 </main>
 <script src="app.js"></script>
+<script src="eingaenge.js"></script>
 <script>{
   const $=id=>document.getElementById(id);
   /* Geburtsdatum über die Zahlentastatur: Tag, Monat, Jahr – springt automatisch ins nächste Feld */
@@ -97,7 +98,7 @@
   f.addEventListener("submit",e=>{e.preventDefault();checkAge();checkNick();checkVn();plzRule();
     if(!f.checkValidity()){const bad=f.querySelector(":invalid");bad&&bad.focus();
       NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="vorname"?"Bitte gib deinen Vornamen ein (mindestens 2 Buchstaben).":bad&&bad.id==="bT"?"Bitte gib dein Geburtsdatum ein (ab 18 Jahren).":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?`Bitte gib deine Postleitzahl ein (${NMA.LAND[landEl.value].len} Ziffern für ${NMA.LAND[landEl.value].name}).`:"Bitte fülle alle Pflichtfelder aus.");return}
-    NMA.store.set("user",{registered:Date.now(),lastLogin:Date.now(),mail:$("mail").value.trim(),nick:nick.value.trim(),vorname:vn.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,sex:$("sex").value,job:$("job").value.trim(),land:landEl.value,plz:$("plz").value,radius:$("radius").value,city:"",about:""});
+    NMA.store.set("user",{eingang:NMA.eingang?{code:NMA.eingang.code,host:NMA.eingang.host}:null,registered:Date.now(),lastLogin:Date.now(),mail:$("mail").value.trim(),nick:nick.value.trim(),vorname:vn.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,sex:$("sex").value,job:$("job").value.trim(),land:landEl.value,plz:$("plz").value,radius:$("radius").value,city:"",about:""});
     NMA.store.set("buchungen",[]);NMA.store.set("favs",[]);NMA.store.set("pushAsk",true);NMA.store.set("lock",null);NMA.store.set("lockReset",false);try{sessionStorage.setItem("nma_unlocked","1")}catch(e){}NMA.store.set("pushModeSet",false);NMA.setCoins(5); location.href="uebersicht.html?neu=1";
   });
 }</script>

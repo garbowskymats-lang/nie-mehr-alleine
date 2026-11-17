@@ -32,22 +32,16 @@
   </div>
 </main>
 <script src="app.js"></script>
+<script src="eingaenge.js"></script>
 <script>{
-  /* Ein Login für alle: Mitarbeiter hängen ihre Team-Kennung an den Benutzernamen, z. B. „marco#2580“.
-     „#“ ist in Kunden-Nicknames nicht erlaubt – Verwechslungen sind ausgeschlossen.
-     SERVER: Die Kennung prüft nur der Server (nicht im Browser-Code!). Echte Sicherheit = Passwort (+ 2-Faktor). */
+  /* Kunden-Anmeldung. Mitarbeiter haben ein eigenes Team-Portal (portal.html, eigene Domain). */
   if(NMA.param("gesperrt"))NMA.toast("5× falsche PIN – bitte mit Passwort anmelden und eine neue PIN festlegen.");
   else if(NMA.param("pinvergessen"))NMA.toast("Melde dich mit deinem Passwort an – danach legst du eine neue PIN fest.");
   const f=document.getElementById("loginForm"),nick=document.getElementById("nick"),pw=document.getElementById("pw");
   f.addEventListener("submit",e=>{e.preventDefault();
     if(!nick.value.trim()||!pw.value){NMA.toast("Bitte Nickname und Passwort eingeben.");return}
-    const v=nick.value.trim(),suf=String(NMA.store.get("staffSuffix","#2580"));
-    if(v.toLowerCase().endsWith(suf.toLowerCase())){
-      const user=v.slice(0,-suf.length).trim().toLowerCase();
-      const staff=NMA.store.get("staff",null)||[{user:"sandra",active:true},{user:"marco",active:true},{user:"julia",active:true},{user:"tim",active:true},{user:"nicole",active:true}];
-      const s=staff.find(x=>x.user===user&&x.active!==false);
-      if(!s){NMA.toast("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");return}
-      NMA.store.set("teamUser",user);location.href="team.html";return}
+    /* Mitarbeiter melden sich NICHT hier an, sondern im eigenen Team-Portal (eigene Domain). */
+    if(nick.value.includes("#")){NMA.toast("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");return}
     const u=NMA.user();u.lastLogin=Date.now();NMA.store.set("user",u);try{sessionStorage.setItem("nma_unlocked","1")}catch(e){}location.href="uebersicht.html"});
 }</script>
 </body>

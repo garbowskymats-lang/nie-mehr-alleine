@@ -31,10 +31,7 @@ App installieren (PWA)
 - app-installieren.html: Anleitung getrennt nach Android, iPhone/iPad, PC – inkl. Hinweis, dass Firefox am PC nicht installieren kann.
 
 Mitarbeiterbereich
-- Login für Mitarbeiter: über die normale Anmeldeseite (login.html) mit Team-Kennung hinter dem Benutzernamen,
-  z. B. „marco#2580“ (Kennung ändert der Chef unter Mitarbeiter). mitarbeiter-login.html leitet nur noch auf login.html weiter.
-  SERVER: Kennung nur serverseitig prüfen (nicht im Browser-Code ausliefern), echte Sicherheit = Passwort + möglichst
-  2-Faktor, Login-Versuche begrenzen, team.html nur mit gültiger Mitarbeiter-Sitzung ausliefern.
+- Login für Mitarbeiter: NUR über das eigene Team-Portal (portal.html, eigene Domain wie tippelclub.de) – siehe Abschnitt „Mehrere Domains“.
 - team.html: Statistik (Nachrichten, Antwortzeiten, Auslastung nach Uhrzeit)
   und Mitarbeiterverwaltung (anlegen, bearbeiten, sperren, Rollen Admin/Moderator).
 - Posteingang: wartende Kundennachrichten (älteste zuerst, Wartezeit farbig), Antwort als Profil,
@@ -98,7 +95,7 @@ UMGESETZT (Demo, 16.11.2026) – Wohnort der Profile pro Kunde („Kontakt-Ort�
 - AGB/Hinweis muss ausdrücklich sagen, dass Angaben der Profile (auch der Wohnort) erfunden sind und Treffen nicht möglich sind.
 
 Stand 16.11.2026 – Registrierung, Vorname, Support
-- Pflichtangaben bei der Registrierung: Nickname (einmalig, KEINE Leerzeichen, KEIN „#“ (reserviert für die Team-Kennung); 3–30 Zeichen: Buchstaben, Ziffern, _ - . – gilt auch für Profilnamen; Regel NMA.nickOk), Vorname (nur Buchstaben, mind. 2), E-Mail, Passwort,
+- Pflichtangaben bei der Registrierung: Nickname (einmalig, KEINE Leerzeichen, KEIN „#“; 3–30 Zeichen: Buchstaben, Ziffern, _ - . – gilt auch für Profilnamen; Regel NMA.nickOk), Vorname (nur Buchstaben, mind. 2), E-Mail, Passwort,
   wer sucht wen, Beziehung/Abenteuer, Geburtsdatum (ab 18), PLZ + Umkreis.
 - Nickname und Vorname kann der Kunde NICHT selbst ändern (Mein Profil zeigt sie gesperrt) – nur der Admin im
   Mitarbeiterbereich unter „🛟 Support“. Server: Änderungen protokollieren, Nickname-Eindeutigkeit serverseitig prüfen.
@@ -215,3 +212,21 @@ Stand 17.11.2026 – Fotos & Fotofreigabe (photos.js)
 - Kunde gibt im Chat über 📷 seine eigenen privaten bzw. FSK-18-Fotos für dieses Profil frei.
 - SERVER: FSK-18-Bilder bis zur Freigabe nur als gepixelte Datei ausliefern (CSS-Unschärfe ist kein Schutz),
   FSK-18-Freigabe nur für altersgeprüfte Kunden (AVS), jedes Foto vor Freischaltung prüfen, Freigaben in der Datenbank.
+
+
+Stand 17.11.2026 – Mehrere Domains (Eingänge) + eigenes Team-Portal
+- Viele Kunden-Domains → EIN Chat (gleiche Profile, gleiche Mitarbeiter). Liste in eingaenge.js (nur auf Kundenseiten):
+  Domain, Kürzel, Anzeigename. Der Seitenname passt sich der Domain an (z. B. „Feurige Romanze“). Test ohne Domain: ?eingang=FR.
+- Kunde wird mit Eingang gespeichert; sehen kann das nur der Chef (Kundenkarte „Eingang“, Kundenliste Spalte + Filter).
+- Mitarbeiter melden sich ausschließlich im Team-Portal an (portal.html, Benutzername + Passwort). team.html ohne Anmeldung
+  → Portal. Im Portal steht kein Seitenname und keine Domain („Team-Portal“), Kunden-Anmeldung lehnt „#“ ab.
+- Getrennt veröffentlichen (zwei Cloudflare-Pages-Projekte aus demselben Repository):
+  1) Kunden:  Build command „bash build-kunden.sh“, Ausgabe „dist-kunden“ → alle Kunden-Domains als Custom Domains.
+     Enthält KEIN team.html und keine Mitarbeiter-Dateien.
+  2) Portal:  Build command „bash build-portal.sh“, Ausgabe „dist-portal“ → Domain tippelclub.de.
+     Enthält keine Kundenseiten und keine Domain-Liste, robots.txt sperrt Suchmaschinen.
+  Zum Testen kann das bisherige Projekt (Ausgabe „/“) bleiben: dort ist das Portal unter /portal.html erreichbar.
+  Hinweis: Live-Nachrichten zwischen Kunden-Tab und Team funktionieren über getrennte Domains erst mit dem Server.
+- SERVER: ein Backend für alle Eingänge; Eingang aus dem Host-Header beim Registrieren; Team-API nur für das Portal
+  (eigene Domain, CORS/Host prüfen); Kunden-API liefert nie Mitarbeiter-Daten; Domains in Mitarbeiter-Antworten weglassen
+  (nur der Chef bekommt „Eingang“).

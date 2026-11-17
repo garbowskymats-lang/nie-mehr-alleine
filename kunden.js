@@ -29,6 +29,7 @@
       if (!c.reg) { c.reg = reg; ch = true; }
       if (!c.mail) { c.mail = nick.toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "") + "@beispiel.de"; ch = true; }
       if (!c.birth && c.age) { const y = new Date().getFullYear() - c.age - 1; c.birth = `${y}-${String(h % 12 + 1).padStart(2, "0")}-${String(h % 27 + 1).padStart(2, "0")}`; ch = true; }
+      if (!c.eingang) { c.eingang = { code: ["NMA", "NMA", "FR"][h % 3] }; ch = true; }   /* Demo: nur Kürzel */
       if (!c.lastLogin) { c.lastLogin = Date.now() - (h % 96 + 1) * 36e5; ch = true; }
       if (!c.buchungen) {
         c.buchungen = [];
@@ -78,24 +79,26 @@
   `;
   document.head.appendChild(css);
 
-  let q = "", stf = "";
+  let q = "", stf = "", eg = "";
   const render = () => {
     const sec = $("kunden"); if (!sec) return;
     if (!T.isAdmin()) { sec.innerHTML = ""; return; }
     demoFill();
     const ql = q.toLowerCase();
-    const list = Object.entries(T.customers).filter(([n, c]) => (!stf || c.st === stf) &&
+    const list = Object.entries(T.customers).filter(([n, c]) => (!stf || c.st === stf) && (!eg || (c.eingang && c.eingang.code) === eg) &&
       (!ql || n.toLowerCase().includes(ql) || String(c.nr).includes(ql) || (c.mail || "").toLowerCase().includes(ql) || (c.payName || "").toLowerCase().includes(ql) || (c.vorname || "").toLowerCase().includes(ql)))
       .sort((a, b) => (b[1].lastLogin || 0) - (a[1].lastLogin || 0));
     sec.innerHTML = `<div class="toolbar"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <label class="search"><span aria-hidden="true">⌕</span><input type="search" id="kdQ" placeholder="Nickname, Kunden-Nr., E-Mail, Name" value="${esc(q)}" aria-label="Kunden suchen"></label>
+        <select class="input" id="kdEg" style="width:auto" aria-label="Eingang"><option value="">Alle Eingänge</option>${[...new Set(Object.values(T.customers).map(c => c.eingang && c.eingang.code).filter(Boolean))].sort().map(e => `<option ${eg === e ? "selected" : ""}>${esc(e)}</option>`).join("")}</select>
         <select class="input" id="kdSt" style="width:auto"><option value="">Alle</option><option value="K" ${stf === "K" ? "selected" : ""}>Kunden (haben bezahlt)</option><option value="T" ${stf === "T" ? "selected" : ""}>Testmitglieder</option></select></div>
         <span class="hint">${list.length} von ${Object.keys(T.customers).length} · Klick öffnet die Kundenkarte</span></div>
-      <div class="card pad" style="padding-top:8px"><table class="staff kd-list"><thead><tr><th>Kunden-Nr.</th><th>Nickname</th><th>Status</th><th>Wohnort</th><th class="num">Coins</th><th class="num">Umsatz</th><th>Letzter Login</th></tr></thead><tbody>
-      ${list.map(([n, c]) => `<tr data-k="${esc(n)}"><td data-l="Kunden-Nr.">#${c.nr || "–"}</td><td data-l="Nickname"><b>${esc(n)}</b>${c.gesperrt ? ' <small class="muted">· gesperrt</small>' : ""}</td><td data-l="Status">${c.st === "K" ? "Kunde" : "Tester"}</td><td data-l="Wohnort">${esc(c.ort || "–")} <small class="muted">${c.land || "DE"}</small></td><td data-l="Coins" class="num">${c.coins ?? 0}</td><td data-l="Umsatz" class="num">${eur(umsatz(c))}</td><td data-l="Letzter Login">${dt(c.lastLogin)}</td></tr>`).join("") || '<tr><td colspan="7" class="empty">Keine Kunden gefunden.</td></tr>'}
+      <div class="card pad" style="padding-top:8px"><table class="staff kd-list"><thead><tr><th>Kunden-Nr.</th><th>Nickname</th><th>Status</th><th>Wohnort</th><th>Eingang</th><th class="num">Coins</th><th class="num">Umsatz</th><th>Letzter Login</th></tr></thead><tbody>
+      ${list.map(([n, c]) => `<tr data-k="${esc(n)}"><td data-l="Kunden-Nr.">#${c.nr || "–"}</td><td data-l="Nickname"><b>${esc(n)}</b>${c.gesperrt ? ' <small class="muted">· gesperrt</small>' : ""}</td><td data-l="Status">${c.st === "K" ? "Kunde" : "Tester"}</td><td data-l="Wohnort">${esc(c.ort || "–")} <small class="muted">${c.land || "DE"}</small></td><td data-l="Eingang">${esc((c.eingang && c.eingang.code) || "–")}</td><td data-l="Coins" class="num">${c.coins ?? 0}</td><td data-l="Umsatz" class="num">${eur(umsatz(c))}</td><td data-l="Letzter Login">${dt(c.lastLogin)}</td></tr>`).join("") || '<tr><td colspan="8" class="empty">Keine Kunden gefunden.</td></tr>'}
       </tbody></table></div>`;
     const qi = $("kdQ"); qi.addEventListener("input", () => { q = qi.value; render(); const n = $("kdQ"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); });
     $("kdSt").addEventListener("change", e => { stf = e.target.value; render(); });
+    $("kdEg").addEventListener("change", e => { eg = e.target.value; render(); });
     sec.querySelectorAll("[data-k]").forEach(tr => tr.addEventListener("click", () => open(tr.dataset.k)));
   };
 
@@ -119,6 +122,7 @@
           <span>Wohnort</span><b>${esc(c.ort || "–")} (${NMA.LAND[c.land || "DE"].name})</b>
           <span>PLZ-Bereich</span><b>${esc(NMA.region(c.land || "DE", plz) || "–")}</b>
           <span>E-Mail</span><b>${esc(c.mail || "–")}</b>
+          <span>Eingang</span><b>${c.eingang ? esc((c.eingang.host ? c.eingang.host + " · " : "") + c.eingang.code) : "–"} <small class="muted" style="font-weight:400">(sieht nur der Chef)</small></b>
           <span>Passwort</span><b><span class="muted" style="font-weight:400">verschlüsselt gespeichert – nicht einsehbar</span> <button class="btn sm" data-pw style="margin-left:6px;min-height:30px">Link zum Zurücksetzen senden</button></b>
         </div></div>
         <div class="kd-box"><h4>KONTO &amp; AKTIVITÄT</h4><div class="kd-kv">

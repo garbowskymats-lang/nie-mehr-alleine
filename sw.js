@@ -1,6 +1,6 @@
 /* Service Worker: macht die Seite installierbar und hält die Grunddateien offline bereit.
    Außerdem empfängt er Push-Benachrichtigungen („neue Nachricht“) – siehe push.js und server/push-beispiel.js. */
-const CACHE = "nma-v5";
+const CACHE = "nma-v6";
 const FILES = ["./","index.html","uebersicht.html","chat.html","postfach.html","suche.html","style.css","app.js","assets/icon-192.png"];
 self.addEventListener("install", e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));

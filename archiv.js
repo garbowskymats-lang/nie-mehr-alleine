@@ -57,7 +57,7 @@
 
   const exportText = l => {
     const c = T.customers[l.cust] || {};
-    return [`Chatverlauf – Nie mehr alleine (Archiv)`, `Kunde: ${l.cust}${c.nr ? " (Kunden-Nr. " + c.nr + ")" : ""}`, `Profil: ${l.profile}`, `Exportiert: ${fmt(Date.now())} durch Admin`, `Aufbewahrung: ${cfg.years} Jahre${c.legalHold ? " · LÖSCHSPERRE aktiv" : ""}`, "".padEnd(60, "-"),
+    return [`Chatverlauf (Archiv)`, `Kunde: ${l.cust}${c.nr ? " (Kunden-Nr. " + c.nr + ")" : ""}`, `Profil: ${l.profile}`, `Exportiert: ${fmt(Date.now())} durch Admin`, `Aufbewahrung: ${cfg.years} Jahre${c.legalHold ? " · LÖSCHSPERRE aktiv" : ""}`, "".padEnd(60, "-"),
       ...l.msgs.map(m => `[${m[2]}] ${m[0] === "m" ? l.profile + (m[3] ? " (" + m[3] + ")" : "") : l.cust}: ${m[1]}`)].join("\n");
   };
   const sha = async s => { try { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join(""); } catch (e) { return "(nur auf der echten Seite mit https verfügbar)"; } };

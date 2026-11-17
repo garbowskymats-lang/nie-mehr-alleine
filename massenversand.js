@@ -79,7 +79,7 @@
     if (u && u.nick) {
       const c = T.customers[u.nick] || (T.customers[u.nick] = { nr: 10600, st: "T", coins: NMA.coins(), since: new Date().toLocaleDateString("de-DE") });
       Object.assign(c, { vorname: u.vorname || c.vorname, age: u.age || c.age, job: u.job || c.job || "", look: u.looking || c.look || "Beziehung", radius: +u.radius || 50,
-        mail: u.mail || c.mail, birth: u.birth || c.birth, reg: u.registered || c.reg, lastLogin: u.lastLogin || c.lastLogin, coins: NMA.coins(),
+        eingang: u.eingang || c.eingang, mail: u.mail || c.mail, birth: u.birth || c.birth, reg: u.registered || c.reg, lastLogin: u.lastLogin || c.lastLogin, coins: NMA.coins(),
         buchungen: NMA.store.get("buchungen", c.buchungen || []),
         sex: /^eine Frau/.test(u.sex || "") ? "w" : "m", land: u.land || "DE", ort: ((u.plz || "") + " " + (u.city || "")).trim() || c.ort });
       if (c.buchungen.length) { c.st = "K"; c.firstPay = c.firstPay || c.buchungen[0].t; }
