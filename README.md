@@ -260,3 +260,4 @@ Stand 17.11.2026 – Team-App
 - Team-Portal liegt jetzt unter `team/` (Anmeldung `team/index.html`, Arbeitsbereich `team/team.html`, eigenes Manifest und eigener Service Worker mit Bereich `/team/`).
 - Dadurch lassen sich Kunden-App und Team-App auf derselben Adresse **beide** installieren (Edge/Chrome: Installieren-Symbol in der Adressleiste, getrennte Apps in der Taskleiste).
 - Alte Adressen `portal.html` und `team.html` leiten automatisch weiter.
+- Neues Startbild `assets/hero-paar.jpg`: KI-generiertes älteres Paar, keine echten Personen. Es erscheint auf der Startseite, bei der Anmeldung und bei der Registrierung. Am PC steht das Paar links, Text und Anmeldung rechts. Am Handy ist das Bild oben, der Text darunter.

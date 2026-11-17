@@ -127,8 +127,9 @@ textarea.input{min-height:120px;resize:vertical}
 .pubbar nav{display:flex;gap:6px;align-items:center}
 .pubbar nav a:not(.btn){padding:8px 12px;color:#dff4f2;font-size:15px}
 @media(max-width:700px){.pubbar nav a:not(.btn){display:none}}
-.hero{position:relative;min-height:min(820px,100svh);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:center;gap:40px;padding:110px max(5vw,16px) 60px;background:linear-gradient(90deg,#071012f0 0%,#071012b0 45%,#07101266 100%),url("assets/hero-romance.png") 25% center/cover}
-.hero h1{font-size:clamp(42px,6.5vw,80px);line-height:1.02;letter-spacing:-.01em}
+.hero{position:relative;min-height:min(860px,100svh);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,600px);align-content:center;align-items:center;gap:26px 40px;padding:110px max(5vw,16px) 60px;background:linear-gradient(180deg,#071012cc 0,#07101200 130px),linear-gradient(270deg,#071012f2 0%,#071012cc 38%,#07101200 72%),url("assets/hero-paar.jpg") left center/cover}
+.hero>*{grid-column:2}  /* Paar links im Bild, Text und Anmeldung rechts */
+.hero h1{font-size:clamp(38px,4.6vw,64px);line-height:1.02;letter-spacing:-.01em}
 .hero h1 span{color:var(--gold);font-style:italic}
 .hero .intro{max-width:560px;font-size:clamp(17px,1.6vw,19px);color:#cfe3e1;margin:20px 0}
 .trust{display:flex;gap:18px;flex-wrap:wrap;color:#cfe3e1;font-size:15px}
@@ -140,7 +141,7 @@ textarea.input{min-height:120px;resize:vertical}
 .online-now{display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
 .stack-av{display:flex}.stack-av .avatar{width:34px;height:34px;margin-left:-8px;border:2px solid var(--card);font-size:13px}
 .stack-av .avatar:first-child{margin-left:0}
-@media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:96px;background:linear-gradient(180deg,#07101299 0%,#071012ee 55%,#071012 100%),url("assets/hero-romance.png") 22% top/cover}}
+@media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:96px;background:linear-gradient(180deg,#071012bb 0,#07101200 90px,#07101200 55%,#071012 100%) left top/100% 62svh no-repeat,url("assets/hero-paar.jpg") left top/auto 62svh no-repeat,#071012;padding-top:calc(48svh)}.hero>*{grid-column:1}}
 .steps{padding:clamp(48px,7vw,90px) max(5vw,16px);max-width:1240px;margin:auto}
 .steps h2{font-size:clamp(30px,4vw,44px);margin-bottom:30px}
 .step-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
@@ -156,7 +157,7 @@ textarea.input{min-height:120px;resize:vertical}
 @media(max-width:800px){.safe{grid-template-columns:1fr;margin-inline:16px}}
 
 .auth{min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.auth-photo{background:linear-gradient(180deg,#07101233,#071012cc),url("assets/hero-romance.png") 28% center/cover;display:flex;align-items:flex-end;padding:40px}
+.auth-photo{background:linear-gradient(180deg,#07101233,#071012cc),url("assets/hero-paar.jpg") left center/cover;display:flex;align-items:flex-end;padding:40px}
 .auth-photo p{font:600 clamp(26px,3vw,36px)/1.15 var(--serif);max-width:420px;margin:0}
 .auth-side{display:grid;align-content:center;justify-items:center;padding:30px 16px}
 .auth-side .brand{margin-bottom:26px}
