@@ -28,7 +28,7 @@
   };
 
   /* Wo gilt die Sperre? Mitgliederbereich (nicht Startseite, Anmeldung, Registrierung, Rechtliches, Team) */
-  const guarded = /^(uebersicht|suche|profil|chat|postfach|mein-profil|einstellungen|coins|hilfe|app-installieren)$/.test(pg);
+  const guarded = /^(uebersicht|suche|profil|chat|mein-profil|einstellungen|coins|hilfe|app-installieren)$/.test(pg);
 
   /* Anmeldung/Registrierung → für diese Sitzung entsperrt */
   if (pg === "login" || pg === "register") return;

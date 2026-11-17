@@ -26,7 +26,7 @@
     </div>
     <div class="stats">
       <a class="card stat" href="chat.html"><strong id="sChat">2</strong><span>Ungelesene Chats</span></a>
-      <a class="card stat" href="postfach.html"><strong id="sMail">1</strong><span>Neue Mails</span></a>
+      <a class="card stat" href="chat.html"><strong id="sFav">0</strong><span>★ Favoriten</span></a>
       <a class="card stat" href="mein-profil.html"><strong>7</strong><span>Profilbesucher heute</span></a>
       <a class="card stat" href="suche.html"><strong id="sLiked">5</strong><span>Herzen heute übrig</span></a>
     </div>
@@ -48,7 +48,7 @@
   else document.getElementById("greet").textContent=`Schön, dass du da bist, ${u.nick}!`;
   document.getElementById("sLiked").textContent=NMA.heartsLeft();
   document.getElementById("sChat").textContent=Object.values(NMA.unread).reduce((a,b)=>a+b,0);
-  document.getElementById("sMail").textContent=NMA.mails.filter(m=>m.unread).length;
+  document.getElementById("sFav").textContent=NMA.favs().length;
   document.getElementById("recent").innerHTML=Object.keys(NMA.chats).map(id=>{const p=NMA.get(id),msgs=NMA.chats[id].filter(m=>m.x),last=msgs[msgs.length-1];const n=NMA.unread[id]||0;
     return `<a class="list-row" href="chat.html?mit=${id}">${NMA.avatar(p)}<span class="grow"><strong>${p.name}, ${p.age}</strong><span class="muted" style="display:block">${last.t==="me"?"Du: ":""}${NMA.esc(last.x)}</span></span><span class="time">${last.h}</span>${n?`<span class="unread-n">${n}</span>`:""}</a>`}).join("");
   document.getElementById("online").innerHTML=NMA.profiles.filter(p=>p.online&&p.sex==="w").slice(0,4).map(p=>`<article class="card person"><a href="profil.html?id=${p.id}">${NMA.photo(p)}</a><div class="body"><div class="title"><h3>${p.name}, ${p.age}</h3><span class="small muted">${p.km} km</span></div><p>${p.city}</p><div class="acts"><a class="btn sm" href="profil.html?id=${p.id}">Profil</a><a class="btn sm primary" href="chat.html?mit=${p.id}">Chatten</a></div></div></article>`).join("");

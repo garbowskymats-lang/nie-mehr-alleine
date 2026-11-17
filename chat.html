@@ -86,7 +86,7 @@
     try{history.replaceState(null,"","?mit="+id)}catch(e){}
     if(innerWidth>860)$("txt").focus();
   };
-  const needCoins=()=>NMA.modal({title:"Keine Coins mehr",text:"Um weiter zu chatten, lade bitte dein Guthaben auf. Mails im Postfach bleiben kostenlos.",cancel:"Später",ok:"Coins aufladen",onOk:()=>location.href="coins.html"});
+  const needCoins=()=>NMA.modal({title:"Keine Coins mehr",text:"Um weiter zu chatten, lade bitte dein Guthaben auf.",cancel:"Später",ok:"Coins aufladen",onOk:()=>location.href="coins.html"});
   const pay=()=>{const c=NMA.coins();if(c<NMA.costPerChat){needCoins();return false}NMA.setCoins(c-NMA.costPerChat);renderCost();return true};
   const fakeReply=id=>{
     const t=document.createElement("div");t.className="typing";t.innerHTML="<i></i><i></i><i></i>";

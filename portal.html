@@ -43,6 +43,7 @@
     const staff=NMA.store.get("staff",null)||[{user:"sandra",active:true},{user:"marco",active:true},{user:"julia",active:true},{user:"tim",active:true},{user:"nicole",active:true}];
     const s=staff.find(x=>x.user===user&&x.active!==false);
     if(!s){NMA.toast("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");return}
+    const lg=NMA.store.get("staffLog",[]);lg.push({user,in:Date.now(),out:null});NMA.store.set("staffLog",lg.slice(-500));
     NMA.store.set("teamUser",user);location.href="team.html"});
   if(NMA.store.get("teamUser",null))NMA.toast("Du bist abgemeldet.");
   NMA.store.set("teamUser",null);

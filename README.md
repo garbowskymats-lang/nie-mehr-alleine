@@ -236,3 +236,16 @@ Stand 17.11.2026 – Feiertage DE/AT/CH (feiertage.js, nur Team-Portal)
 - Öffnet ein Mitarbeiter ein Gespräch mit einem Kunden aus einem Land mit Feiertag: Pop-up „Heute Feiertag in Österreich: …“
   (einmal pro Gespräch und Tag), zusätzlich Zeile „Feiertag“ im Chat rechts. Bewegliche Feiertage über das Osterdatum,
   gilt für alle Jahre. Test: team.html?datum=2026-10-26
+
+Stand 17.11.2026 – Postfach entfernt
+- Es gibt keine Mails mehr, nur noch den Chat. Menü: Übersicht, Suche, Chat, Mein Bereich. postfach.html leitet in den Chat.
+  Übersicht zeigt statt „Neue Mails“ die Zahl der Favoriten. Texte zu „Mails kostenlos“ angepasst.
+
+Stand 17.11.2026 – Verwaltung im Team-Portal (admin.js)
+- 📌 Pinnwand (alle Mitarbeiter): Beiträge vom Team; Chef kann Team-Infos „wichtig“ anheften (Pop-up beim Öffnen,
+  bis „Gelesen“ bestätigt; Chef sieht, wie viele gelesen haben) und das Laufband oben setzen.
+- 📡 Monitor (nur Chef): Live – Kunden online (30 Min.), wartende Gespräche mit Bearbeiter und Wartezeit (rot > 15 Min.),
+  Mitarbeiter-Status; Login-Zeiten – Kunden-Logins der letzten 3 Tage, neue Anmeldungen (7 Tage), An-/Abmeldungen der
+  Mitarbeiter mit Dauer (Portal protokolliert An- und Abmelden).
+- Reiter Kunden: „⬇ Kundenliste (Excel)“ / „⬇ Testerliste (Excel)“ – CSV mit ; für Excel, gefiltert nach gewähltem Eingang.
+- Im Team-Portal gibt es keinen Link mehr zur Kundenseite.

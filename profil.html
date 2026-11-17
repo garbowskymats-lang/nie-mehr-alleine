@@ -38,7 +38,7 @@
     <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
     <h2 style="font-size:24px;margin:22px 0 10px">Fotos</h2><div id="gal"></div>
     <p class="notice" style="margin:22px 0 0">Moderiertes Profil – wird von einem Moderator geführt.</p>
-    <div class="acts"><a class="btn primary" href="chat.html?mit=${p.id}">Chat starten</a><button class="btn ${NMA.isFav(p.id)?"on":""}" id="fav" aria-pressed="${NMA.isFav(p.id)}">${NMA.isFav(p.id)?"★ Favorit":"☆ Favorit"}</button><button class="btn like ${NMA.hasHeart(p.id)?"on":""}" id="heart">${NMA.hasHeart(p.id)?"♥ Herz gesendet":"♡ Herz schicken"}</button><a class="btn" href="postfach.html?an=${p.id}">Mail schreiben</a><button class="btn ghost" id="report">Melden / Blockieren</button></div>
+    <div class="acts"><a class="btn primary" href="chat.html?mit=${p.id}">Chat starten</a><button class="btn ${NMA.isFav(p.id)?"on":""}" id="fav" aria-pressed="${NMA.isFav(p.id)}">${NMA.isFav(p.id)?"★ Favorit":"☆ Favorit"}</button><button class="btn like ${NMA.hasHeart(p.id)?"on":""}" id="heart">${NMA.hasHeart(p.id)?"♥ Herz gesendet":"♡ Herz schicken"}</button><button class="btn ghost" id="report">Melden / Blockieren</button></div>
   </div>`;
   const galDraw=()=>FOTO.gallery(document.getElementById("gal"),"p:"+p.id,"c:"+NMA.user().nick,{requests:true});galDraw();
   addEventListener("storage",e=>{if(e.key==="nma_fotoAccess"||e.key==="nma_fotos")galDraw()});

@@ -25,18 +25,13 @@ NMA.chats = {
 };
 NMA.unread = {sabine:2};
 
-NMA.mails = [
-  {id:1, from:"karin",  subj:"Hallo von mir", date:"Heute, 14:05", unread:true, text:"Hallo,\n\nich bin über dein Profil gestolpert und musste schmunzeln. Magst du auch Theater? Ich würde mich über eine Antwort freuen.\n\nLiebe Grüße\nKarin"},
-  {id:2, from:"petra",  subj:"Danke für dein Interesse", date:"Gestern, 19:40", unread:false, text:"Hallo,\n\ndanke für das Herz! Ich schaue mich hier noch in Ruhe um, aber schreib mir gern im Chat.\n\nPetra"},
-  {id:3, from:"system", subj:"Willkommen bei Nie mehr alleine", date:"12.11.2026", unread:false, text:"Schön, dass du da bist!\n\nVervollständige dein Profil mit einem Foto und ein paar Sätzen über dich. Profile mit Foto bekommen deutlich mehr Nachrichten.\n\nDein Team von Nie mehr alleine"}
-];
+NMA.mails = [];   /* Postfach entfernt (17.11.2026) – es gibt nur noch den Chat */
 
 NMA.packs = [ /* Beispielpreise – werden vom Betreiber festgelegt */
   {coins:25,  price:19},{coins:50, price:38},{coins:100,price:75,flag:"Beliebt"},
   {coins:200, price:148},{coins:500,price:340},{coins:1000,price:590,flag:"Bester Preis"}
 ];
 NMA.costPerChat = 1;   /* Coins pro Chatnachricht */
-NMA.costPerMail = 0;   /* Coins pro Mail */
 
 /* ---------------- Speicher (nur Demo, im Browser) ---------------- */
 const store = {
@@ -123,10 +118,9 @@ const ico = {
 const page = document.body.dataset.page;
 if (document.body.classList.contains("member")) {
   const chatUnread = Object.values(NMA.unread).reduce((a,b)=>a+b,0);
-  const mailUnread = NMA.mails.filter(m=>m.unread).length;
   const items = [
     ["uebersicht","Übersicht","home",0],["suche","Suche","search",0],
-    ["chat","Chat","chat",chatUnread],["postfach","Postfach","mail",mailUnread],["mein-profil","Mein Bereich","me",0]
+    ["chat","Chat","chat",chatUnread],["mein-profil","Mein Bereich","me",0]
   ];
   const isActive = k => k===page || (k==="mein-profil" && ["einstellungen","hilfe","app-installieren"].includes(page)) || (k==="suche" && page==="profil");
   const top = document.createElement("header");
@@ -409,7 +403,7 @@ NMA.pushMode = () => NMA.store.get("pushMode", "alle");      /* "alle" | "favori
 {
   const pg = (document.body && document.body.dataset.page) || "";
   NMA.askPush = () => {
-    if (!NMA.store.get("pushAsk", false) || !/^(uebersicht|suche|chat|postfach|mein-profil)$/.test(pg) || document.querySelector(".lock")) return;
+    if (!NMA.store.get("pushAsk", false) || !/^(uebersicht|suche|chat|mein-profil)$/.test(pg) || document.querySelector(".lock")) return;
     NMA.store.set("pushAsk", false);
     const m = document.createElement("div"); m.className = "modal";
     m.innerHTML = `<div class="card" role="dialog" aria-modal="true" aria-labelledby="pqT" style="max-width:460px">
