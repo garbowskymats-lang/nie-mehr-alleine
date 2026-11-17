@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
 <link rel="stylesheet" href="style.css">
+<script>try{var l=localStorage.getItem("nma_lock");if(l&&l!=="null"&&sessionStorage.getItem("nma_unlocked")!=="1")document.documentElement.classList.add("nma-locked")}catch(e){}</script><style>html.nma-locked body>*:not(.lock){visibility:hidden}</style>
 </head>
 <body class="member" data-page="profil">
 <main class="page">
@@ -20,6 +21,7 @@
 </main>
 <script src="app.js"></script>
 <script src="push.js"></script>
+<script src="lock.js"></script>
 <script>{
   const p=NMA.get(NMA.param("id"));
   document.title=`${p.name}, ${p.age} – Nie mehr alleine`;

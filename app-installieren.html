@@ -37,6 +37,7 @@
 .matrix th,.matrix td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left}
 .matrix th{color:var(--muted);font-weight:600;font-size:13px}
 </style>
+<script>try{var l=localStorage.getItem("nma_lock");if(l&&l!=="null"&&sessionStorage.getItem("nma_unlocked")!=="1")document.documentElement.classList.add("nma-locked")}catch(e){}</script><style>html.nma-locked body>*:not(.lock){visibility:hidden}</style>
 </head>
 <body class="member" data-page="app-installieren">
 <main class="page">
@@ -116,6 +117,8 @@
   </div>
 </main>
 <script src="app.js"></script>
+<script src="push.js"></script>
+<script src="lock.js"></script>
 <script>{
   /* Passendes Gerät hervorheben */
   const ua=navigator.userAgent;

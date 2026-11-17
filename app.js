@@ -407,7 +407,8 @@ NMA.pushMode = () => NMA.store.get("pushMode", "alle");      /* "alle" | "favori
    Erscheint genau EINMAL direkt nach der Registrierung. „Nein“ = keine Benachrichtigungen (änderbar in den Einstellungen). */
 {
   const pg = (document.body && document.body.dataset.page) || "";
-  if (NMA.store.get("pushAsk", false) && /^(uebersicht|suche|chat|postfach|mein-profil)$/.test(pg)) setTimeout(() => {
+  NMA.askPush = () => {
+    if (!NMA.store.get("pushAsk", false) || !/^(uebersicht|suche|chat|postfach|mein-profil)$/.test(pg) || document.querySelector(".lock")) return;
     NMA.store.set("pushAsk", false);
     const m = document.createElement("div"); m.className = "modal";
     m.innerHTML = `<div class="card" role="dialog" aria-modal="true" aria-labelledby="pqT" style="max-width:460px">
@@ -429,5 +430,6 @@ NMA.pushMode = () => NMA.store.get("pushMode", "alle");      /* "alle" | "favori
       try { await NMA.push.enable(NMA.store.get("pushPreview", false), mode); NMA.toast(mode === "alle" ? "🔔 Du wirst bei neuen Nachrichten benachrichtigt." : "☆ Du wirst nur bei Nachrichten deiner Favoriten benachrichtigt."); }
       catch (err) { NMA.toast(err.message); }
     }));
-  }, 700);
+  };
+  setTimeout(() => { if (!NMA.lockBusy) NMA.askPush(); }, 700);   /* die App-Sperre ruft askPush nach dem Einrichten selbst auf */
 }

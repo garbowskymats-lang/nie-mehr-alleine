@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Nie mehr alleine">
 <link rel="stylesheet" href="style.css">
+<script>try{var l=localStorage.getItem("nma_lock");if(l&&l!=="null"&&sessionStorage.getItem("nma_unlocked")!=="1")document.documentElement.classList.add("nma-locked")}catch(e){}</script><style>html.nma-locked body>*:not(.lock){visibility:hidden}</style>
 </head>
 <body class="member" data-page="einstellungen">
 <main class="page">
@@ -27,6 +28,12 @@
         <div id="pushTestRow" hidden style="margin:4px 0 10px"><button class="btn sm" id="pushTest" type="button">Test-Benachrichtigung schicken</button></div>
         <div class="setting"><div><b>E-Mail bei neuen Nachrichten</b><p>Eine kurze Info, wenn du offline bist.</p></div><label class="switch"><input type="checkbox" checked aria-label="E-Mail-Benachrichtigung"><span></span></label></div>
         <div class="setting"><div><b>Ton im Chat</b><p>Kurzer Hinweiston, wenn eine Nachricht eintrifft.</p></div><label class="switch"><input type="checkbox" id="snd" aria-label="Ton im Chat"><span></span></label></div>
+      </section>
+      <section class="card pad">
+        <h2 style="font-size:24px;margin-bottom:6px">App-Sperre</h2>
+        <p class="muted" style="margin:0 0 10px">Wenn du die App ganz schließt, ist sie beim nächsten Öffnen gesperrt. Entsperren mit Fingerabdruck (Handy) oder deiner 6-stelligen PIN.</p>
+        <div class="setting" id="bioRow" hidden><div><b>Mit Fingerabdruck entsperren</b><p>Finger oder Gesicht statt PIN – die PIN bleibt als Ersatz.</p></div><label class="switch"><input type="checkbox" id="bioOn" aria-label="Mit Fingerabdruck entsperren"><span></span></label></div>
+        <button class="btn sm" id="pinChange" type="button" style="margin-top:6px">PIN ändern</button>
       </section>
       <section class="card pad">
         <h2 style="font-size:24px;margin-bottom:6px">Privatsphäre</h2>
@@ -50,8 +57,14 @@
 </main>
 <script src="app.js"></script>
 <script src="push.js"></script>
+<script src="lock.js"></script>
 <script>{
   {const s=document.getElementById("snd");s.checked=NMA.store.get("chatSound",false);s.addEventListener("change",()=>{NMA.store.set("chatSound",s.checked);NMA.toast(s.checked?"Hinweiston eingeschaltet.":"Hinweiston aus.")})}
+  /* App-Sperre */
+  if(NMA.lock){const b=document.getElementById("bioOn");
+    NMA.lock.bioAvailable().then(ok=>{document.getElementById("bioRow").hidden=!ok;b.checked=NMA.lock.hasBio()});
+    b.addEventListener("change",()=>{if(b.checked)NMA.lock.bioOn();else{NMA.lock.bioOff();NMA.toast("Fingerabdruck aus – du entsperrst mit der PIN.")}});
+    document.getElementById("pinChange").addEventListener("click",()=>NMA.lock.changePin());}
   /* Push-Benachrichtigungen */
   {
     const $=id=>document.getElementById(id),on=$("pushOn"),prev=$("pushPrev"),hint=$("pushHint");

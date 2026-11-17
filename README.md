@@ -193,3 +193,14 @@ Stand 17.11.2026 – Favoriten & Frage nach Benachrichtigungen
 Stand 17.11.2026 – Geburtsdatum per Zahlentastatur
 - Registrierung: statt Kalender drei Felder TT . MM . JJJJ mit Zahlentastatur; springt automatisch weiter, Löschen springt
   zurück, „9“ wird zu „09“. Prüft unmögliche Daten (31.02.) und Alter ab 18. Gespeichert wird weiterhin JJJJ-MM-TT.
+
+Stand 17.11.2026 – App-Sperre (lock.js)
+- App/Browser ganz geschlossen → beim nächsten Öffnen gesperrt (Merker im sessionStorage). Entsperren: Handy/Tablet mit
+  Fingerabdruck/Gesicht (Passkey, WebAuthn), PC mit 6-stelliger PIN; PIN geht überall als Ersatz.
+- Einrichtung direkt nach der Registrierung (PIN 2× eingeben, keine Reihen wie 123456/111111; auf dem Handy danach
+  „Mit Fingerabdruck entsperren?“), danach kommt die Frage nach Benachrichtigungen.
+- 5× falsche PIN → Anmeldung mit Passwort, danach neue PIN. „PIN vergessen?“ → genauso. Einstellungen: PIN ändern,
+  Fingerabdruck an/aus.
+- Fingerabdruck geht nur über https (echte Seite/Cloudflare), nicht in der Claude-Vorschau.
+- SERVER: Passkey registrieren und Signatur beim Entsperren prüfen (z. B. @simplewebauthn/server), Sitzung serverseitig
+  beenden, PIN nur als Hash (argon2/bcrypt), Fehlversuche serverseitig zählen.
