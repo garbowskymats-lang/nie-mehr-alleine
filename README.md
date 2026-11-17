@@ -189,3 +189,7 @@ Stand 17.11.2026 – Favoriten & Frage nach Benachrichtigungen
 - Favoriten: ☆ im Profil und im Chat-Kopf, Filter „☆ Favoriten“ in der Chatliste, ★ vor dem Namen.
 - SERVER: Favoriten pro Kunde speichern; push/subscribe bekommt mode ("alle"|"favoriten"); bei „favoriten“ nur pushen,
   wenn das schreibende Profil in den Favoriten ist (siehe server/push-beispiel.js).
+
+Stand 17.11.2026 – Geburtsdatum per Zahlentastatur
+- Registrierung: statt Kalender drei Felder TT . MM . JJJJ mit Zahlentastatur; springt automatisch weiter, Löschen springt
+  zurück, „9“ wird zu „09“. Prüft unmögliche Daten (31.02.) und Alter ab 18. Gespeichert wird weiterhin JJJJ-MM-TT.

@@ -32,7 +32,15 @@
         <select class="input" id="sex" required><option value="">Bitte wählen</option><option>ein Mann und suche eine Frau</option><option>eine Frau und suche einen Mann</option><option>ein Mann und suche einen Mann</option><option>eine Frau und suche eine Frau</option></select></div>
       <div class="field"><span class="label">Ich suche</span>
         <div class="seg" role="radiogroup" aria-label="Ich suche"><label><input type="radio" name="look" value="Beziehung" required> Beziehung</label><label><input type="radio" name="look" value="Abenteuer"> Abenteuer</label></div></div>
-      <div class="field"><label for="birth">Geburtsdatum</label><input class="input" id="birth" type="date" required><span class="hint" id="ageHint">Dein Alter wird automatisch berechnet. Anmeldung ab 18 Jahren.</span></div>
+      <div class="field"><label for="bT">Geburtsdatum</label>
+        <div class="dob" role="group" aria-label="Geburtsdatum">
+          <input class="input" id="bT" inputmode="numeric" autocomplete="bday-day" maxlength="2" placeholder="TT" aria-label="Tag" required>
+          <span aria-hidden="true">.</span>
+          <input class="input" id="bM" inputmode="numeric" autocomplete="bday-month" maxlength="2" placeholder="MM" aria-label="Monat" required>
+          <span aria-hidden="true">.</span>
+          <input class="input" id="bJ" inputmode="numeric" autocomplete="bday-year" maxlength="4" placeholder="JJJJ" aria-label="Jahr" required>
+        </div>
+        <span class="hint" id="ageHint">Dein Alter wird automatisch berechnet. Anmeldung ab 18 Jahren.</span></div>
       <div class="field"><label for="job">Beruf <span class="muted">(freiwillig)</span></label><input class="input" id="job" autocomplete="organization-title" placeholder="z. B. Elektriker"></div>
 
       <div class="field"><label for="land">Land</label><select class="input" id="land" aria-label="Land" required><option value="DE">Deutschland</option><option value="AT">Österreich</option><option value="CH">Schweiz</option></select></div>
@@ -50,11 +58,19 @@
 <script src="app.js"></script>
 <script>{
   const $=id=>document.getElementById(id);
-  const f=$("reg"),birth=$("birth"),hint=$("ageHint"),ok=$("ok"),nick=$("nick"),nh=$("nickHint");
-  const today=new Date(); birth.max=today.toISOString().slice(0,10);
+  /* Geburtsdatum über die Zahlentastatur: Tag, Monat, Jahr – springt automatisch ins nächste Feld */
+  const bT=$("bT"),bM=$("bM"),bJ=$("bJ"),birth={get value(){const d=+bT.value,m=+bM.value,y=+bJ.value;
+      if(!d||!m||String(bJ.value).length!==4)return"";const x=new Date(y,m-1,d);if(x.getFullYear()!==y||x.getMonth()!==m-1||x.getDate()!==d)return"";
+      return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`},setCustomValidity:v=>bT.setCustomValidity(v)};
+  [[bT,bM,2],[bM,bJ,2],[bJ,null,4]].forEach(([el,next,len])=>{
+    el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"").slice(0,len);if(el.value.length===len&&next)next.focus();checkAge()});
+    el.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!el.value){const prev=el===bJ?bM:el===bM?bT:null;if(prev){prev.focus();e.preventDefault()}}});
+    el.addEventListener("blur",()=>{if(len===2&&el.value.length===1)el.value="0"+el.value});});
+  const f=$("reg"),hint=$("ageHint"),ok=$("ok"),nick=$("nick"),nh=$("nickHint");
+  const today=new Date();
   const age=()=>{if(!birth.value)return null;const b=new Date(birth.value+"T00:00");let a=today.getFullYear()-b.getFullYear();const m=today.getMonth()-b.getMonth();if(m<0||(m===0&&today.getDate()<b.getDate()))a--;return a};
   const checkAge=()=>{const a=age();
-    if(a===null){hint.className="hint";hint.textContent="Dein Alter wird automatisch berechnet. Anmeldung ab 18 Jahren.";ok.disabled=true;ok.checked=false;birth.setCustomValidity("leer");return}
+    if(a===null){const typed=bT.value||bM.value||bJ.value,full=bT.value&&bM.value&&bJ.value.length===4;hint.className=full?"hint bad":"hint";hint.textContent=full?"Dieses Datum gibt es nicht – bitte prüfen.":typed?"Bitte Tag, Monat und Jahr eingeben, z. B. 12 . 03 . 1962":"Dein Alter wird automatisch berechnet. Anmeldung ab 18 Jahren.";ok.disabled=true;ok.checked=false;birth.setCustomValidity("leer");return}
     if(a<18){hint.className="hint bad";hint.textContent=`Du bist ${Math.max(a,0)} Jahre alt. Diese Seite ist nur für Erwachsene ab 18.`;ok.disabled=true;ok.checked=false;birth.setCustomValidity("unter 18");return}
     if(a>110){hint.className="hint bad";hint.textContent="Bitte prüfe das Geburtsdatum.";ok.disabled=true;birth.setCustomValidity("unplausibel");return}
     hint.className="hint good";hint.textContent=`Du bist ${a} Jahre alt.`;ok.disabled=false;birth.setCustomValidity("")};
@@ -73,14 +89,14 @@
     if(!okV){vh.className="hint bad";vh.textContent="Bitte deinen echten Vornamen – nur Buchstaben, mindestens 2.";vn.setCustomValidity("ungültig");return}
     vh.className="hint good";vh.textContent="Danke!";vn.setCustomValidity("")};
   vn.addEventListener("input",checkVn);
-  birth.addEventListener("input",checkAge);nick.addEventListener("input",checkNick);checkAge();
+  nick.addEventListener("input",checkNick);checkAge();
   const plzEl=$("plz"),landEl=$("land");
   const plzRule=()=>{const L=NMA.LAND[landEl.value];plzEl.maxLength=L.len;plzEl.placeholder=landEl.value==="DE"?"z. B. 34508":landEl.value==="AT"?"z. B. 1100":"z. B. 8004";
     if(plzEl.value.length>L.len)plzEl.value=plzEl.value.slice(0,L.len);plzEl.setCustomValidity(NMA.plzOk(landEl.value,plzEl.value)?"":"plz")};
   plzEl.addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,"");plzRule()});landEl.addEventListener("change",plzRule);plzRule();
   f.addEventListener("submit",e=>{e.preventDefault();checkAge();checkNick();checkVn();plzRule();
     if(!f.checkValidity()){const bad=f.querySelector(":invalid");bad&&bad.focus();
-      NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="vorname"?"Bitte gib deinen Vornamen ein (mindestens 2 Buchstaben).":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?`Bitte gib deine Postleitzahl ein (${NMA.LAND[landEl.value].len} Ziffern für ${NMA.LAND[landEl.value].name}).`:"Bitte fülle alle Pflichtfelder aus.");return}
+      NMA.toast(bad&&bad.id==="nick"?"Bitte wähle einen freien Nickname.":bad&&bad.id==="vorname"?"Bitte gib deinen Vornamen ein (mindestens 2 Buchstaben).":bad&&bad.id==="bT"?"Bitte gib dein Geburtsdatum ein (ab 18 Jahren).":bad&&bad.id==="ok"?"Bitte bestätige Alter und Hinweise.":bad&&bad.id==="plz"?`Bitte gib deine Postleitzahl ein (${NMA.LAND[landEl.value].len} Ziffern für ${NMA.LAND[landEl.value].name}).`:"Bitte fülle alle Pflichtfelder aus.");return}
     NMA.store.set("user",{registered:Date.now(),lastLogin:Date.now(),mail:$("mail").value.trim(),nick:nick.value.trim(),vorname:vn.value.replace(/\s+/g," ").trim(),age:age(),birth:birth.value,looking:f.look.value,sex:$("sex").value,job:$("job").value.trim(),land:landEl.value,plz:$("plz").value,radius:$("radius").value,city:"",about:""});
     NMA.store.set("buchungen",[]);NMA.store.set("favs",[]);NMA.store.set("pushAsk",true);NMA.store.set("pushModeSet",false);NMA.setCoins(5); location.href="uebersicht.html?neu=1";
   });

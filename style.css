@@ -379,3 +379,4 @@ details.faq p{margin:0 4px 18px;color:#cfe3e1}
 @media(prefers-reduced-motion:reduce){.ig-arrow{animation:none}}
 @media(max-width:600px){.install-sheet{align-items:end}.install-sheet .card{margin-bottom:56px}}
 .btn.on:not(.like){border-color:var(--gold);color:var(--gold)}
+.dob{display:grid;grid-template-columns:minmax(0,64px) auto minmax(0,64px) auto minmax(0,96px);gap:6px;align-items:center;justify-content:start}.dob .input{text-align:center;font-size:20px;letter-spacing:.04em;padding-inline:8px}.dob span{font-size:22px;color:var(--muted)}
