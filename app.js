@@ -206,7 +206,7 @@ document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",e
     const g = steps();
     const m = document.createElement("div"); m.className = "modal install-sheet";
     m.innerHTML = `<div class="card" role="dialog" aria-modal="true" aria-labelledby="igT">
-      <div class="ig-head"><img src="assets/icon-192.png" alt="" width="52" height="52"><h2 id="igT">${g.t}</h2></div>
+      <div class="ig-head"><img src="${teamPg ? "assets/team-192.png" : "assets/icon-192.png"}" alt="" width="52" height="52"><h2 id="igT">${g.t}</h2></div>
       <ol class="ig-steps">${g.s.map(x => `<li><span>${x}</span></li>`).join("")}</ol>
       ${g.n ? `<p class="hint">${g.n}</p>` : ""}
       <div class="row"><button class="btn primary" data-x>Verstanden</button></div></div>

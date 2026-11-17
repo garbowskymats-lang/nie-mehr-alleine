@@ -792,7 +792,7 @@ table.staff{width:100%;border-collapse:collapse;font-size:15px}
     if(s){const v=s.role==="Admin"?"admin":s.user;
       if(![...$("viewAs").options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=`${s.name} (${s.role})`;$("viewAs").appendChild(o)}
       $("viewAs").value=v;me=v;applyRole()}}
-  {const b=$("teamApp"),upd=()=>{b.hidden=!NMA.install.can()||NMA.install.standalone()};b.addEventListener("click",async()=>{if(await NMA.install.run())NMA.toast("Team-App wird installiert.");upd()});addEventListener("nma:installable",upd);upd();}
+  {const b=$("teamApp");b.hidden=NMA.install.standalone();b.addEventListener("click",()=>NMA.installApp());}
   $("teamLogout").addEventListener("click",()=>{const tu=NMA.store.get("teamUser",null),lg=NMA.store.get("staffLog",[]),o=lg.slice().reverse().find(l=>l.user===tu&&!l.out);if(o){o.out=Date.now();NMA.store.set("staffLog",lg)}NMA.store.set("teamUser",null)});
 }</script>
 <script src="massenversand.js"></script>
