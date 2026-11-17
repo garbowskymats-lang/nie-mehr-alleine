@@ -156,7 +156,7 @@ document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",e
   addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; });
   addEventListener("appinstalled", () => { try{localStorage.setItem("nma_app","1")}catch(e){}; document.getElementById("appBanner")?.remove(); NMA.toast("App installiert – du findest sie jetzt auf deinem Startbildschirm."); });
   const teamPg = /^team/.test((document.body && document.body.dataset.page) || "");
-  try { if ("serviceWorker" in navigator && location.protocol.startsWith("http")) (teamPg ? navigator.serviceWorker.register("sw-team.js", { scope: "./team" }) : navigator.serviceWorker.register("sw.js")).catch(()=>{});   /* eigener Bereich, damit sich Kunden- und Team-App nicht stören */ } catch (e) {}
+  try { if ("serviceWorker" in navigator && location.protocol.startsWith("http")) (teamPg ? navigator.serviceWorker.register("team/sw.js", { scope: "team/" }) : navigator.serviceWorker.register("sw.js")).catch(()=>{});   /* eigener Bereich, damit sich Kunden- und Team-App nicht stören */ } catch (e) {}
   /* für das Team-Portal: eigener Installieren-Knopf */
   NMA.install = { can: () => !!deferred, standalone, run: async () => { if (!deferred) return false; deferred.prompt(); const r = await deferred.userChoice; deferred = null; return r.outcome === "accepted"; } };
   addEventListener("beforeinstallprompt", () => dispatchEvent(new Event("nma:installable")));

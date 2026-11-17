@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><base href="../"><!-- alle Dateien liegen eine Ebene höher --><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Team-Portal</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="team/manifest.webmanifest">
+<meta name="theme-color" content="#071012">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/team-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Team">
+<link rel="icon" href="assets/team-192.png">
+<link rel="stylesheet" href="style.css">
+<style>
+.tb-tag{padding:4px 10px;border-radius:20px;background:#2a2112;color:#f6d79f;font-size:12px;font-weight:700;margin-left:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{min-height:40px;padding:0 16px;border-radius:30px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600}
+.tabs button.on{background:#0f2a2b;color:var(--accent);border-color:#1f5552}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.kpi{padding:18px 20px}
+.kpi small{display:block;color:var(--muted);font-size:14px}
+.kpi strong{display:block;font:700 clamp(28px,3.4vw,38px)/1.1 var(--serif);margin-top:6px;white-space:nowrap}
+.kpi .delta{font-size:13px;margin-top:4px}
+.up{color:var(--ok)}.down{color:var(--danger)}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.panel h2{font-size:22px;margin-bottom:4px}
+.panel>p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.bars{display:grid;gap:12px}
+.bar{display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) 56px;align-items:center;gap:12px;font-size:14px}
+.bar .track{height:14px;border-radius:8px;background:#10292a;overflow:hidden}
+.bar .fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+.bar b{text-align:right;font-variant-numeric:tabular-nums}
+.hours{display:flex;align-items:flex-end;gap:4px;height:170px;padding-top:10px}
+.hours div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.hours i{display:block;width:100%;border-radius:5px 5px 0 0;background:#1d5c58}
+.hours i.peak{background:var(--accent)}
+.hours span{font-size:11px;color:var(--muted)}
+table.staff{width:100%;border-collapse:collapse;font-size:15px}
+.staff th{text-align:left;color:var(--muted);font-weight:600;font-size:13px;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.staff td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.staff td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.staff tr.off td{opacity:.5}
+.who{display:flex;align-items:center;gap:10px}
+.role{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:#10292a;color:#bdf3ee}
+.mv-tag{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#2a2112;color:#f6d79f}.mv-tag.frei{background:#123a2a;color:#9be8bf}
+.role.admin{background:#2a2112;color:#f6d79f}
+.st{white-space:nowrap}
+.st::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#5d7472}
+.st.online::before{background:var(--ok)}.st.pause::before{background:var(--gold)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px}
+.toolbar .search{min-width:240px}
+.form-modal .card{width:min(520px,100%)}
+.kpis.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpis.two-k{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ekpi{padding:16px 18px;background:var(--card-2)}.ekpi small{display:block;color:var(--muted);font-size:13px}.ekpi strong{display:block;font:700 clamp(22px,2.6vw,30px)/1.15 var(--serif);margin-top:4px;white-space:nowrap}.ekpi .delta{font-size:12px;margin-top:3px;color:var(--muted)}
+.ekpi.gold strong{color:var(--gold)}.ekpi.ok strong{color:var(--ok)}
+@media(max-width:900px){.kpis.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ibx{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,300px);gap:16px;height:min(720px,calc(100svh - 230px));min-height:520px}
+.ibx-list,.ibx-info{overflow:auto}
+.ibx-head{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;border-bottom:1px solid var(--line)}
+.q-item{width:100%;display:grid;gap:3px;padding:13px 16px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;cursor:pointer}
+.q-item:hover{background:#ffffff07}.q-item.on{background:#0f2a2b}
+.q-item .top{display:flex;justify-content:space-between;gap:8px}
+.q-item small{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wait{white-space:nowrap;font-size:13px;font-weight:700;padding:3px 9px;border-radius:20px;background:#10292a;color:#bdf3ee}
+.wait.warn{background:#2a2112;color:#f6d79f}.wait.late{background:#3a1714;color:#ffb3a8}
+.ibx-chat{display:flex;flex-direction:column;min-height:0}
+.ibx-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ibx-reply{border-top:1px solid var(--line);padding:12px 14px}
+.ibx-reply textarea{min-height:80px}
+.ibx-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
+.ibx-actions .hint{flex:1}
+.ibx-info{padding:16px}
+.ibx-info h4{font:700 13px/1 var(--sans);color:var(--muted);margin:18px 0 8px}
+.ibx-info h4:first-child{margin-top:0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv span{color:var(--muted)}
+.ibx-info textarea{min-height:90px;font-size:14px}
+.assignee{font-size:12px;color:var(--gold)}
+@media(max-width:1100px){.ibx{grid-template-columns:minmax(0,260px) minmax(0,1fr)}.ibx-info{grid-column:1/-1;max-height:none}.ibx{height:auto}.ibx-chat{min-height:520px}}
+@media(max-width:700px){.ibx{grid-template-columns:1fr}.ibx-list{max-height:260px}}
+.ibx-filter{padding:12px 12px 10px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.ibx-filter .chips{padding:0}
+.ibx-filter .chip b{margin-left:4px;font-size:12px;opacity:.85}
+.seg-sm label{min-height:36px;font-size:13px;border-radius:10px;padding:0 4px}
+.seg-sm input{position:absolute;opacity:0;pointer-events:none}
+.q-item .top b{display:flex;align-items:center;gap:6px;min-width:0}
+.seg.seg-sm{grid-template-columns:repeat(3,1fr);gap:6px}
+.q-item.unread b:first-child{color:var(--ink)}
+.q-item.unread{box-shadow:inset 3px 0 0 var(--accent)}
+.q-item.heart{box-shadow:inset 3px 0 0 #ff6b8b}
+.q-item.sent{cursor:default}
+.kst{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font:700 12px/1 var(--sans);vertical-align:1px}
+.kst.k{background:#e3b26a;color:#2a1c06}.kst.t{background:#2b3f3e;color:#cfe3e1}
+.ibx-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.ibx-badges .nr{font-size:13px;color:var(--muted)}
+.coin-b{white-space:nowrap;font-size:13px;font-weight:700;padding:3px 9px;border-radius:20px;background:#2a2112;color:#f6d79f}
+.heart-note{margin:auto;text-align:center;padding:24px;border-radius:14px;background:#2a1018;border:1px solid #6b2a3b;color:#ffd6df;max-width:420px;line-height:1.6}
+.owner-lock{margin:12px 14px;padding:12px 14px;border-radius:10px;background:#1a1110;border:1px solid #5a2a26;color:#e9cfcb;font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tpl-row{margin-bottom:8px}.tpl-row select{min-height:40px;font-size:14px}
+#ibxConv{display:flex;flex-direction:column;min-height:0;flex:1}
+#ibxConv[hidden]{display:none}
+.pgroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media(max-width:900px){.pgroups{grid-template-columns:1fr}}
+.pgroup h3{font:700 18px/1.2 var(--sans);margin-bottom:10px}
+.pcards{display:grid;gap:10px}
+.pcard{display:flex;align-items:center;gap:12px;padding:12px 14px;flex-wrap:wrap}
+.pcard .grow{flex:1;min-width:150px;display:grid;gap:2px}
+.pcard small{color:var(--muted);font-size:13px}
+.pacts{display:flex;gap:6px;flex-wrap:wrap}
+.sm-sel{min-height:38px;padding:4px 10px;font-size:14px;width:auto;border-radius:10px}
+.tpl{padding:14px 0;border-bottom:1px solid var(--line)}
+.tpl:last-child{border-bottom:0}
+.tpl-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tpl-nr{font:700 12px/1 var(--sans);padding:5px 8px;border-radius:8px;background:#10292a;color:var(--accent)}
+.tpl p{margin:8px 0;color:#cfe3e1}
+.tpl-acts{display:flex;gap:6px}
+.lockbox{max-width:520px;margin:20px auto;text-align:center}
+.lockbox h2{font-size:26px;margin-bottom:8px}
+.pin-row{display:flex;gap:10px;margin:18px 0 8px}
+.pin-row .input{flex:1;text-align:center;letter-spacing:.3em;font-size:20px}
+.pin-row .input::placeholder{letter-spacing:normal;font-size:16px}
+.logs{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:18px;min-height:480px}
+@media(max-width:860px){.logs{grid-template-columns:1fr}}
+.log-list{overflow:auto;max-height:640px}
+.log-item{width:100%;display:grid;gap:3px;padding:14px 16px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;cursor:pointer}
+.log-item:hover{background:#ffffff07}.log-item.on{background:#0f2a2b}
+.log-item .top{display:flex;justify-content:space-between;gap:8px}
+.log-item small{color:var(--muted);font-size:13px}
+.log-view{display:flex;flex-direction:column;max-height:640px}
+.log-head{padding:16px 20px;border-bottom:1px solid var(--line)}
+.log-head h3{font-size:22px}
+.log-msgs{flex:1;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.lm{max-width:80%;padding:9px 13px;border-radius:14px;background:var(--card-2);font-size:15px}
+.lm.mod{align-self:flex-end;background:#0d5f5a}
+.lm .meta{display:block;font-size:12px;color:#bfe0dc;opacity:.85;margin-bottom:3px}
+.lm.cust .meta{color:var(--muted)}
+@media(max-width:700px){
+  .staff thead{display:none}
+  .staff tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .staff td{border:0;padding:0;display:flex;flex-direction:column;font-size:14px}
+  .staff td::before{content:attr(data-l);color:var(--muted);font-size:12px}
+  .staff td.num{text-align:left}
+  .staff td:first-child{grid-column:1/-1}.staff td:first-child::before{display:none}
+  .staff td:last-child{grid-column:1/-1;flex-direction:row;gap:8px}.staff td:last-child::before{display:none}
+  .bar{grid-template-columns:minmax(0,96px) minmax(0,1fr) 46px}
+  .tb-tag,#me .lbl,a[title="Zur Kundenseite"]{display:none}
+  #me select{max-width:150px}
+  .staff .role{align-self:flex-start}
+}
+</style>
+</head>
+<body data-page="team">
+<header class="topbar">
+  <a class="brand" href="team/team.html"><i aria-hidden="true">✦</i><span>Team-<b>Portal</b></span></a>
+  <div class="top-right"><label class="muted small" id="me"><span class="lbl">Ansicht (Demo): </span><select class="input" id="viewAs" style="width:auto;min-height:36px;padding:4px 10px;font-size:14px"><option value="admin">Chef (Admin)</option><option value="marco">Marco B. (Moderator)</option><option value="julia">Julia W. (Moderator)</option></select></label><button class="btn sm" id="teamApp" hidden>📲 App installieren</button><a class="btn sm ghost" href="team/index.html" id="teamLogout">Abmelden</a></div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div><h1 id="pTitle">Mitarbeiterbereich</h1><p id="pSub">Statistik und Verwaltung des Moderatoren-Teams.</p></div>
+    <div class="tabs" role="tablist"><button class="on" data-tab="inbox" role="tab">Nachrichten <span class="badge" id="qBadge">0</span></button><button data-tab="profiles" role="tab" id="tabProf">Meine Profile</button><button data-tab="templates" role="tab">Vorlagen</button><button data-tab="mass" role="tab" id="tabMass" hidden>📣 Massenversand <span class="badge" id="mvBadge" hidden>0</span></button><button data-tab="stats" role="tab">Statistik</button><button data-tab="staff" role="tab" data-admin>Mitarbeiter</button><button data-tab="pinnwand" role="tab">📌 Pinnwand <span class="badge" id="pinBadge" hidden>0</span></button><button data-tab="monitor" role="tab" data-admin>📡 Monitor</button><button data-tab="kunden" role="tab" data-admin>👤 Kunden</button><button data-tab="support" role="tab" data-admin>🛟 Support <span class="badge" id="supBadge" hidden>0</span></button><button data-tab="logs" role="tab" data-admin>🔒 Verläufe</button></div>
+  </div>
+
+  <!-- ================= STATISTIK ================= -->
+  <!-- ================= NACHRICHTEN ================= -->
+  <section id="inbox">
+    <div class="ibx">
+      <aside class="card ibx-list">
+        <div class="ibx-filter">
+          <div class="chips" id="boxChips" role="tablist" aria-label="Ordner">
+            <button class="chip on" data-box="unread">Ungelesen <b id="nUnread">0</b></button>
+            <button class="chip" data-box="read">Gelesen <b id="nRead">0</b></button>
+            <button class="chip" data-box="sent">Gesendet</button>
+            <button class="chip" data-box="hearts">♥ Herzchen <b id="nHearts">0</b></button>
+          </div>
+          <div class="seg seg-sm" role="radiogroup" aria-label="Rubrik">
+            <label><input type="radio" name="rub" value="" checked> Alle</label><label><input type="radio" name="rub" value="Beziehung"> Beziehung</label><label><input type="radio" name="rub" value="Abenteuer"> Abenteuer</label>
+          </div>
+        </div>
+        <div id="fotoReqs"></div>
+        <div id="queue"></div>
+      </aside>
+      <div class="card ibx-chat">
+        <div id="ibxEmpty" class="empty" style="margin:auto">Wähle links eine Nachricht.</div>
+        <div id="ibxConv" hidden>
+          <div class="log-head ibx-top"><div><h3 id="cTitle"></h3><small class="muted" id="cSub"></small></div><div class="ibx-badges" id="cBadges"></div></div>
+          <div class="log-msgs" id="cMsgs"></div>
+          <div class="owner-lock" id="ownerLock" hidden></div>
+          <form class="ibx-reply" id="replyForm">
+            <div class="tpl-row"><select class="input" id="tplPick" aria-label="Vorlage einfügen"><option value="">Vorlage einfügen …</option></select></div>
+            <textarea class="input" id="reply" rows="3" placeholder="Antwort schreiben … (Strg+Enter sendet)" aria-label="Antwort"></textarea>
+            <div class="ibx-actions"><span class="hint" id="charHint">0 Zeichen</span><button type="button" class="btn ghost sm" id="skip">Zurückstellen</button><button class="btn primary" id="sendBtn">Senden</button></div>
+          </form>
+        </div>
+      </div>
+      <aside class="card ibx-info" id="infoPane"><p class="empty">Infos zu Kunde und Profil erscheinen hier.</p></aside>
+    </div>
+  </section>
+
+  <!-- ================= MEINE PROFILE ================= -->
+  <section id="profiles" hidden>
+    <div class="toolbar">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="pq" placeholder="Profil suchen" aria-label="Profil suchen"></label>
+        <select class="input" id="pOwner" style="width:auto" aria-label="Mitarbeiter" data-admin><option value="">Alle Mitarbeiter</option></select></div>
+      <button class="btn primary" id="pAdd">+ Profil anlegen</button>
+    </div>
+    <p class="hint" id="pRule" style="margin:-4px 0 16px"></p>
+    <div class="pgroups" id="pGroups"></div>
+  </section>
+
+  <!-- ================= VORLAGEN ================= -->
+  <section id="templates" hidden>
+    <div class="two">
+      <form class="card pad" id="tplForm">
+        <h2 style="font-size:22px;margin-bottom:6px" id="tplFormTitle">Neue Vorlage</h2>
+        <p class="hint" style="margin:0 0 12px">Jede Vorlage bekommt automatisch eine Nummer. Das System merkt sich, welcher Kunde welche Vorlage bekommen hat – <b>derselbe Text geht nie zweimal an denselben Kunden</b>, auch nicht von verschiedenen Profilen.</p>
+        <div class="field"><label for="tplName">Kurzname</label><input class="input" id="tplName" maxlength="40" placeholder="z. B. Wochenende"></div>
+        <div class="field"><label for="tplText">Text</label><textarea class="input" id="tplText" required placeholder="Das Wochenende war toll – was hast du so gemacht?"></textarea></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="tplSave">Vorlage speichern</button><button type="button" class="btn ghost" id="tplCancel" hidden>Abbrechen</button></div>
+      </form>
+      <div class="card pad">
+        <h2 style="font-size:22px;margin-bottom:12px" id="tplListTitle">Meine Vorlagen</h2>
+        <div id="tplList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MASSENVERSAND (massenversand.js) ================= -->
+  <section id="mass" hidden></section>
+
+  <section id="stats" hidden>
+    <div class="toolbar">
+      <div class="tabs" id="range"><button class="on" data-r="1">Heute</button><button data-r="7">7 Tage</button><button data-r="30">30 Tage</button></div>
+      <span class="demo">Beispieldaten – echte Zahlen liefert später der Server.</span>
+    </div>
+    <div class="kpis">
+      <div class="card kpi"><small id="lMsg">Beantwortete Nachrichten</small><strong id="kMsg">–</strong><div class="delta" id="dMsg"></div></div>
+      <div class="card kpi"><small id="lTime">Ø Antwortzeit</small><strong id="kTime">–</strong><div class="delta" id="dTime"></div></div>
+      <div class="card kpi" id="onCard"><small>Mitarbeiter online</small><strong id="kOn">–</strong><div class="delta muted" id="dOn"></div></div>
+      <div class="card kpi"><small id="lWait">Wartende Nachrichten</small><strong id="kWait">–</strong><div class="delta muted">älteste: <span id="kOld">–</span></div></div>
+    </div>
+    <div class="card pad panel" id="earnCard" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><h2 id="eTitle">Umsatz &amp; Verdienst</h2><p id="eSub" style="margin:0 0 16px;color:var(--muted);font-size:14px"></p></div>
+        <label class="small muted" id="eRateBox" data-admin>Ø Erlös pro Coin <input class="input" id="eCoin" type="number" min="0.1" max="5" step="0.01" style="width:90px;min-height:36px;padding:4px 8px;margin-left:6px"> €</label></div>
+      <div class="kpis" id="eKpis" style="margin-bottom:16px"></div>
+      <div id="eTable"></div>
+    </div>
+    <div class="two" id="perMod">
+      <div class="card pad panel"><h2>Nachrichten pro Mitarbeiter</h2><p id="barsSub">Beantwortete Nachrichten im gewählten Zeitraum</p><div class="bars" id="bars"></div></div>
+      <div class="card pad panel"><h2>Antwortzeit pro Mitarbeiter</h2><p>Durchschnitt in Minuten – kürzer ist besser</p><div class="bars" id="rt"></div></div>
+    </div>
+    <div class="card pad panel" id="hoursCard" style="margin-top:20px"><h2 id="hTitle">Eingehende Nachrichten nach Uhrzeit</h2><p id="hSub">Wann am meisten los ist – hilft bei der Schichtplanung</p><div class="hours" id="hours"></div></div>
+  </section>
+
+  <!-- ================= MITARBEITER ================= -->
+  <section id="staff" hidden>
+    <div class="toolbar">
+      <label class="search"><span aria-hidden="true">⌕</span><input type="search" id="q" placeholder="Mitarbeiter suchen" aria-label="Mitarbeiter suchen"></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><select class="input" id="fRole" style="width:auto" aria-label="Rolle filtern"><option value="">Alle Rollen</option><option>Admin</option><option>Moderator</option></select><button class="btn primary" id="add">+ Mitarbeiter anlegen</button></div>
+    </div>
+    <div class="card pad" style="padding-top:8px">
+      <table class="staff">
+        <thead><tr><th>Name</th><th>Rolle</th><th>Status</th><th>Letzter Login</th><th class="num">Nachrichten (7 T.)</th><th class="num">Ø Antwort</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <p class="hint" style="margin-top:12px"><b>Admin</b> darf Mitarbeiter verwalten, alle Statistiken und – mit Zusatzcode – die Verläufe sehen. <b>Moderator</b> sieht nur seinen eigenen Posteingang und seine Zahlen.</p>
+  </section>
+  <!-- ================= PINNWAND (alle) + MONITOR (nur Admin) – admin.js ================= -->
+  <section id="pinnwand" hidden></section>
+  <section id="monitor" hidden></section>
+  <!-- ================= KUNDEN (nur Admin, kunden.js) ================= -->
+  <section id="kunden" hidden></section>
+  <!-- ================= SUPPORT (nur Admin, support.js) ================= -->
+  <section id="support" hidden></section>
+  <!-- ================= VERLÄUFE (nur Admin) ================= -->
+  <section id="logs" hidden>
+    <div class="card pad lockbox" id="lock">
+      <h2>🔒 Geschützter Bereich</h2>
+      <p class="muted">Hier sieht der Admin, was die Mitarbeiter geschrieben haben. Bitte gib zusätzlich deinen Admin-Code ein.</p>
+      <form id="pinForm" class="pin-row"><input class="input" id="pin" type="password" inputmode="numeric" maxlength="6" placeholder="Admin-Code" aria-label="Admin-Code" autocomplete="off"><button class="btn primary">Entsperren</button></form>
+      <p class="hint" id="pinHint">Demo: beliebiger Code mit 4–6 Ziffern. Jeder Zugriff wird protokolliert.</p>
+    </div>
+    <div id="logView" hidden>
+      <div id="archCfg"></div>
+      <div class="toolbar">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="lq" placeholder="Kunde oder Profil suchen" aria-label="Verläufe durchsuchen"></label>
+        <select class="input" id="lMod" style="width:auto" aria-label="Mitarbeiter filtern"><option value="">Alle Mitarbeiter</option></select></div>
+        <button class="btn ghost" id="relock">Bereich sperren</button>
+      </div>
+      <div class="logs">
+        <div class="card log-list" id="logList"></div>
+        <div class="card log-view" id="logDetail"><p class="empty">Verlauf links auswählen.</p></div>
+      </div>
+      <p class="hint" style="margin-top:12px">Zugriffsprotokoll: <span id="audit"></span></p>
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+<script src="photos.js"></script>
+<script>{
+  const $=id=>document.getElementById(id);
+  const KEY="staff";
+  const seed=[
+    {id:1,name:"Sandra K.",user:"sandra",role:"Admin",rate:0,status:"online",last:"Heute, 08:02",msg:[64,402,1690],rt:[3.1,3.4,3.6],active:true,g:"linear-gradient(145deg,#c79a54,#4b3517)"},
+    {id:2,name:"Marco B.",user:"marco",role:"Moderator",mass:"kontrolle",rate:0.12,status:"online",last:"Heute, 12:15",msg:[81,515,2120],rt:[2.6,2.9,3.0],active:true,g:"linear-gradient(145deg,#5b7aa0,#1c2a3c)"},
+    {id:3,name:"Julia W.",user:"julia",role:"Moderator",status:"pause",last:"Heute, 10:40",msg:[47,388,1610],rt:[4.2,3.9,4.1],active:true,g:"linear-gradient(145deg,#b0566f,#3b1825)"},
+    {id:4,name:"Tim R.",user:"tim",role:"Moderator",status:"online",last:"Heute, 14:01",msg:[29,301,1302],rt:[5.8,5.1,4.9],active:true,g:"linear-gradient(145deg,#4f8f87,#173a37)"},
+    {id:5,name:"Nicole H.",user:"nicole",role:"Moderator",status:"offline",last:"Gestern, 22:47",msg:[0,276,1188],rt:[0,3.7,3.8],active:true,g:"linear-gradient(145deg,#8a6aa8,#2c2240)"},
+    {id:6,name:"Dennis P.",user:"dennis",role:"Moderator",status:"offline",last:"03.11.2026",msg:[0,0,410],rt:[0,0,6.2],active:false,g:"linear-gradient(145deg,#7b8a5a,#283019)"}
+  ];
+  let staff=NMA.store.get(KEY,null)||seed;
+  const persist=()=>NMA.store.set(KEY,staff);
+  let range=1;const ri=()=>range===1?0:range===7?1:2;
+  const fmtMin=m=>m?`${m.toFixed(1).replace(".",",")} Min.`:"–";
+  const nf=n=>n.toLocaleString("de-DE");
+
+  /* ---------- Statistik ---------- */
+  const renderStats=()=>{
+    const i=ri(),act=(typeof me!=="undefined"&&me!=="admin")?staff.filter(s=>s.user===me):staff.filter(s=>s.active);
+    const total=act.reduce((a,s)=>a+s.msg[i],0);
+    const withRt=act.filter(s=>s.rt[i]);
+    const avg=withRt.length?withRt.reduce((a,s)=>a+s.rt[i]*s.msg[i],0)/Math.max(1,withRt.reduce((a,s)=>a+s.msg[i],0)):0;
+    let prev={0:[198,3.6],1:[1730,3.8],2:[7900,4.0]}[i];if(typeof me!=="undefined"&&me!=="admin")prev=[Math.max(1,Math.round(total*.9)),avg+.3];
+    $("kMsg").textContent=nf(total);
+    const dm=Math.round((total-prev[0])/prev[0]*100);
+    $("dMsg").innerHTML=`<span class="${dm>=0?"up":"down"}">${dm>=0?"▲":"▼"} ${Math.abs(dm)} %</span> <span class="muted">zum Vorzeitraum</span>`;
+    $("kTime").textContent=fmtMin(avg);
+    const dt=avg-prev[1];
+    $("dTime").innerHTML=`<span class="${dt<=0?"up":"down"}">${dt<=0?"▼":"▲"} ${Math.abs(dt).toFixed(1).replace(".",",")} Min.</span> <span class="muted">zum Vorzeitraum</span>`;
+    const on=act.filter(s=>s.status==="online").length,pause=act.filter(s=>s.status==="pause").length;
+    $("kOn").textContent=`${on} von ${act.length}`;$("dOn").textContent=pause?`${pause} in Pause`:"niemand in Pause";
+    {const mq=typeof myQueue==="function"?myQueue():[];$("kWait").textContent=mq.length;$("kOld").textContent=mq.length?waitTxt(mq[0].t):"–";}
+    $("barsSub").textContent=`Beantwortete Nachrichten – ${range===1?"heute":"letzte "+range+" Tage"}`;
+    const sorted=[...act].sort((a,b)=>b.msg[i]-a.msg[i]),max=Math.max(1,...sorted.map(s=>s.msg[i]));
+    $("bars").innerHTML=sorted.map(s=>`<div class="bar"><span>${NMA.esc(s.name)}</span><span class="track"><span class="fill" style="display:block;width:${s.msg[i]/max*100}%"></span></span><b>${nf(s.msg[i])}</b></div>`).join("");
+    const rs=act.filter(s=>s.rt[i]).sort((a,b)=>a.rt[i]-b.rt[i]),rmax=Math.max(1,...rs.map(s=>s.rt[i]));
+    $("rt").innerHTML=rs.length?rs.map(s=>`<div class="bar"><span>${NMA.esc(s.name)}</span><span class="track"><span class="fill" style="display:block;width:${s.rt[i]/rmax*100}%;background:${s.rt[i]>5?"linear-gradient(90deg,#9a5a30,#e3b26a)":""}"></span></span><b>${s.rt[i].toFixed(1).replace(".",",")}</b></div>`).join(""):'<p class="muted">Keine Daten.</p>';
+    const own=(typeof me!=="undefined"&&me!=="admin")?.25:1;const h=[2,1,1,0,0,0,1,2,4,6,7,8,9,9,8,8,10,12,15,19,22,24,18,9].map(v=>Math.round(v*(range===1?4:range*4)*own));
+    const hm=Math.max(...h);
+    $("hours").innerHTML=h.map((v,k)=>`<div title="${k}–${k+1} Uhr: ${nf(v)} Nachrichten"><i class="${v>=hm*.8?"peak":""}" style="height:${v/hm*100}%"></i><span>${k%3===0?k:""}</span></div>`).join("");
+    renderEarn(i,act);
+  };
+
+  /* ---------- Umsatz & Verdienst ----------
+     Demo-Rechnung: jede beantwortete Nachricht = 1 vom Kunden bezahlte Chatnachricht (NMA.costPerChat Coins).
+     Verdienst Mitarbeiter = beantwortete Nachrichten × Vergütung pro Nachricht (pro Mitarbeiter einstellbar).
+     Coin-Käufe (Einzahlungen) sind Beispielzahlen – echte Zahlen liefert später der Zahlungsanbieter/Server. */
+  const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+  const ecfg=Object.assign({coin:0.70},NMA.store.get("earnCfg",{}));
+  const buys={0:[6,455],1:[41,3190],2:[176,13480]};      /* [Käufe, Euro] je Zeitraum – Beispiel */
+  const rateOf=s=>s.role==="Admin"?(s.rate||0):(s.rate??0.10);
+  const renderEarn=(i,act)=>{
+    const admin=typeof me!=="undefined"&&me==="admin",per=range===1?"heute":"letzte "+range+" Tage";
+    const rows=act.filter(s=>s.role!=="Admin"||rateOf(s)>0).map(s=>{const coins=s.msg[i]*NMA.costPerChat;return{s,msgs:s.msg[i],coins,ums:coins*ecfg.coin,pay:s.msg[i]*rateOf(s)}}).sort((a,b)=>b.ums-a.ums);
+    $("eCoin").value=ecfg.coin.toFixed(2);
+    if(admin){
+      const used=act.reduce((a,s)=>a+s.msg[i]*NMA.costPerChat,0),pay=rows.reduce((a,r)=>a+r.pay,0),[nb,in_]=buys[i];
+      $("eTitle").textContent="Umsatz & Verdienst";
+      $("eSub").textContent=`Zeitraum: ${per} · Beträge brutto, vor Gebühren des Zahlungsanbieters und Steuern`;
+      $("eKpis").className="kpis";
+      $("eKpis").innerHTML=`<div class="ekpi card gold"><small>Umsatz (Coins gekauft)</small><strong>${eur(in_)}</strong><div class="delta">${nf(nb)} Käufe · Beispielzahl</div></div>
+        <div class="ekpi card"><small>Coins im Chat verbraucht</small><strong>${nf(used)}</strong><div class="delta">≈ ${eur(used*ecfg.coin)}</div></div>
+        <div class="ekpi card"><small>Verdienst Mitarbeiter</small><strong>${eur(pay)}</strong><div class="delta">für ${nf(rows.reduce((a,r)=>a+r.msgs,0))} Nachrichten</div></div>
+        <div class="ekpi card ok"><small>Bleibt nach Vergütung</small><strong>${eur(in_-pay)}</strong><div class="delta">Umsatz − Verdienst Mitarbeiter</div></div>`;
+      $("eTable").innerHTML=rows.length?`<table class="staff"><thead><tr><th>Mitarbeiter</th><th class="num">Nachrichten</th><th class="num">Coins verbraucht</th><th class="num">Umsatz erzeugt</th><th class="num">Satz / Nachricht</th><th class="num">Verdienst</th></tr></thead><tbody>
+        ${rows.map(r=>`<tr><td data-l="Mitarbeiter"><b>${NMA.esc(r.s.name)}</b></td><td data-l="Nachrichten" class="num">${nf(r.msgs)}</td><td data-l="Coins verbraucht" class="num">${nf(r.coins)}</td><td data-l="Umsatz erzeugt" class="num">${eur(r.ums)}</td><td data-l="Satz / Nachricht" class="num">${eur(rateOf(r.s))}</td><td data-l="Verdienst" class="num"><b>${eur(r.pay)}</b></td></tr>`).join("")}
+        </tbody></table><p class="hint" style="margin-top:10px">Den Satz pro Nachricht stellst du unter Mitarbeiter → Bearbeiten ein. „Umsatz erzeugt“ = verbrauchte Coins × Ø Erlös pro Coin.</p>`:'<p class="muted">Keine Daten.</p>';
+    }else{
+      const r=rows.find(x=>x.s.user===me)||{msgs:0,pay:0,s:{rate:0}};
+      $("eTitle").textContent="Dein Verdienst";
+      $("eSub").textContent=`Zeitraum: ${per} · Die Abrechnung macht der Chef.`;
+      $("eKpis").className="kpis three";
+      $("eKpis").innerHTML=`<div class="ekpi card ok"><small>Dein Verdienst</small><strong>${eur(r.pay)}</strong><div class="delta">${per}</div></div>
+        <div class="ekpi card"><small>Beantwortete Nachrichten</small><strong>${nf(r.msgs)}</strong></div>
+        <div class="ekpi card"><small>Satz pro Nachricht</small><strong>${eur(rateOf(r.s))}</strong></div>`;
+      $("eTable").innerHTML="";
+    }
+  };
+
+  /* ---------- Mitarbeiter ---------- */
+  const stLabel={online:"Online",pause:"Pause",offline:"Offline"};
+  const renderStaff=()=>{
+    const q=$("q").value.trim().toLowerCase(),r=$("fRole").value;
+    const list=staff.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.user.includes(q))&&(!r||s.role===r));
+    $("rows").innerHTML=list.length?list.map(s=>`<tr class="${s.active?"":"off"}">
+      <td data-l="Name"><span class="who"><span class="avatar" style="--g:${s.g};width:38px;height:38px;font-size:14px">${NMA.esc(s.name[0])}</span><span><b>${NMA.esc(s.name)}</b><br><span class="muted small">Benutzer: ${NMA.esc(s.user)}${s.active?"":" · deaktiviert"}</span></span></span></td>
+      <td data-l="Rolle"><span class="role ${s.role==="Admin"?"admin":""}">${s.role}</span>${s.role!=="Admin"&&s.mass&&s.mass!=="aus"?`<br><span class="mv-tag ${s.mass}" title="Massenversand">📣 ${s.mass==="frei"?"selbstständig":"mit Kontrolle"}</span>`:""}</td>
+      <td data-l="Status"><span class="st ${s.status}">${s.active?stLabel[s.status]:"Gesperrt"}</span></td>
+      <td data-l="Letzter Login">${s.last}</td>
+      <td data-l="Nachrichten (7 T.)" class="num">${nf(s.msg[1])}</td>
+      <td data-l="Ø Antwort" class="num">${fmtMin(s.rt[1])}</td>
+      <td><button class="btn sm" data-edit="${s.id}">Bearbeiten</button><button class="btn sm ghost" data-toggle="${s.id}">${s.active?"Sperren":"Freischalten"}</button></td></tr>`).join(""):'<tr><td colspan="7" class="empty">Keine Mitarbeiter gefunden.</td></tr>';
+  };
+
+  const form=(s)=>{
+    const isNew=!s; s=s||{name:"",user:"",role:"Moderator",status:"offline"};
+    const m=document.createElement("div");m.className="modal form-modal";
+    m.innerHTML=`<form class="card" novalidate><h2>${isNew?"Mitarbeiter anlegen":"Mitarbeiter bearbeiten"}</h2>
+      <div class="form-grid" style="margin-top:14px">
+        <div class="field"><label for="fn">Name</label><input class="input" id="fn" required value="${NMA.esc(s.name)}"></div>
+        <div class="field"><label for="fu">Benutzername</label><input class="input" id="fu" required pattern="[a-z0-9._-]{3,}" value="${NMA.esc(s.user)}"><span class="hint">Kleinbuchstaben, mind. 3 Zeichen</span></div>
+        <div class="field"><label for="fr">Rolle</label><select class="input" id="fr"><option ${s.role==="Moderator"?"selected":""}>Moderator</option><option ${s.role==="Admin"?"selected":""}>Admin</option></select></div>
+        <div class="field"><label for="fe">E-Mail</label><input class="input" id="fe" type="email" value="${NMA.esc(s.mail||"")}" placeholder="für das Einladungs-Passwort"></div>
+        <div class="field"><label for="frate">Vergütung pro beantworteter Nachricht (€)</label><input class="input" id="frate" type="number" min="0" max="5" step="0.01" value="${s.rate??0.10}"><span class="hint">Für die Verdienst-Anzeige in der Statistik.</span></div>
+        <div class="field full"><label for="fm">Massenversand</label><select class="input" id="fm">${[["aus","Nicht erlaubt"],["kontrolle","Erlaubt – jede Aussendung muss der Chef freigeben"],["frei","Erlaubt – darf selbst senden (erfahren)"]].map(([v,t])=>`<option value="${v}" ${(s.mass||"aus")===v?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Gilt nur für Moderatoren. Admins dürfen immer.</span></div>
+      </div>
+      ${isNew?'<p class="hint">Der neue Mitarbeiter bekommt per E-Mail einen Link, um sein Passwort selbst festzulegen.</p>':""}
+      <div class="row"><button type="button" class="btn ghost" data-x>Abbrechen</button><button class="btn primary">${isNew?"Anlegen":"Speichern"}</button></div></form>`;
+    document.body.appendChild(m);
+    const f=m.querySelector("form");m.querySelector("#fn").focus();
+    m.addEventListener("click",e=>{if(e.target===m||e.target.hasAttribute("data-x"))m.remove()});
+    f.addEventListener("submit",e=>{e.preventDefault();
+      const name=m.querySelector("#fn").value.trim(),user=m.querySelector("#fu").value.trim().toLowerCase();
+      if(!name||!/^[a-z0-9._-]{3,}$/.test(user)){NMA.toast("Bitte Name und gültigen Benutzernamen eingeben.");return}
+      if(staff.some(x=>x.user===user&&x.id!==s.id)){NMA.toast(`@${user} ist schon vergeben.`);return}
+      const data={name,user,role:m.querySelector("#fr").value,mail:m.querySelector("#fe").value.trim(),mass:m.querySelector("#fm").value,rate:Math.max(0,+m.querySelector("#frate").value||0)};
+      if(isNew){staff.push(Object.assign({id:Date.now(),status:"offline",last:"noch nie",msg:[0,0,0],rt:[0,0,0],active:true,g:"linear-gradient(145deg,#2f6f69,#123234)"},data));NMA.toast(`${name} wurde angelegt (Demo).`)}
+      else{Object.assign(s,data);NMA.toast("Gespeichert.")}
+      persist();m.remove();renderStaff();renderStats();window.MV&&MV.render()});
+  };
+
+  $("rows").addEventListener("click",e=>{
+    const ed=e.target.closest("[data-edit]"),tg=e.target.closest("[data-toggle]");
+    if(ed)form(staff.find(s=>s.id==ed.dataset.edit));
+    if(tg){const s=staff.find(x=>x.id==tg.dataset.toggle);
+      if(s.role==="Admin"&&s.active&&staff.filter(x=>x.role==="Admin"&&x.active).length===1){NMA.toast("Der letzte Admin kann nicht gesperrt werden.");return}
+      NMA.modal({title:s.active?`${s.name} sperren?`:`${s.name} freischalten?`,text:s.active?"Der Zugang wird sofort gesperrt. Statistiken bleiben erhalten.":"Der Zugang wird wieder freigegeben.",cancel:"Abbrechen",ok:s.active?"Sperren":"Freischalten",
+        onOk:()=>{s.active=!s.active;if(!s.active)s.status="offline";persist();renderStaff();renderStats();window.MV&&MV.render()}})}
+  });
+  $("add").addEventListener("click",()=>form());
+
+  $("q").addEventListener("input",renderStaff);$("fRole").addEventListener("change",renderStaff);
+  document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));
+    ["inbox","profiles","templates","mass","stats","staff","pinnwand","monitor","kunden","support","logs"].forEach(id=>$(id).hidden=b.dataset.tab!==id);}));
+  $("eCoin").addEventListener("change",e=>{const v=+e.target.value;if(v>0){ecfg.coin=v;NMA.store.set("earnCfg",ecfg);renderStats();NMA.toast("Gespeichert.")}});
+  $("range").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;range=+b.dataset.r;
+    $("range").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderStats()});
+  /* ---------- Verläufe (nur Admin, mit Zusatzcode) ---------- */
+  const logs=[
+    {id:"l1",cust:"MichaelNordlicht",profile:"GitarrenLena",msgs:[["c","Hallo! Dein Profil klingt sympathisch.","Heute 18:30"],["m","Hallo! Spielst du auch ein Instrument?","Heute 18:34","Marco B."],["c","Ein bisschen Gitarre, am liebsten draußen.","Heute 18:36"],["m","Das klingt schön 😊 Erzähl mir mehr von dir!","Heute 18:39","Marco B."]]},
+    {id:"l2",cust:"Sonnenschein63",profile:"SabineHerz",msgs:[["c","Guten Abend, wie war dein Tag?","Heute 18:20"],["m","Ganz entspannt, ich war im Garten. Und deiner?","Heute 18:25","Julia W."],["c","Lang, aber jetzt wird er besser 🙂","Heute 18:29"],["m","Das freut mich! Hast du am Wochenende schon was vor?","Heute 18:31","Sandra K."]]},
+    {id:"l3",cust:"Rolf_Kassel",profile:"MonikaHerz",msgs:[["c","Hallo Monika, wie heißt denn dein Hund?","Gestern 20:10"],["m","Er heißt Bruno und ist ein echter Schatz.","Gestern 20:22","Tim R."],["c","Schöner Name! Was für eine Rasse?","Gestern 20:24"],["m","Ein Labrador-Mischling, 6 Jahre alt.","Gestern 20:31","Tim R."]]},
+    {id:"l4",cust:"Wanderfreund",profile:"AndreaLächeln",msgs:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?","Montag 09:05"],["m","Das war an der Ostsee, im letzten Sommer.","Montag 09:12","Nicole H."]]}
+  ];
+  const audit=[];
+  let unlocked=false,curLog=null;
+  const mods=[...new Set(logs.flatMap(l=>l.msgs.filter(m=>m[0]==="m").map(m=>m[3])))];
+  $("lMod").innerHTML+=mods.map(m=>`<option>${NMA.esc(m)}</option>`).join("");
+  const renderLogs=()=>{
+    const q=$("lq").value.trim().toLowerCase(),md=$("lMod").value;
+    const all=window.ARCH?ARCH.convs(logs):logs;
+    const list=all.filter(l=>(!q||l.cust.toLowerCase().includes(q)||l.profile.toLowerCase().includes(q))&&(!md||l.msgs.some(m=>m[3]===md)));
+    $("logList").innerHTML=list.length?list.map(l=>{const ms=[...new Set(l.msgs.filter(m=>m[3]).map(m=>m[3]))];const last=l.msgs[l.msgs.length-1];
+      return `<button class="log-item ${l.id===curLog?"on":""}" data-log="${l.id}"><span class="top"><b>${NMA.esc(l.cust)}</b><small>${last[2]}</small></span><small>mit Profil „${NMA.esc(l.profile)}“ · ${l.msgs.length} Nachrichten</small><small>Geschrieben von: ${ms.map(NMA.esc).join(", ")}</small></button>`}).join(""):'<p class="empty">Keine Verläufe gefunden.</p>';
+  };
+  const showLog=id=>{const l=(window.ARCH?ARCH.convs(logs):logs).find(x=>x.id===id);if(!l)return;curLog=id;renderLogs();
+    $("logDetail").innerHTML=`<div class="log-head"><h3>${NMA.esc(l.cust)} ↔ ${NMA.esc(l.profile)}</h3><small class="muted">Kunde links · Mitarbeiter-Antworten rechts mit Namen</small>${window.ARCH?ARCH.tools(l):""}</div>
+      <div class="log-msgs">${l.msgs.map(m=>`<div class="lm ${m[0]==="m"?"mod":"cust"}"><span class="meta">${m[0]==="m"?"✎ "+NMA.esc(m[3])+" als "+NMA.esc(l.profile):NMA.esc(l.cust)} · ${m[2]}</span>${NMA.esc(m[1])}</div>`).join("")}</div>`;
+    audit.unshift(`${new Date().toTimeString().slice(0,5)} Admin hat Verlauf „${l.cust}“ geöffnet`);$("audit").textContent=audit.slice(0,3).join(" · ");
+  };
+  const setLock=u=>{unlocked=u;$("lock").hidden=u;$("logView").hidden=!u;if(u){renderLogs();audit.unshift(`${new Date().toTimeString().slice(0,5)} Bereich entsperrt`);$("audit").textContent=audit.slice(0,3).join(" · ")}else{$("pin").value="";curLog=null;$("logDetail").innerHTML='<p class="empty">Verlauf links auswählen.</p>'}};
+  $("pinForm").addEventListener("submit",e=>{e.preventDefault();
+    if(!/^\d{4,6}$/.test($("pin").value)){$("pinHint").className="hint bad";$("pinHint").textContent="Bitte 4–6 Ziffern eingeben.";return}
+    $("pinHint").className="hint";setLock(true)});
+  $("relock").addEventListener("click",()=>setLock(false));
+  $("logList").addEventListener("click",e=>{const b=e.target.closest("[data-log]");if(b)showLog(b.dataset.log)});
+  $("lq").addEventListener("input",renderLogs);$("lMod").addEventListener("change",renderLogs);
+
+  /* ---------- Rollen ---------- */
+  let me="admin";                       /* admin | marco | julia (Demo) */
+  const isAdmin=()=>me==="admin";
+  const meStaff=()=>staff.find(x=>x.user===me);
+
+  /* ======================================================
+     NACHRICHTEN · MEINE PROFILE · VORLAGEN
+     Regeln:
+     - Jedes Profil gehört genau einem Mitarbeiter. Nur er schreibt damit.
+     - Nur der Chef kann Profile verschieben (zu einem anderen Mitarbeiter oder zu sich).
+     - Kunden sehen nur diese Profile, nie andere Kunden. Kunden können nie miteinander schreiben.
+     - Vorlagen haben eine Nummer; dieselbe Vorlage geht nie zweimal an denselben Kunden.
+     ====================================================== */
+  const meKey=()=>isAdmin()?"chef":me;
+  const ownerName=u=>u==="chef"?"Chef":(staff.find(x=>x.user===u)||{name:u}).name;
+  const owners=()=>[{user:"chef",name:"Chef"}].concat(staff.filter(s=>s.active&&s.role==="Moderator").map(s=>({user:s.user,name:s.name})));
+  const profiles=NMA.profiles;
+  const saveProfiles=()=>NMA.store.set("tProfiles",profiles);
+  const prof=id=>profiles.find(p=>p.id===id);
+  const mine=p=>p&&p.owner===meKey();
+  const visibleProfile=p=>isAdmin()||mine(p);
+
+  /* Kunden (Demo). st: T = Tester (noch nichts bezahlt), K = Kunde (hat bezahlt) */
+  const customers=NMA.store.get("tCustomers",null)||{
+    "MichaelNordlicht":{nr:10482,st:"T",age:56,ort:"20095 Hamburg",job:"Elektriker",coins:5,since:"12.11.2026",look:"Beziehung"},
+    "Sonnenschein63":{nr:10217,st:"K",age:63,ort:"34508 Willingen",job:"Rentner",coins:42,since:"02.10.2026",look:"Beziehung"},
+    "Rolf_Kassel":{nr:9876,st:"K",age:59,ort:"34117 Kassel",job:"Busfahrer",coins:118,since:"14.08.2026",look:"Abenteuer"},
+    "Wanderfreund":{nr:10391,st:"T",age:61,ort:"28195 Bremen",job:"Lehrer",coins:12,since:"30.10.2026",look:"Beziehung"},
+    "Berti_K":{nr:10511,st:"T",age:67,ort:"60311 Frankfurt",job:"",coins:7,since:"15.11.2026",look:"Abenteuer"},
+    "Kalle58":{nr:10133,st:"K",age:58,ort:"34537 Bad Wildungen",job:"Landwirt",coins:22,since:"21.09.2026",look:"Abenteuer"}
+  };
+  const cust=n=>customers[n]||(customers[n]={nr:10500+Math.floor(Math.random()*400),st:"T",age:"",ort:"",job:"",coins:NMA.coins(),since:new Date().toLocaleDateString("de-DE"),look:""});
+  let notes=NMA.store.get("teamNotes",{"Rolf_Kassel":"Hat einen Garten, mag Labradore. Geburtstag im März.","Sonnenschein63":"Witwer seit 2022, sehr höflich."});
+
+  const mins=m=>Date.now()-m*60000;
+  let items=NMA.store.get("tItems",null)||[
+    {id:"q1",kind:"msg",cust:"Sonnenschein63",pid:"sabine",t:mins(9),read:false,hist:[["c","Guten Abend, wie war dein Tag?"],["m","Ganz entspannt, ich war im Garten. Und deiner?","marco"],["c","Lang, aber jetzt wird er besser 🙂 Was machst du am Wochenende?"]]},
+    {id:"q2",kind:"msg",cust:"Rolf_Kassel",pid:"monika",t:mins(4),read:false,hist:[["c","Hallo Monika, wie heißt denn dein Hund?"],["m","Er heißt Bruno und ist ein echter Schatz.","marco"],["c","Schöner Name! Gehst du morgen früh mit ihm raus?"]]},
+    {id:"q3",kind:"msg",cust:"Berti_K",pid:"petra",t:mins(2),read:false,hist:[["c","Hallo Petra, tanzt du auch Discofox?"]]},
+    {id:"q4",kind:"msg",cust:"MichaelNordlicht",pid:"lena",t:mins(6),read:true,hist:[["c","Hallo! Dein Profil klingt sympathisch."],["m","Hallo! Spielst du auch ein Instrument?","marco"],["c","Ein bisschen Gitarre. Und welche Musik hörst du am liebsten?"]]},
+    {id:"q5",kind:"msg",cust:"Wanderfreund",pid:"andrea",t:mins(1),read:false,hist:[["c","Das Foto vom Meer ist wirklich schön. Wo war das?"]]},
+    {id:"h1",kind:"heart",cust:"Kalle58",pid:"monika",t:mins(12),read:false,hist:[]},
+    {id:"h2",kind:"heart",cust:"Wanderfreund",pid:"thomas",t:mins(30),read:false,hist:[]}
+  ];
+  let sent=NMA.store.get("tSent",[]);
+  let tpls=NMA.store.get("tTpls",null)||[
+    {nr:1,owner:"marco",name:"Wochenende",text:"Das Wochenende war toll – ich war viel draußen. Was hast du so gemacht?"},
+    {nr:2,owner:"marco",name:"Danke fürs Herz",text:"Danke für dein Herz! Ich habe mich gefreut und wollte dir gleich mal Hallo sagen 😊"},
+    {nr:3,owner:"julia",name:"Guten Morgen",text:"Guten Morgen! Ich hoffe, du hast gut geschlafen. Was steht heute bei dir an?"}
+  ];
+  let tplSent=NMA.store.get("tTplSent",{"Kalle58":[{nr:2,t:mins(60*24*3),pid:"lena"}]});
+  const saveAll=()=>{NMA.store.set("tItems",items);NMA.store.set("tSent",sent);NMA.store.set("tTpls",tpls);NMA.store.set("tTplSent",tplSent);NMA.store.set("teamNotes",notes);NMA.store.set("tCustomers",customers)};
+  const tplNo=n=>"V-"+String(n).padStart(3,"0");
+  const norm=s=>s.toLowerCase().replace(/\s+/g," ").replace(/[^\p{L}\p{N} ]/gu,"").trim();
+
+  /* Herzen von der Kundenseite übernehmen */
+  const pullHearts=()=>{
+    const hs=NMA.store.get("hearts",[]);let n=0;
+    hs.forEach(h=>{if(!items.some(i=>i.id===h.id)&&prof(h.pid)){items.push({id:h.id,kind:"heart",cust:h.cust,pid:h.pid,t:h.t,read:false,hist:[]});cust(h.cust);n++}});
+    if(n){saveAll();renderQueue()}
+  };
+
+  let box="unread",rub="",cur=null,insertedTpl=null;
+  const inScope=i=>{const p=prof(i.pid);return p&&visibleProfile(p)&&(!rub||p.looking===rub)};
+  const listFor=b=>{
+    if(b==="sent")return sent.filter(s=>{const p=prof(s.pid);return p&&visibleProfile(p)&&(!rub||p.looking===rub)}).sort((a,c)=>c.t-a.t);
+    return items.filter(i=>inScope(i)&&(b==="hearts"?i.kind==="heart":i.kind==="msg"&&(b==="unread"?!i.read:i.read))).sort((a,c)=>(a.later||a.t)-(c.later||c.t));
+  };
+  const waitTxt=t=>{const m=Math.max(0,Math.round((Date.now()-t)/60000));return m<1?"gerade eben":m<60?m+" Min.":m<1440?Math.round(m/60)+" Std.":Math.round(m/1440)+" Tg."};
+  const waitCls=t=>{const m=(Date.now()-t)/60000;return m>=8?"late":m>=5?"warn":""};
+  const stBadge=c=>`<span class="kst ${c.st==="K"?"k":"t"}" title="${c.st==="K"?"Kunde – hat bezahlt":"Tester – hat noch nichts bezahlt"}">${c.st}</span>`;
+  const myQueue=()=>items.filter(i=>{const p=prof(i.pid);return i.kind==="msg"&&p&&visibleProfile(p)}).sort((a,b)=>a.t-b.t);
+
+  const renderQueue=()=>{
+    const all=items.filter(i=>{const p=prof(i.pid);return p&&visibleProfile(p)});
+    const nU=all.filter(i=>i.kind==="msg"&&!i.read).length,nR=all.filter(i=>i.kind==="msg"&&i.read).length,nH=all.filter(i=>i.kind==="heart").length;
+    $("nUnread").textContent=nU;$("nRead").textContent=nR;$("nHearts").textContent=nH;
+    $("qBadge").textContent=nU+nH;$("qBadge").hidden=!(nU+nH);
+    const list=listFor(box);
+    $("queue").innerHTML=list.length?list.map(x=>{
+      const p=prof(x.pid)||{name:"?"},c=cust(x.cust);
+      if(box==="sent")return `<div class="q-item sent"><span class="top"><b>${NMA.esc(x.cust)} ${stBadge(c)}</b><small>${waitTxt(x.t)}</small></span><small>von „${NMA.esc(p.name)}“${x.tpl?" · "+tplNo(x.tpl):""}${isAdmin()?" · ✎ "+NMA.esc(ownerName(x.by)):""}</small><small>${NMA.esc(x.text)}</small></div>`;
+      const last=x.kind==="heart"?"♥ hat dir ein Herzchen geschickt":x.hist[x.hist.length-1][1];
+      return `<button class="q-item ${x.id===cur?"on":""} ${x.kind==="heart"?"heart":""} ${!x.read?"unread":""}" data-q="${x.id}"><span class="top"><b>${NMA.esc(x.cust)} ${stBadge(c)}</b><span class="wait ${x.kind==="msg"&&!x.read?waitCls(x.t):""}">${waitTxt(x.t)}</span></span><small>an „${NMA.esc(p.name)}“ · ${p.looking} · ${c.coins} Coins</small><small>${NMA.esc(last)}</small>${isAdmin()?`<span class="assignee">Profil gehört: ${NMA.esc(ownerName(p.owner))}</span>`:""}</button>`}).join("")
+      :`<p class="empty">${box==="hearts"?"Keine neuen Herzchen.":box==="sent"?"Noch nichts gesendet.":box==="read"?"Keine gelesenen, offenen Nachrichten.":"Keine ungelesenen Nachrichten 🎉"}</p>`;
+  };
+
+  const renderTplPick=()=>{
+    const own=tpls.filter(t=>t.owner===meKey()||isAdmin());
+    $("tplPick").innerHTML='<option value="">Vorlage einfügen …</option>'+own.map(t=>`<option value="${t.nr}">${tplNo(t.nr)} · ${NMA.esc(t.name||t.text.slice(0,30))}</option>`).join("");
+  };
+  const renderInfo=x=>{
+    const c=cust(x.cust),p=prof(x.pid)||{};
+    const got=(tplSent[x.cust]||[]).map(s=>tplNo(s.nr)).join(", ")||"keine";
+    $("infoPane").innerHTML=`<h4>KUNDE</h4><div class="kv"><span>Nickname</span><b>${NMA.esc(x.cust)}</b><span>Vorname</span>${NMA.esc(c.vorname||"–")}<span>Kunden-Nr.</span>#${c.nr}<span>Status</span><span style="color:var(--ink)">${stBadge(c)} ${c.st==="K"?"Kunde (hat bezahlt)":"Tester"}</span><span>Coins</span><b style="color:var(--gold)">${c.coins}</b><span>Alter</span>${c.age||"–"}<span>Wohnort</span>${NMA.esc(c.ort||"–")}${c.ort?` <small class="muted">(${c.land||"DE"})</small>`:""}<span>PLZ-Bereich</span>${NMA.esc(NMA.region(c.land||"DE",(String(c.ort||"").match(/\d{4,5}/)||[])[0])||"–")}${window.FEIERTAGE&&FEIERTAGE.info(c.land)?`<span>Feiertag</span><b style="color:var(--gold)">${NMA.esc(FEIERTAGE.info(c.land))}</b>`:""}<span>Beruf</span>${NMA.esc(c.job||"–")}<span>Sucht</span>${c.look||"–"}<span>Dabei seit</span>${c.since||"–"}<span>Vorlagen erhalten</span>${got}</div>
+      ${isAdmin()?`<button class="btn sm" data-kcard="${NMA.esc(x.cust)}" style="margin:10px 0 4px">👤 Kundenkarte öffnen</button>`:""}
+      <h4>NOTIZEN ZUM KUNDEN <small style="font-weight:400">(für alle Mitarbeiter)</small></h4><textarea class="input" id="note" placeholder="z. B. Hobbys, Familie, worüber zuletzt gesprochen wurde">${NMA.esc(notes[x.cust]||"")}</textarea>
+      <h4>PROFIL IN DIESEM GESPRÄCH</h4><div class="kv"><span>Name</span><b>${NMA.esc(p.name||"")}</b><span>Rubrik</span>${p.sex==="m"?"Mann":"Frau"} · ${p.looking||""}<span>Alter</span>${p.age||"–"}${(()=>{const ko=NMA.wohnortModus()==="kontakt"&&NMA.kontaktOrt(p,{nick:x.cust,plz:(String(c.ort||"").match(/\d{4,5}/)||[])[0],radius:c.radius||50,city:String(c.ort||"").replace(/\d{4,5}/,"").trim(),land:c.land||"DE"});return ko?`<span>Wohnt für ihn</span><b style="color:var(--accent)">${NMA.esc(ko.ort)} (${ko.km} km)</b>`:`<span>Ort</span>${NMA.esc(p.city||"–")}`})()}<span>Beruf</span>${NMA.esc(p.job||"–")}<span>Gehört</span>${NMA.esc(ownerName(p.owner))}</div>
+      <p class="small muted" style="margin:8px 0 0">${NMA.esc(p.about||"")}</p>
+      <h4>FOTOS</h4><div id="fotoInfo"></div>`;
+    renderFotoInfo(x);
+    $("note").addEventListener("input",e=>{notes[x.cust]=e.target.value;saveAll()});
+  };
+  /* ---------- Fotos: Anfragen + Freigaben (photos.js) ---------- */
+  const renderFotoReqs=()=>{const box=$("fotoReqs");if(!box||!window.FOTO)return;
+    const open=FOTO.reqs().filter(r=>r.status==="offen"&&r.owner.startsWith("p:")&&(()=>{const p=prof(r.owner.slice(2));return p&&(isAdmin()||mine(p))})()).sort((a,b)=>a.t-b.t);
+    box.innerHTML=open.length?`<div class="card" style="padding:10px 12px;margin-bottom:10px"><b style="font-size:14px">📷 Foto-Anfragen (${open.length})</b>${open.map(r=>{const p=prof(r.owner.slice(2));return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line);font-size:14px"><span style="flex:1;min-width:160px"><b>${NMA.esc(r.viewer.slice(2))}</b> bittet <b>${NMA.esc(p.name)}</b> um ${r.type==="fsk"?"🔞 FSK-18-Freigabe":"📷 Fotofreigabe"}</span><button class="btn sm primary" data-fr-ok="${r.id}">Freigeben</button><button class="btn sm ghost" data-fr-no="${r.id}">Ablehnen</button></div>`}).join("")}</div>`:"";
+    box.querySelectorAll("[data-fr-ok]").forEach(b=>b.addEventListener("click",()=>{FOTO.decide(b.dataset.frOk,true);NMA.toast("Freigegeben – der Kunde bekommt Bescheid.");renderFotoReqs();if(cur){const x=items.find(i=>i.id===cur);x&&renderFotoInfo(x)}}));
+    box.querySelectorAll("[data-fr-no]").forEach(b=>b.addEventListener("click",()=>{FOTO.decide(b.dataset.frNo,false);renderFotoReqs()}))};
+  const renderFotoInfo=x=>{const box=$("fotoInfo");if(!box||!window.FOTO)return;const p=prof(x.pid);if(!p)return;
+    const pk="p:"+p.id,ck="c:"+x.cust,a=FOTO.access(pk,ck),can=isAdmin()||mine(p);
+    box.innerHTML=`<p class="small" style="margin:0 0 6px">Fotos von <b>${NMA.esc(p.name)}</b> für diesen Kunden:</p>
+      <label class="small" style="display:flex;gap:8px;align-items:center;min-height:32px"><input type="checkbox" id="frP" ${a.photos?"checked":""} ${can?"":"disabled"}> Private Fotos freigegeben</label>
+      <label class="small" style="display:flex;gap:8px;align-items:center;min-height:32px"><input type="checkbox" id="frF" ${a.fsk?"checked":""} ${can&&a.photos?"":"disabled"}> FSK-18-Fotos freigegeben</label>
+      <p class="small" style="margin:10px 0 6px">Fotos des Kunden (so sieht ${NMA.esc(p.name)} sie):</p><div id="frCust"></div>`;
+    FOTO.gallery($("frCust"),ck,pk,{empty:"Der Kunde hat keine weiteren Fotos."});
+    const sP=$("frP"),sF=$("frF");
+    sP.addEventListener("change",()=>{FOTO.setAccess(pk,ck,{photos:sP.checked?Date.now():0});renderFotoInfo(x)});
+    sF.addEventListener("change",()=>{FOTO.setAccess(pk,ck,{fsk:sF.checked?Date.now():0});renderFotoInfo(x)})};
+  addEventListener("storage",e=>{if(e.key==="nma_fotoReq")renderFotoReqs();if((e.key==="nma_fotoAccess"||e.key==="nma_fotos")&&cur){const x=items.find(i=>i.id===cur);x&&renderFotoInfo(x)}});
+  const openQ=id=>{
+    const x=items.find(q=>q.id===id);if(!x)return;cur=id;insertedTpl=null;
+    const p=prof(x.pid),c=cust(x.cust);
+    if(x.kind==="msg"&&!x.read){x.read=true;saveAll()}
+    $("ibxEmpty").hidden=true;$("ibxConv").hidden=false;
+    $("cTitle").textContent=`${x.cust} ↔ ${p.name}`;
+    $("cSub").textContent=x.kind==="heart"?`hat „${p.name}“ ein Herzchen geschickt – jetzt anschreiben!`:mine(p)?"Du schreibst als "+p.name:"Profil gehört "+ownerName(p.owner);
+    $("cBadges").innerHTML=`<span class="kst ${c.st==="K"?"k":"t"}">${c.st}</span><span class="nr">#${c.nr}</span><span class="coin-b">${c.coins} Coins</span>`+(x.kind==="msg"?`<span class="wait ${waitCls(x.t)}">wartet ${waitTxt(x.t)}</span>`:"");
+    $("cMsgs").innerHTML=x.kind==="heart"&&!x.hist.length?`<div class="heart-note">♥ <b>${NMA.esc(x.cust)}</b> gefällt das Profil <b>${NMA.esc(p.name)}</b>.<br><span class="muted">Er hat ein Herzchen geschickt. Schreib ihn jetzt an – z. B. mit einer Vorlage.</span></div>`
+      :x.hist.map(m=>`<div class="lm ${m[0]==="m"?"mod":"cust"}"><span class="meta">${m[0]==="m"?NMA.esc(p.name)+(isAdmin()&&m[2]?" · ✎ "+NMA.esc(ownerName(m[2])):""):NMA.esc(x.cust)}</span>${NMA.esc(m[1])}</div>`).join("");
+    $("cMsgs").scrollTop=1e6;
+    const can=mine(p);
+    $("replyForm").hidden=!can;$("ownerLock").hidden=can;
+    if(!can)$("ownerLock").innerHTML=`🔒 Dieses Profil gehört <b>${NMA.esc(ownerName(p.owner))}</b>. Nur er/sie kann damit schreiben.${isAdmin()?` <button class="btn sm" id="takeOver">Profil zu mir verschieben</button>`:""}`;
+    if(!can&&isAdmin())$("takeOver").addEventListener("click",()=>moveProfile(p,"chef",()=>openQ(id)));
+    $("sendBtn").textContent=x.kind==="heart"?"Anschreiben":"Antworten";
+    renderTplPick();renderQueue();renderInfo(x);window.FEIERTAGE&&FEIERTAGE.check(x.cust,c.land||"DE");$("reply").value="";$("charHint").textContent="0 Zeichen";
+    if(can&&innerWidth>700)$("reply").focus();
+  };
+  const hideConv=()=>{cur=null;$("ibxConv").hidden=true;$("ibxEmpty").hidden=false;$("infoPane").innerHTML='<p class="empty">Infos zu Kunde und Profil erscheinen hier.</p>'};
+
+  /* Vorlage erkennen: eingefügte Vorlage ODER Text, der einer Vorlage entspricht */
+  const detectTpl=text=>{
+    const n=norm(text);if(!n)return null;
+    if(insertedTpl){const t=tpls.find(x=>x.nr===insertedTpl);if(t&&n.includes(norm(t.text).slice(0,Math.min(40,norm(t.text).length))))return t}
+    return tpls.find(t=>{const tn=norm(t.text);return tn&&(n===tn||(tn.length>=25&&n.includes(tn))||(n.length>=25&&tn.includes(n)))})||null;
+  };
+
+  $("queue").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b)openQ(b.dataset.q)});
+  $("boxChips").addEventListener("click",e=>{const b=e.target.closest("[data-box]");if(!b)return;box=b.dataset.box;$("boxChips").querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===b));hideConv();renderQueue()});
+  document.querySelectorAll("input[name=rub]").forEach(r=>r.addEventListener("change",()=>{rub=r.value;hideConv();renderQueue()}));
+  $("tplPick").addEventListener("change",e=>{const t=tpls.find(x=>x.nr==e.target.value);if(!t)return;
+    const x=items.find(q=>q.id===cur);
+    if(x&&(tplSent[x.cust]||[]).some(s=>s.nr===t.nr)){NMA.modal({title:`${tplNo(t.nr)} schon gesendet`,text:`${NMA.esc(x.cust)} hat diese Vorlage bereits bekommen. Bitte eine andere Vorlage nehmen oder selbst schreiben.`,ok:"Verstanden"});e.target.value="";return}
+    $("reply").value=t.text;insertedTpl=t.nr;$("charHint").textContent=t.text.length+" Zeichen · "+tplNo(t.nr);e.target.value="";$("reply").focus()});
+  $("reply").addEventListener("input",e=>{$("charHint").textContent=e.target.value.length+" Zeichen"+(insertedTpl?" · "+tplNo(insertedTpl):"")});
+  $("reply").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("replyForm").requestSubmit()}});
+  $("replyForm").addEventListener("submit",e=>{e.preventDefault();
+    const v=$("reply").value.trim(),x=items.find(q=>q.id===cur);if(!x)return;
+    const p=prof(x.pid);if(!mine(p)){NMA.toast("Mit diesem Profil darfst du nicht schreiben.");return}
+    if(v.length<2){NMA.toast("Bitte eine Nachricht schreiben.");return}
+    const t=detectTpl(v);
+    if(t){const prevSent=(tplSent[x.cust]||[]).find(s=>s.nr===t.nr);
+      if(prevSent){NMA.modal({title:"Nicht gesendet – doppelte Vorlage",text:`<b>${NMA.esc(x.cust)}</b> hat <b>${tplNo(t.nr)}</b> („${NMA.esc(t.name||"Vorlage")}“) schon am ${new Date(prevSent.t).toLocaleDateString("de-DE")} von „${NMA.esc((prof(prevSent.pid)||{name:"?"}).name)}“ bekommen. Derselbe Text darf nicht zweimal an einen Kunden gehen.`,ok:"Text ändern"});return}}
+    const took=Math.max(.5,(Date.now()-x.t)/60000);
+    const st=staff.find(s=>s.user===(isAdmin()?"sandra":me));
+    if(st&&x.kind==="msg"){[0,1,2].forEach(i=>{st.rt[i]=st.msg[i]?(st.rt[i]*st.msg[i]+took)/(st.msg[i]+1):took;st.msg[i]++});persist()}
+    if(t)(tplSent[x.cust]=tplSent[x.cust]||[]).push({nr:t.nr,t:Date.now(),pid:x.pid});
+    sent.push({id:"s"+Date.now(),cust:x.cust,pid:x.pid,text:v,t:Date.now(),by:meKey(),tpl:t?t.nr:null});
+    window.ARCH&&ARCH.addConv(x.cust,p,x.hist,v,isAdmin()?"Chef":ownerName(me),x.t);
+    /* Live an den Kunden (Demo: angemeldeter Test-Kunde in einem anderen Tab; Server: WebSocket) */
+    if(x.cust===NMA.user().nick){const cm=NMA.store.get("custMsgs",[]);cm.push({id:"r"+Date.now(),to:x.cust,pid:x.pid,text:v,t:Date.now(),read:false});NMA.store.set("custMsgs",cm.slice(-500))}
+    items=items.filter(q=>q.id!==cur);saveAll();
+    NMA.toast(x.kind==="heart"?`${x.cust} wurde angeschrieben.`:`Antwort gesendet (${took.toFixed(1).replace(".",",")} Min.)`);
+    const next=listFor(box)[0];next?openQ(next.id):(hideConv(),renderQueue());renderStats();renderTpls();
+  });
+  $("skip").addEventListener("click",()=>{const x=items.find(q=>q.id===cur);if(!x)return;x.later=Date.now();saveAll();const next=listFor(box).find(q=>q.id!==x.id);next?openQ(next.id):hideConv();renderQueue();NMA.toast("Zurückgestellt – ans Ende der Liste.")});
+
+  /* ---------- Meine Profile ---------- */
+  const groups=[["w","Beziehung","Frauen · Beziehung"],["w","Abenteuer","Frauen · Abenteuer"],["m","Beziehung","Männer · Beziehung"],["m","Abenteuer","Männer · Abenteuer"]];
+  let pOwnerSel="";
+  const renderProfiles=()=>{
+    const q=$("pq").value.trim().toLowerCase(),o=isAdmin()?pOwnerSel:meKey();
+    $("pOwner").innerHTML='<option value="">Alle Mitarbeiter</option>'+owners().map(x=>`<option value="${x.user}" ${x.user===o?"selected":""}>${NMA.esc(x.name)}</option>`).join("");
+    $("pRule").textContent=isAdmin()?"Als Chef siehst du alle Profile und kannst sie einem anderen Mitarbeiter oder dir selbst zuteilen.":"Diese Profile gehören nur dir – kein anderer Mitarbeiter kann mit ihnen schreiben.";
+    const list=profiles.filter(p=>(!o||p.owner===o)&&(!q||p.name.toLowerCase().includes(q)||(p.city||"").toLowerCase().includes(q)));
+    $("pGroups").innerHTML=groups.map(([sx,lk,title])=>{const g=list.filter(p=>p.sex===sx&&p.looking===lk);
+      return `<section class="pgroup"><h3>${title} <span class="muted small">${g.length}</span></h3>${g.length?`<div class="pcards">${g.map(p=>{const open=items.filter(i=>i.pid===p.id).length;
+        return `<article class="card pcard">${NMA.avatar(p,"lg",false)}<div class="grow"><b>${NMA.esc(p.name)}, ${p.age}</b><small>${NMA.esc(p.city||"")}${p.job?" · "+NMA.esc(p.job):""}</small><small>${open?`<span style="color:var(--accent)">${open} offen</span> · `:""}${isAdmin()?"gehört "+NMA.esc(ownerName(p.owner)):"dein Profil"}</small></div>
+        <div class="pacts"><button class="btn sm" data-pedit="${p.id}">Bearbeiten</button>${isAdmin()||mine(p)?`<button class="btn sm" data-pfoto="${p.id}">📷 Fotos</button>`:""}${isAdmin()?`<select class="input sm-sel" data-pmove="${p.id}" aria-label="Profil verschieben">${owners().map(x=>`<option value="${x.user}" ${x.user===p.owner?"selected":""}>→ ${NMA.esc(x.name)}</option>`).join("")}</select>`:""}</div></article>`}).join("")}</div>`:'<p class="muted small" style="margin:6px 0 0">Noch keine Profile.</p>'}</section>`}).join("");
+  };
+  const moveProfile=(p,to,done)=>{
+    if(!isAdmin())return;
+    NMA.modal({title:"Profil verschieben?",text:`„${NMA.esc(p.name)}“ geht von ${NMA.esc(ownerName(p.owner))} an <b>${NMA.esc(ownerName(to))}</b>. Offene Nachrichten an dieses Profil wandern mit.`,cancel:"Abbrechen",ok:"Verschieben",
+      onOk:()=>{p.owner=to;saveProfiles();renderProfiles();renderQueue();NMA.toast(`„${p.name}“ gehört jetzt ${ownerName(to)}.`);done&&done()}});
+    renderProfiles();
+  };
+  const profileForm=p=>{
+    const isNew=!p;p=p||{sex:"w",looking:"Beziehung",age:"",city:"",job:"",about:"",tags:[],height:"",status:"Single"};
+    const m=document.createElement("div");m.className="modal form-modal";
+    m.innerHTML=`<form class="card" novalidate style="max-height:92svh;overflow:auto"><h2>${isNew?"Profil anlegen":"Profil bearbeiten"}</h2>
+      <div class="form-grid" style="margin-top:14px">
+        <div class="field full"><label for="pn">Nickname</label><input class="input" id="pn" required maxlength="30" value="${NMA.esc(p.name||"")}"><span class="hint" id="pnh">Ohne Leerzeichen, jeder Name nur einmal, z. B. „BlondeCarola“.</span></div>
+        <div class="field"><span class="label">Geschlecht</span><div class="seg"><label><input type="radio" name="psx" value="w" ${p.sex!=="m"?"checked":""}> Frau</label><label><input type="radio" name="psx" value="m" ${p.sex==="m"?"checked":""}> Mann</label></div></div>
+        <div class="field"><span class="label">Sucht</span><div class="seg"><label><input type="radio" name="plk" value="Beziehung" ${p.looking!=="Abenteuer"?"checked":""}> Beziehung</label><label><input type="radio" name="plk" value="Abenteuer" ${p.looking==="Abenteuer"?"checked":""}> Abenteuer</label></div></div>
+        <div class="field"><label for="pa">Alter</label><input class="input" id="pa" type="number" min="18" max="99" required value="${p.age||""}"></div>
+        <div class="field"><label for="pc">Ort</label><input class="input" id="pc" required value="${NMA.esc(p.city||"")}"></div>
+        <div class="field"><label for="pland">Land</label><select class="input" id="pland">${Object.entries(NMA.LAND).map(([k,L])=>`<option value="${k}" ${(p.land||"DE")===k?"selected":""}>${L.name}</option>`).join("")}</select></div>
+        <div class="field"><label for="pz">PLZ</label><input class="input" id="pz" inputmode="numeric" maxlength="5" value="${NMA.esc(p.plz||"")}"><span class="hint">Nur nötig bei „fester Ort“ (Massenversand)</span></div>
+        <div class="field"><label for="pj">Beruf</label><input class="input" id="pj" value="${NMA.esc(p.job||"")}"></div>
+        <div class="field"><label for="ps">Familienstand</label><select class="input" id="ps">${["Single","Geschieden","Verwitwet","Getrennt lebend"].map(x=>`<option ${x===p.status?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div class="field full"><label for="pab">Über mich</label><textarea class="input" id="pab" maxlength="800">${NMA.esc(p.about||"")}</textarea></div>
+        <div class="field full"><label for="pt">Interessen</label><input class="input" id="pt" value="${NMA.esc((p.tags||[]).join(", "))}" placeholder="Tanzen, Kochen, Reisen"></div>
+        ${isAdmin()?`<div class="field full"><label for="po">Gehört</label><select class="input" id="po">${owners().map(x=>`<option value="${x.user}" ${(p.owner||"chef")===x.user?"selected":""}>${NMA.esc(x.name)}</option>`).join("")}</select></div>`:""}
+      </div>
+      <div class="row">${!isNew&&isAdmin()?'<button type="button" class="btn danger" data-del style="margin-right:auto">Löschen</button>':""}<button type="button" class="btn ghost" data-x>Abbrechen</button><button class="btn primary">${isNew?"Anlegen":"Speichern"}</button></div></form>`;
+    document.body.appendChild(m);m.querySelector("#pn").focus();
+    m.addEventListener("click",e=>{if(e.target===m||e.target.hasAttribute("data-x"))m.remove()});
+    const del=m.querySelector("[data-del]");if(del)del.addEventListener("click",()=>{if(items.some(i=>i.pid===p.id)){NMA.toast("Profil hat noch offene Nachrichten – erst beantworten oder verschieben.");return}
+      const i=profiles.indexOf(p);profiles.splice(i,1);saveProfiles();m.remove();renderProfiles();NMA.toast("Profil gelöscht.")});
+    m.querySelector("form").addEventListener("submit",e=>{e.preventDefault();
+      const name=m.querySelector("#pn").value.trim(),age=+m.querySelector("#pa").value,city=m.querySelector("#pc").value.trim();
+      if(!NMA.nickOk(name)){m.querySelector("#pnh").className="hint bad";m.querySelector("#pnh").textContent="3–30 Zeichen, keine Leerzeichen (nur Buchstaben, Ziffern, _ - .).";return}
+      const taken=profiles.some(x=>x!==p&&x.name.toLowerCase()===name.toLowerCase())||Object.keys(customers).some(c=>c.toLowerCase()===name.toLowerCase())||(isNew||name.toLowerCase()!==(p.name||"").toLowerCase())&&!NMA.nickFree(name);
+      if(taken){m.querySelector("#pnh").className="hint bad";m.querySelector("#pnh").textContent=`„${name}“ ist schon vergeben.`;return}
+      if(!(age>=18&&age<=99)){NMA.toast("Alter muss zwischen 18 und 99 liegen.");return}
+      if(!city){NMA.toast("Bitte einen Ort eingeben.");return}
+      const land=m.querySelector("#pland").value,plz=m.querySelector("#pz").value.trim();if(plz&&!NMA.plzOk(land,plz)){NMA.toast(`Die PLZ muss ${NMA.LAND[land].len} Ziffern haben (${NMA.LAND[land].name}).`);return}
+      const data={name,age,city,sex:m.querySelector("input[name=psx]:checked").value,looking:m.querySelector("input[name=plk]:checked").value,job:m.querySelector("#pj").value.trim(),status:m.querySelector("#ps").value,about:m.querySelector("#pab").value.trim(),tags:m.querySelector("#pt").value.split(",").map(s=>s.trim()).filter(Boolean),plz,land};
+      if(isAdmin())data.owner=m.querySelector("#po").value;
+      if(isNew){const grads=["#c0796a,#4a2b2e","#8a6aa8,#2c2240","#c79a54,#4b3517","#4f8f87,#173a37","#b0566f,#3b1825","#5b7aa0,#1c2a3c"];
+        profiles.push(Object.assign({id:"p"+Date.now(),owner:meKey(),km:5+Math.floor(Math.random()*40),online:true,height:"",g:`linear-gradient(145deg,${grads[profiles.length%grads.length]})`},data));NMA.toast(`Profil „${name}“ angelegt – Kunden sehen es jetzt in der Suche.`)}
+      else{Object.assign(p,data);NMA.toast("Profil gespeichert.")}
+      saveProfiles();m.remove();renderProfiles();renderQueue()});
+  };
+  $("pAdd").addEventListener("click",()=>profileForm());
+  $("pq").addEventListener("input",renderProfiles);$("pOwner").addEventListener("change",e=>{pOwnerSel=e.target.value;renderProfiles()});
+  $("pGroups").addEventListener("click",e=>{const b=e.target.closest("[data-pedit]");if(b)profileForm(prof(b.dataset.pedit));
+    const f=e.target.closest("[data-pfoto]");if(f&&window.FOTO){const p=prof(f.dataset.pfoto),m=document.createElement("div");m.className="modal form-modal";
+      m.innerHTML=`<div class="card" style="max-width:620px;width:100%;max-height:92svh;overflow:auto"><h2>Fotos von ${NMA.esc(p.name)}</h2><p class="muted small" style="margin:0 0 12px">Hauptfoto bleibt das Profilbild. Hier legst du fest, welche Fotos alle sehen, welche nur nach Freigabe und welche FSK 18 sind.</p><div id="pfm"></div><div class="row"><button class="btn primary" data-x>Fertig</button></div></div>`;
+      document.body.appendChild(m);FOTO.manager(m.querySelector("#pfm"),"p:"+p.id);m.addEventListener("click",ev=>{if(ev.target===m||ev.target.hasAttribute("data-x"))m.remove()})}});
+  $("pGroups").addEventListener("change",e=>{const s=e.target.closest("[data-pmove]");if(s){const p=prof(s.dataset.pmove);if(s.value!==p.owner)moveProfile(p,s.value)}});
+
+  /* ---------- Vorlagen ---------- */
+  let editTpl=null;
+  const renderTpls=()=>{
+    const list=tpls.filter(t=>isAdmin()||t.owner===meKey()).sort((a,b)=>b.nr-a.nr);
+    $("tplListTitle").textContent=isAdmin()?"Alle Vorlagen":"Meine Vorlagen";
+    $("tplList").innerHTML=list.length?list.map(t=>{const uses=Object.values(tplSent).filter(a=>a.some(s=>s.nr===t.nr)).length;
+      return `<article class="tpl"><div class="tpl-top"><span class="tpl-nr">${tplNo(t.nr)}</span><b>${NMA.esc(t.name||"Vorlage")}</b>${isAdmin()?`<small class="muted">· ${NMA.esc(ownerName(t.owner))}</small>`:""}<small class="muted" style="margin-left:auto">an ${uses} Kunde${uses===1?"":"n"} gesendet</small></div><p>${NMA.esc(t.text)}</p><div class="tpl-acts"><button class="btn sm" data-tedit="${t.nr}">Bearbeiten</button><button class="btn sm ghost" data-tdel="${t.nr}">Löschen</button></div></article>`}).join(""):'<p class="empty">Noch keine Vorlagen.</p>';
+    renderTplPick();
+  };
+  const resetTplForm=()=>{editTpl=null;$("tplForm").reset();$("tplFormTitle").textContent="Neue Vorlage";$("tplSave").textContent="Vorlage speichern";$("tplCancel").hidden=true};
+  $("tplForm").addEventListener("submit",e=>{e.preventDefault();
+    const text=$("tplText").value.trim(),name=$("tplName").value.trim();
+    if(text.length<10){NMA.toast("Der Text ist zu kurz (mind. 10 Zeichen).");return}
+    const dup=tpls.find(t=>t!==editTpl&&norm(t.text)===norm(text));
+    if(dup){NMA.toast(`Diesen Text gibt es schon als ${tplNo(dup.nr)}.`);return}
+    if(editTpl){Object.assign(editTpl,{text,name});NMA.toast(`${tplNo(editTpl.nr)} gespeichert.`)}
+    else{const nr=Math.max(0,...tpls.map(t=>t.nr))+1;tpls.push({nr,owner:meKey(),name,text});NMA.toast(`Vorlage ${tplNo(nr)} angelegt.`)}
+    saveAll();resetTplForm();renderTpls()});
+  $("tplCancel").addEventListener("click",resetTplForm);
+  $("tplList").addEventListener("click",e=>{const ed=e.target.closest("[data-tedit]"),dl=e.target.closest("[data-tdel]");
+    if(ed){editTpl=tpls.find(t=>t.nr==ed.dataset.tedit);$("tplName").value=editTpl.name||"";$("tplText").value=editTpl.text;$("tplFormTitle").textContent="Vorlage "+tplNo(editTpl.nr)+" bearbeiten";$("tplSave").textContent="Speichern";$("tplCancel").hidden=false;$("tplText").focus()}
+    if(dl){const t=tpls.find(x=>x.nr==dl.dataset.tdel);NMA.modal({title:`${tplNo(t.nr)} löschen?`,text:"Die Nummer wird nicht neu vergeben. Bereits gesendete Vorlagen bleiben gespeichert, damit die Doppel-Sperre weiter greift.",cancel:"Abbrechen",ok:"Löschen",onOk:()=>{tpls=tpls.filter(x=>x!==t);saveAll();renderTpls()}})}});
+
+  /* Live: Kundennachrichten kommen sofort in den Posteingang (Demo: aus einem Kunden-Tab; Server: WebSocket) */
+  const pullInbox=()=>{
+    const q=NMA.store.get("inboxQ",[]),seenQ=new Set(NMA.store.get("inboxSeen",[]));let n=0,last=null;
+    q.forEach(m=>{if(seenQ.has(m.id))return;seenQ.add(m.id);const p=prof(m.pid);if(!p)return;cust(m.cust);
+      let it=items.find(i=>i.kind==="msg"&&i.cust===m.cust&&i.pid===m.pid);
+      if(it){it.hist.push(["c",m.text]);it.read=false}
+      else{let hist=[];if(window.ARCH){const cv=ARCH.convs(logs).find(c=>c.cust===m.cust&&c.profile===p.name);if(cv)hist=cv.msgs.slice(-8).map(x=>x[0]==="m"?["m",x[1],x[3]]:["c",x[1]])}
+        hist.push(["c",m.text]);it={id:"q"+m.id,kind:"msg",cust:m.cust,pid:m.pid,t:m.t,read:false,hist};items.push(it)}
+      n++;last={m,p}});
+    NMA.store.set("inboxSeen",[...seenQ].slice(-600));
+    if(n){saveAll();renderQueue();if(cur){const x=items.find(i=>i.id===cur);if(x&&x.cust===last.m.cust&&x.pid===last.m.pid){$("cMsgs").insertAdjacentHTML("beforeend",`<div class="lm cust"><span class="meta">${NMA.esc(x.cust)} · gerade eben</span>${NMA.esc(last.m.text)}</div>`);$("cMsgs").scrollTop=1e6}}
+      NMA.toast(`💬 Neue Nachricht von ${last.m.cust} an „${last.p.name}“`)}
+  };
+  addEventListener("storage",e=>{if(e.key==="nma_hearts")pullHearts();if(e.key==="nma_inboxQ")pullInbox()});
+  setInterval(()=>{pullHearts();pullInbox();renderQueue()},20000);
+  setInterval(()=>NMA.store.set("teamAlive",Date.now()),4000);NMA.store.set("teamAlive",Date.now());
+  pullHearts();pullInbox();renderFotoReqs();setInterval(renderFotoReqs,20000);
+
+  /* ---------- Rollenansicht anwenden ---------- */
+  const applyRole=()=>{
+    const a=isAdmin();
+    document.querySelectorAll("[data-admin]").forEach(b=>b.hidden=!a);
+    $("onCard").hidden=!a;document.querySelector(".kpis").classList.toggle("three",!a);
+    $("perMod").hidden=!a;
+    $("lMsg").textContent=a?"Beantwortete Nachrichten (alle)":"Deine beantworteten Nachrichten";
+    $("lTime").textContent=a?"Ø Antwortzeit (alle)":"Deine Ø Antwortzeit";
+    $("lWait").textContent=a?"Wartende Nachrichten (alle)":"Deine wartenden Nachrichten";
+    $("hTitle").textContent=a?"Eingehende Nachrichten nach Uhrzeit":"Eingehende Nachrichten für deine Profile";
+    $("hSub").textContent=a?"Alle Profile – hilft bei der Schichtplanung":"Nur Nachrichten an die Profile, die du betreust";
+    $("pTitle").textContent=a?"Mitarbeiterbereich":"Hallo "+(meStaff()||{name:""}).name.split(" ")[0]+"!";
+    $("pSub").textContent=a?"Nachrichten, Profile, Vorlagen, Statistik und Team.":"Deine Nachrichten, Profile, Vorlagen und Zahlen.";
+    if(!a){setLock(false);const vis=document.querySelector("[data-tab].on");if(vis&&vis.hidden)document.querySelector('[data-tab="inbox"]').click()}
+    $("tabProf").textContent=a?"Profile":"Meine Profile";
+    hideConv();renderQueue();renderStats();renderProfiles();renderTpls();resetTplForm();typeof renderFotoReqs==='function'&&renderFotoReqs();
+    window.MV&&MV.render();window.SUP&&SUP.render();window.KD&&KD.render();window.ADM&&ADM.render();
+  };
+  $("viewAs").addEventListener("change",e=>{me=e.target.value;applyRole();NMA.toast(isAdmin()?"Ansicht: Chef (Admin)":"Ansicht: "+ownerName(me)+" (Moderator)")});
+
+  /* Schnittstelle für massenversand.js */
+  window.TEAM={renderLogs,logs,get me(){return me},isAdmin,meKey,ownerName,owners,get staff(){return staff},persistStaff:()=>{persist();renderStaff()},
+    profiles,customers,cust,get notes(){return notes},get sent(){return sent},get items(){return items},saveAll,renderQueue,renderStaff};
+
+  renderStats();renderStaff();applyRole();
+
+  /* Angemeldeter Mitarbeiter (Login über das Team-Portal team/index.html). Ohne Anmeldung → zum Portal. */
+  {const tu=NMA.store.get("teamUser",null),s=tu&&staff.find(x=>x.user===tu&&x.active);
+    if(!s){document.body.style.visibility="hidden";location.replace("team/index.html")}
+    if(s){const v=s.role==="Admin"?"admin":s.user;
+      if(![...$("viewAs").options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=`${s.name} (${s.role})`;$("viewAs").appendChild(o)}
+      $("viewAs").value=v;me=v;applyRole()}}
+  {const b=$("teamApp");b.hidden=NMA.install.standalone();b.addEventListener("click",()=>NMA.installApp());}
+  $("teamLogout").addEventListener("click",()=>{const tu=NMA.store.get("teamUser",null),lg=NMA.store.get("staffLog",[]),o=lg.slice().reverse().find(l=>l.user===tu&&!l.out);if(o){o.out=Date.now();NMA.store.set("staffLog",lg)}NMA.store.set("teamUser",null)});
+}</script>
+<script src="massenversand.js"></script>
+<script src="support.js"></script>
+<script src="kunden.js"></script>
+<script src="archiv.js"></script>
+<script src="feiertage.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -34,7 +34,7 @@
 <script src="app.js"></script>
 <script src="eingaenge.js"></script>
 <script>{
-  /* Kunden-Anmeldung. Mitarbeiter haben ein eigenes Team-Portal (portal.html, eigene Domain). */
+  /* Kunden-Anmeldung. Mitarbeiter haben ein eigenes Team-Portal (team/index.html, eigene Domain). */
   if(NMA.param("gesperrt"))NMA.toast("5× falsche PIN – bitte mit Passwort anmelden und eine neue PIN festlegen.");
   else if(NMA.param("pinvergessen"))NMA.toast("Melde dich mit deinem Passwort an – danach legst du eine neue PIN fest.");
   const f=document.getElementById("loginForm"),nick=document.getElementById("nick"),pw=document.getElementById("pw");

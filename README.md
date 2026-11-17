@@ -255,3 +255,8 @@ Stand 17.11.2026 – Team-App
   sw-team.js). Knopf „📲 Team-App installieren“ auf der Portal-Anmeldung und „📲 App installieren“ oben im Team-Bereich;
   auf iPhone/iPad Anleitung über Safari → Teilen → Zum Home-Bildschirm. Die App startet im Team-Bereich (Anmeldung nötig).
 - Auf der gemeinsamen Testseite haben Kunden- und Team-App getrennte Service-Worker-Bereiche (/ und /team).
+
+## Stand 17.11.2026 – Team-Portal im eigenen Ordner `/team/`
+- Team-Portal liegt jetzt unter `team/` (Anmeldung `team/index.html`, Arbeitsbereich `team/team.html`, eigenes Manifest und eigener Service Worker mit Bereich `/team/`).
+- Dadurch lassen sich Kunden-App und Team-App auf derselben Adresse **beide** installieren (Edge/Chrome: Installieren-Symbol in der Adressleiste, getrennte Apps in der Taskleiste).
+- Alte Adressen `portal.html` und `team.html` leiten automatisch weiter.

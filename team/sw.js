@@ -1,4 +1,4 @@
-/* Service Worker für die Team-App (Team-Portal). Speichert nichts zwischen – Kundendaten bleiben auf dem Server.
+/* Service Worker für die Team-App (Ordner /team/ – eigener Bereich, getrennt von der Kunden-App). Speichert nichts zwischen – Kundendaten bleiben auf dem Server.
    Nur nötig, damit sich das Portal als App installieren lässt. */
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", e => e.waitUntil(self.clients.claim()));
